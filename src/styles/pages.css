@@ -1,0 +1,43 @@
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.container {
+  position: relative;
+  background-color: var(--bg-light);
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 10px;
+  margin-bottom: 80px;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px var(--shadow-color);
+  padding: 30px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+}
+
+.botao-flutuante {
+  background-color: var(--bg-light);
+  position: absolute;
+  top: 8px;
+  right: 20px;
+  padding: 10px;
+  border-radius: 50%;
+  border: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.botao-flutuante:hover {
+  transform: scale(1.2);
+}
+
+.botao-flutuante i {
+  color: #ff0000;
+  font-size: 22px;
+}
