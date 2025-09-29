@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { useIMask } from 'react-imask';
+import IMask from 'imask';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import '../styles/pages.css';
 
 function RegisterCustomer() {
   const navigate = useNavigate();
+  const celularInputRef = useRef(null);
   const [formData, setFormData] = useState({
     cliente: '',
     celular: '',
@@ -19,18 +20,29 @@ function RegisterCustomer() {
   });
   const [errors, setErrors] = useState({});
 
-  const { ref: celularRef } = useIMask({
-    mask: '(00) 00000-0000',
-  });
+  useEffect(() => {
+    if (celularInputRef.current) {
+      const maskInstance = IMask(celularInputRef.current, {
+        mask: '(00) 00000-0000',
+      });
+
+      maskInstance.on('accept', () => {
+        setFormData((prev) => ({ ...prev, celular: maskInstance.value }));
+      });
+
+      return () => maskInstance.destroy();
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    if (name !== 'celular') {
+      setFormData({ ...formData, [name]: value });
+    }
     if (errors[name]) {
       setErrors({ ...errors, [name]: '' });
     }
   };
-
   const validate = () => {
     const newErrors = {};
 
@@ -114,7 +126,7 @@ function RegisterCustomer() {
             value={formData.celular}
             onChange={handleChange}
             error={errors.celular}
-            ref={celularRef}
+            ref={celularInputRef}
           />
 
           <Input
