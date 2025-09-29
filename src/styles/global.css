@@ -1,0 +1,252 @@
+/* ICONS BOOTSTRAP */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css");
+/* FONT GOOGLE */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+:root {
+  --btn: #007bff;
+  --btn-hover: #007bffc9;
+  --zap-icon: #25d366;
+  --btn-text:#ffff;
+  --error-color: #dc3545;
+  --text-color: #1a1a1a;
+  --bg-light: #ffffff;
+  --bg-input: #f1f1f1;
+  --shadow-color: #3333332c;
+  --modal-shadow: #66666636;
+  --font-primary: "Poppins", sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #3333333b;
+  font-family: var(--font-primary);
+  width: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 50px;
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.destaque {
+  color: #ff0000;
+}
+
+input {
+  padding: 22px;
+  width: 100%;
+  border: none;
+  outline: none;
+  background-color: var(--bg-input);
+  border-radius: 5px;
+  margin: 10px auto;
+  font-size: 16px;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 50px;
+  font-style: italic;
+  color: var(--bg-light);
+  font-size: 18px;
+  font-weight: bolder;
+  text-shadow: 1px 1px var(--shadow-color);
+}
+
+/* CAMPO ERROR*/
+.msg-erro {
+  font-size: 13px;
+  color: var(--error-color);
+  margin-bottom: 10px;
+}
+
+.input-erro {
+  border: solid 1px var(--error-color);
+}
+
+.resultadoDaBusca p {
+  color: var(--error-color);
+}
+
+/* CLIENTE DIV */
+.cliente-item {
+  position: relative;
+  color: var(--text-color);
+  font-size: 22px;
+  padding: 5px;
+  margin: 10px auto;
+  background-color: var(--bg-input);
+}
+
+.msg-erro span {
+  font-size: 13px;
+  padding: 0 5px 0 2px;
+}
+
+/* BTN FLUTUANTE */
+button.btn {
+  padding: 10px;
+  border: none;
+  border-radius: 3px;
+  width: 100%;
+  margin-top: 20px;
+  color: var(--btn-text);
+  background-color: var(--btn);
+  font-size: 20px;
+  letter-spacing: 4px;
+}
+
+button:hover {
+  background-color: var(--btn-hover);
+  cursor: pointer;
+}
+
+button.botao-flutuante {
+  background-color: var(--bg-light);
+  position: absolute;
+  top: 8px;
+  right: 20px;
+  padding: 10px;
+  border-radius: 50%;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+button.botao-flutuante:hover {
+  transform: scale(1.2);
+}
+
+.botao-flutuante i {
+  color: #ff0000;
+  font-size: 22px;
+}
+
+/* CONTAINER BUSCAR */
+.container {
+  position: relative;
+  background-color: var(--bg-light);
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 10px;
+  margin-bottom: 80px;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px var(--shadow-color);
+  padding: 30px;
+}
+
+.container.buscar {
+  padding: 30px;
+}
+
+/* MODAL BUSCAR */
+.container-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+
+.btn-container-modal {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+}
+
+.modal button {
+  padding: 6px 35px;
+  margin-top: 60px;
+  border: none;
+  border-radius: 3px;
+  color: var(--btn-text);
+  background-color: var(--btn);
+  font-size: 20px;
+}
+
+.modal button:hover {
+  background-color: var(--btn-hover);
+}
+
+.modal {
+  position: fixed; /* Fixa o modal na tela */
+  top: 3%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.9); /* Centraliza corretamente */
+  visibility: hidden;
+  opacity: 0;
+  background-color: var(--bg-light);
+  padding: 20px;
+  max-width: 450px;
+  height: 160px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 10px var(--modal-shadow);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s 0.3s;
+  z-index: 9999;
+}
+
+.modal.ativo {
+  visibility: visible;
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+@keyframes mostrarModal {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes esconderModal {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+}
+/* ICONES PG BUSCAR */
+.icon-zap {
+  margin-left: 10px;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--zap-icon);
+  transition: all 0.2s ease;
+}
+
+.icon-zap:hover {
+  transform: scale(1.2);
+}
+
+.icon-lixo {
+  color: var(--text-color);
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  margin-left: 12rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-lixo:hover {
+  transform: scale(1.2);
+}
