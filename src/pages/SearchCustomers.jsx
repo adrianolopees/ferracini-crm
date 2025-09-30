@@ -9,6 +9,7 @@ import {
   doc,
 } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { useAuth } from '../hooks/useAuth';
 import Input from '../components/ui/Input';
 import Modal from '../components/ui/Modal';
 import '../styles/pages.css';
@@ -20,6 +21,7 @@ function SearchCustomers() {
   const [customers, setCustomers] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const { logout } = useAuth();
 
   const handleSearch = async (e) => {
     const value = e.target.value;
@@ -151,6 +153,7 @@ function SearchCustomers() {
         >
           <i className="bi bi-arrow-left-circle"></i>
         </button>
+        <button onClick={() => logout()}>Sair</button>
       </div>
 
       <Modal
