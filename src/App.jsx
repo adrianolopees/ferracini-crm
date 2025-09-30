@@ -7,7 +7,7 @@ import SearchCustomers from './pages/SearchCustomers';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/cadastro" replace />} />
+      <Route path="/" element={<Navigate to="/register" replace />} />
       <Route path="/register" element={<RegisterCustomer />} />
       <Route path="/search" element={<SearchCustomers />} />
     </Routes>
