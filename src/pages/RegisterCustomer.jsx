@@ -116,6 +116,7 @@ function RegisterCustomer() {
             value={formData.cliente}
             onChange={handleChange}
             error={errors.cliente}
+            required
           />
 
           <Input
@@ -127,6 +128,7 @@ function RegisterCustomer() {
             onChange={handleChange}
             error={errors.celular}
             ref={celularInputRef}
+            required
           />
 
           <Input
@@ -136,6 +138,7 @@ function RegisterCustomer() {
             value={formData.modelo}
             onChange={handleChange}
             error={errors.modelo}
+            required
           />
 
           <Input
@@ -145,6 +148,7 @@ function RegisterCustomer() {
             value={formData.referencia}
             onChange={handleChange}
             error={errors.referencia}
+            required
           />
 
           <Input
@@ -157,6 +161,7 @@ function RegisterCustomer() {
             error={errors.numeracao}
             min="37"
             max="47"
+            required
           />
 
           <Input
@@ -166,6 +171,7 @@ function RegisterCustomer() {
             value={formData.cor}
             onChange={handleChange}
             error={errors.cor}
+            required
           />
 
           <Button type="submit">Salvar</Button>
