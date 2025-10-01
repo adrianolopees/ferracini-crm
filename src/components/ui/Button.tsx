@@ -1,8 +1,13 @@
 import './Button.css';
+import type { ReactNode } from 'react';
 
-function Button({ children, onClick, type = 'button', className = '' }) {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
+}
+
+function Button({ children, className = '', ...props }: ButtonProps) {
   return (
-    <button type={type} onClick={onClick} className={`btn ${className}`}>
+    <button className={`btn ${className}`} {...props}>
       {children}
     </button>
   );
