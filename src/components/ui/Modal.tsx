@@ -1,11 +1,19 @@
 import './Modal.css';
 
-function Modal({ isOpen, onConfirm, onCancel, title }) {
+interface ModalProps {
+  isOpen: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  onClose: () => void;
+  title?: string;
+}
+
+function Modal({ isOpen, title, onClose, onConfirm, onCancel }: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="container-modal">
-      <div className="modal ativo">
+    <div className="container-modal" onClick={onClose}>
+      <div className="modal ativo" onClick={(e) => e.stopPropagation()}>
         <h3>{title}</h3>
         <div className="btn-container-modal">
           <button className="sim" onClick={onConfirm}>

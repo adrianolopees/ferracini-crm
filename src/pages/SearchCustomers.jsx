@@ -160,6 +160,7 @@ function SearchCustomers() {
         isOpen={modalOpen}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
+        onClose={handleCancelDelete}
         title="Você já mandou Msg pro cliente?"
       />
     </div>
