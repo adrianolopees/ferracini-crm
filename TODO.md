@@ -14,11 +14,11 @@
 
 ## 🔜 Fase 2 - Segurança & Backend
 
-- [ ] Implementar autenticação (Firebase Auth)
-- [ ] Criar tela de login
-- [ ] Proteger rotas (apenas usuários autenticados)
-- [ ] Melhorar regras de segurança do Firestore
-- [ ] Adicionar Firebase Functions (opcional)
+- [x] Implementar autenticação (Firebase Auth)
+- [x] Criar tela de login
+- [x] Proteger rotas (apenas usuários autenticados)
+- [x] Melhorar regras de segurança do Firestore
+- [x] Adicionar Firebase Functions (opcional)
 
 ## 🔜 Fase 3 - Qualidade
 
