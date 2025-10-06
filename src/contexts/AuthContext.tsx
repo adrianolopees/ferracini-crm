@@ -1,15 +1,27 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, ReactNode } from 'react';
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signOut,
+  User,
 } from 'firebase/auth';
 import { auth } from '../services/firebase';
 
-const AuthContext = createContext({});
+interface AuthProviderProps {
+  children?: ReactNode;
+}
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+interface AuthContextType {
+  user: User | null;
+  login: (email: string, password: string) => Promise<any>;
+  logout: () => Promise<void>;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +31,7 @@ export function AuthProvider({ children }) {
     });
     return unsubscribe;
   }, []);
-  const login = (email, password) => {
+  const login = (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
   const logout = () => {
