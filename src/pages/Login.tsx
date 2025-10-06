@@ -1,22 +1,24 @@
-import { useState } from 'react';
+import { useState, FormEvent, JSX } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import Input from '../components/ui/Input';
 
-function Login() {
+function Login(): JSX.Element {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await login(email, password);
       navigate('/register');
     } catch (error) {
-      setError('Email ou senha incorretos', error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Erro desconhecido';
+      setError(`Email ou senha incorretor: ${errorMessage}`);
     }
   };
 
