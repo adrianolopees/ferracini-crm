@@ -1,7 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import type { ReactNode } from 'react';
 
-function ProtectedRoute({ children }) {
+interface ProtectedRouteProps {
+  children: ReactNode;
+}
+
+function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
 
   if (loading) return <div>Carregando...</div>;
