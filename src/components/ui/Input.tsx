@@ -1,5 +1,5 @@
 import './Input.css';
-import { InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes, forwardRef } from 'react';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -7,36 +7,32 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   required?: boolean;
 }
 
-function Input({
-  className = '',
-  label,
-  error,
-  required,
-  ...props
-}: InputProps) {
-  return (
-    <div className="input-group">
-      <label>
-        {label}
-        {required && (
-          <span className="required" style={{ color: 'red' }}>
-            *
-          </span>
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className = '', label, error, required, ...props }, ref) => {
+    return (
+      <div className="input-group">
+        <label>
+          {label}
+          {required && (
+            <span className="required" style={{ color: 'red' }}>
+              *
+            </span>
+          )}
+        </label>
+        <input
+          ref={ref}
+          className={`${error ? 'input-erro' : ''} ${className}`}
+          aria-invalid={!!error}
+          {...props}
+        />
+        {error && (
+          <div className="msg-erro" role="alert">
+            <span className="bi bi-exclamation-triangle-fill"></span>
+            {error}
+          </div>
         )}
-      </label>
-      <input
-        className={`${error ? 'input-erro' : ''} ${className}`}
-        aria-invalid={!!error}
-        {...props}
-      />
-      {error && (
-        <div className="msg-erro" role="alert">
-          <span className="bi bi-exclamation-triangle-fill"></span>
-          {error}
-        </div>
-      )}
-    </div>
-  );
-}
-
+      </div>
+    );
+  }
+);
 export default Input;
