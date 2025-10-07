@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,14 +6,13 @@ import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { formSchema, FormData } from '../schemas/registerSchema';
 import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
-import IMask from 'imask';
+import { maskPhone } from '../utils/formatPhone';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import '../styles/pages.css';
 
 function RegisterCustomer() {
   const navigate = useNavigate();
-  const celularInputRef = useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -28,26 +27,9 @@ function RegisterCustomer() {
     mode: 'onSubmit',
   });
 
-  const { ref: celularRegisterRef, ...celularRegisterRest } =
-    register('celular');
-
-  useEffect(() => {
-    if (celularInputRef.current) {
-      const maskInstance = IMask(celularInputRef.current, {
-        mask: '(00) 00000-0000',
-      });
-
-      maskInstance.on('accept', () => {
-        setValue('celular', maskInstance.value);
-      });
-
-      return () => maskInstance.destroy();
-    }
-  }, [setValue]);
-
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
-    setErrorMessage(''); // Limpa erro anterior
+    setErrorMessage('');
 
     try {
       await addDoc(collection(db, 'clientes'), {
@@ -108,10 +90,10 @@ function RegisterCustomer() {
             label="Celular:"
             type="tel"
             placeholder="(dd) 00000-0000"
-            {...celularRegisterRest}
-            ref={(e) => {
-              celularRegisterRef(e);
-              celularInputRef.current = e;
+            {...register('celular')}
+            onChange={(e) => {
+              const masked = maskPhone(e.target.value);
+              setValue('celular', masked);
             }}
             error={errors.celular?.message}
             disabled={isLoading}
