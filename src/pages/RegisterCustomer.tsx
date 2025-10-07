@@ -1,10 +1,11 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { formSchema, FormData } from '../schemas/registerSchema';
+import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
 import IMask from 'imask';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
@@ -13,6 +14,9 @@ import '../styles/pages.css';
 function RegisterCustomer() {
   const navigate = useNavigate();
   const celularInputRef = useRef<HTMLInputElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
   const {
     register,
     handleSubmit,
@@ -42,6 +46,9 @@ function RegisterCustomer() {
   }, [setValue]);
 
   const onSubmit = async (data: FormData) => {
+    setIsLoading(true);
+    setErrorMessage(''); // Limpa erro anterior
+
     try {
       await addDoc(collection(db, 'clientes'), {
         ...data,
@@ -53,8 +60,12 @@ function RegisterCustomer() {
       alert('Cliente salvo com sucesso!');
       reset();
     } catch (error) {
+      // Traduz erro e mostra na tela
+      const message = getFirebaseErrorMessage(error);
+      setErrorMessage(message);
       console.error('Erro ao salvar cliente:', error);
-      alert('Erro ao salvar cliente. Tente novamente.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,11 +80,27 @@ function RegisterCustomer() {
 
       <div className="container cadastrar">
         <form className="form" onSubmit={handleSubmit(onSubmit)}>
+          {/* Mensagem de erro global */}
+          {errorMessage && (
+            <div
+              style={{
+                padding: '12px',
+                backgroundColor: '#fee',
+                color: '#c00',
+                borderRadius: '4px',
+                marginBottom: '16px',
+              }}
+            >
+              {errorMessage}
+            </div>
+          )}
+
           <Input
             label="Cliente:"
             placeholder="Nome e sobrenome"
             {...register('cliente')}
             error={errors.cliente?.message}
+            disabled={isLoading}
             required
           />
 
@@ -87,6 +114,7 @@ function RegisterCustomer() {
               celularInputRef.current = e;
             }}
             error={errors.celular?.message}
+            disabled={isLoading}
             required
           />
 
@@ -95,6 +123,7 @@ function RegisterCustomer() {
             placeholder="Nome da linha"
             {...register('modelo')}
             error={errors.modelo?.message}
+            disabled={isLoading}
             required
           />
 
@@ -103,6 +132,7 @@ function RegisterCustomer() {
             placeholder="Completa"
             {...register('referencia')}
             error={errors.referencia?.message}
+            disabled={isLoading}
             required
           />
 
@@ -112,6 +142,7 @@ function RegisterCustomer() {
             placeholder="Número"
             {...register('numeracao')}
             error={errors.numeracao?.message}
+            disabled={isLoading}
             min="37"
             max="47"
             required
@@ -122,10 +153,13 @@ function RegisterCustomer() {
             placeholder="Cor"
             {...register('cor')}
             error={errors.cor?.message}
+            disabled={isLoading}
             required
           />
 
-          <Button type="submit">Salvar</Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? 'Salvando...' : 'Salvar'}
+          </Button>
         </form>
 
         <button className="botao-flutuante" onClick={() => navigate('/search')}>
