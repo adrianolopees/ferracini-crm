@@ -22,9 +22,9 @@
 
 ## 🔜 Fase 3 - Qualidade
 
-- [ ] Migrar para TypeScript
+- [x] Migrar para TypeScript
 - [ ] Adicionar testes (Jest/Vitest)
-- [ ] Validação com Zod
+- [x] Validação com Zod
 - [ ] Tratamento de erros robusto
 
 ## 🔜 Fase 4 - UI/UX Profissional
