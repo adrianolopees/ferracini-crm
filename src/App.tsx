@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import Cadastro from './pages/RegisterCustomer';
-import Busca from './pages/SearchCustomers';
 import RegisterCustomer from './pages/RegisterCustomer';
 import SearchCustomers from './pages/SearchCustomers';
 import ProtectedRoute from './components/ProtectedRoute';
