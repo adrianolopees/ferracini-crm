@@ -13,6 +13,8 @@ import Input from '../components/ui/Input';
 import Modal from '../components/ui/Modal';
 import Navigation from '../components/ui/Navigation';
 import { formatDistanceToNow, getDaysWaiting } from '../utils/formatDate';
+import toast from 'react-hot-toast';
+
 function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -85,7 +87,7 @@ function SearchCustomers() {
 
     try {
       await deleteDoc(doc(db, 'clientes', selectedCustomer.id));
-      alert(`Cliente ${selectedCustomer.cliente} excluído!`);
+      toast.success(`Cliente ${selectedCustomer.cliente} excluído(a)!`);
       setModalOpen(false);
       setSelectedCustomer(null);
       handleSearch({
@@ -93,7 +95,7 @@ function SearchCustomers() {
       } as ChangeEvent<HTMLInputElement>);
     } catch (error) {
       console.error('Erro ao excluir cliente:', error);
-      alert('Erro ao excluir cliente. Tente novamente.');
+      toast.error('Erro ao excluir cliente. Tente novamente.');
     }
   };
 
