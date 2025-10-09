@@ -150,8 +150,8 @@ function SearchCustomers() {
                     getDaysWaiting(customer.dataCriacao) > 7
                       ? 'border-l-red-500 border-red-200'
                       : getDaysWaiting(customer.dataCriacao) > 3
-                      ? 'border-l-yellow-500 border-yellow-200'
-                      : 'border-l-green-500 border-gray-200'
+                        ? 'border-l-yellow-500 border-yellow-200'
+                        : 'border-l-green-500 border-gray-200'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-3">
@@ -165,15 +165,15 @@ function SearchCustomers() {
                             getDaysWaiting(customer.dataCriacao) > 7
                               ? 'bg-red-500'
                               : getDaysWaiting(customer.dataCriacao) > 3
-                              ? 'bg-yellow-500'
-                              : 'bg-green-500'
+                                ? 'bg-yellow-500'
+                                : 'bg-green-500'
                           }`}
                           title={
                             getDaysWaiting(customer.dataCriacao) > 7
                               ? 'Urgente - mais de 7 dias'
                               : getDaysWaiting(customer.dataCriacao) > 3
-                              ? 'Atenção - 3-7 dias'
-                              : 'Recente - menos de 3 dias'
+                                ? 'Atenção - 3-7 dias'
+                                : 'Recente - menos de 3 dias'
                           }
                         ></span>
                       </div>
@@ -246,7 +246,7 @@ function SearchCustomers() {
           onConfirm={handleConfirmDelete}
           onCancel={handleCancelDelete}
           onClose={handleCancelDelete}
-          title="Você já mandou Msg pro cliente?"
+          title="Você já entrou em contato com o cliente?"
         />
       </div>
     </>
