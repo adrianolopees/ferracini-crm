@@ -9,7 +9,6 @@ import { maskPhone } from '../utils/formatPhone';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Navigation from '../components/ui/Navigation';
-import '../styles/pages.css';
 
 function RegisterCustomer() {
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +59,9 @@ function RegisterCustomer() {
             <h1 className="text-4xl font-bold text-gray-900 mb-2">
               Reserva de <span className="text-blue-600">Cliente</span>
             </h1>
-            <p className="text-gray-600 text-lg">Produto fora de estoque? Registre aqui</p>
+            <p className="text-gray-600 text-lg">
+              Produto fora de estoque? Registre aqui
+            </p>
           </div>
 
           {/* Card do Formulário */}
