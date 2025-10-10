@@ -4,13 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { formSchema, FormData } from '@/schemas/registerSchema';
-import { getFirebaseErrorMessage } from '@/utils/firebaseErrors';
-import { maskPhone } from '@/utils/formatPhone';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import Navigation from '@/components/ui/Navigation';
+import { getFirebaseErrorMessage, maskPhone } from '@/utils';
 import toast from 'react-hot-toast';
-import Spinner from '@/components/ui/Spinner';
+import { Input, Button, Navigation, Spinner } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 
 function RegisterCustomer() {

@@ -9,10 +9,8 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Customer } from '@/types/customer';
-import Input from '@/components/ui/Input';
-import Modal from '@/components/ui/Modal';
-import Navigation from '@/components/ui/Navigation';
-import { formatDistanceToNow, getDaysWaiting } from '@/utils/formatDate';
+import { Input, Modal, Navigation } from '@/components/ui';
+import { formatDistanceToNow, getDaysWaiting } from '@/utils';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 
