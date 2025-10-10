@@ -2,15 +2,16 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
-import { formSchema, FormData } from '../schemas/registerSchema';
-import { getFirebaseErrorMessage } from '../utils/firebaseErrors';
-import { maskPhone } from '../utils/formatPhone';
-import Input from '../components/ui/Input';
-import Button from '../components/ui/Button';
-import Navigation from '../components/ui/Navigation';
+import { db } from '@/services/firebase';
+import { formSchema, FormData } from '@/schemas/registerSchema';
+import { getFirebaseErrorMessage } from '@/utils/firebaseErrors';
+import { maskPhone } from '@/utils/formatPhone';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import Navigation from '@/components/ui/Navigation';
 import toast from 'react-hot-toast';
 import Spinner from '@/components/ui/Spinner';
+import { AnimatedContainer } from '@/components/animations';
 
 function RegisterCustomer() {
   const [isLoading, setIsLoading] = useState(false);
@@ -60,17 +61,21 @@ function RegisterCustomer() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <AnimatedContainer type="slideDown" className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
               Reserva de <span className="text-blue-600">Cliente</span>
             </h1>
             <p className="text-gray-600 text-lg">
               Produto fora de estoque? Registre aqui
             </p>
-          </div>
+          </AnimatedContainer>
 
           {/* Card do Formulário */}
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <AnimatedContainer
+            type="slideUp"
+            delay={0.2}
+            className="bg-white rounded-2xl shadow-xl p-8"
+          >
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
               {/* Mensagem de erro global */}
               {errorMessage && (
@@ -161,7 +166,7 @@ function RegisterCustomer() {
                 </Button>
               </div>
             </form>
-          </div>
+          </AnimatedContainer>
         </div>
       </div>
     </>

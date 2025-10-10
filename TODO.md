@@ -39,31 +39,35 @@
 - [x] Indicadores visuais de urgência (dias de espera)
 - [x] Login page modernizado
 - [x] Remover CSS legado (index.css, App.css, Modal.css)
-- [ ] Animações suaves (framer-motion)
+- [x] Animações suaves (framer-motion)
 - [ ] Skeleton loaders
 - [ ] Empty states ilustrados
 
 ## 🔜 Fase 5 - Features Avançadas
 
 ### Paginação e Performance
+
 - [ ] Implementar paginação na página de busca
 - [ ] Adicionar filtros avançados (cor, numeração, data)
 - [ ] Ordenação de resultados (mais urgente, alfabético, data)
 - [ ] Busca com debounce para melhor performance
 
 ### Dashboard e Estatísticas
+
 - [ ] Criar página de dashboard
 - [ ] Mostrar métricas (total de clientes, tempo médio de espera)
 - [ ] Gráficos de produtos mais procurados
 - [ ] Lista de clientes com mais de X dias aguardando
 
 ### Notificações e Automação
+
 - [ ] Sistema de notificações push
 - [ ] Lembrete automático para contatar clientes após X dias
 - [ ] Envio em massa de WhatsApp
 - [ ] Templates de mensagem personalizáveis
 
 ### Gestão de Estoque (futuro)
+
 - [ ] Cadastro de produtos
 - [ ] Controle de entrada/saída
 - [ ] Notificação quando produto chegar
@@ -102,9 +106,11 @@
 ## 📝 Notas Técnicas
 
 ### Bugs conhecidos
+
 - Nenhum no momento
 
 ### Melhorias de código pendentes
+
 - [ ] Extrair lógica de busca para hook customizado (useCustomerSearch)
 - [ ] Criar componente reutilizável de CustomerCard
 - [ ] Adicionar error boundary para capturar erros globais
@@ -112,6 +118,7 @@
 - [ ] Otimizar re-renders com React.memo onde necessário
 
 ### Débito técnico
+
 - [ ] Revisar queries do Firebase (possível otimização)
 - [ ] Adicionar indices no Firestore para queries mais rápidas
 - [ ] Implementar cache de resultados de busca

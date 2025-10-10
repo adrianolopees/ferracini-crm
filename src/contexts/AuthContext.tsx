@@ -5,7 +5,7 @@ import {
   signOut,
   User,
 } from 'firebase/auth';
-import { auth } from '../services/firebase';
+import { auth } from '@/services/firebase';
 
 interface AuthProviderProps {
   children?: ReactNode;
