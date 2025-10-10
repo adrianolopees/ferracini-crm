@@ -16,7 +16,7 @@ export default function Navigation() {
           {/* Logo/Brand */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
                 Ferracini <span className="text-blue-600">CRM</span>
               </h2>
             </div>
@@ -26,35 +26,35 @@ export default function Navigation() {
           <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => navigate('/register')}
-              className={`px-6 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isRegister
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="bi bi-person-plus mr-2"></i>
-              Cadastrar
+              <i className="fa-solid fa-user-plus sm:mr-2"></i>
+              <span className="hidden sm:inline">Cadastrar</span>
             </button>
             <button
               onClick={() => navigate('/search')}
-              className={`px-6 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isSearch
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="bi bi-search mr-2"></i>
-              Buscar
+              <i className="fa-solid fa-magnifying-glass sm:mr-2"></i>
+              <span className="hidden sm:inline">Buscar</span>
             </button>
           </div>
 
           {/* Botão Sair */}
           <button
             onClick={() => logout()}
-            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
+            className="inline-flex items-center px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors cursor-pointer"
             title="Sair do sistema"
           >
-            <i className="bi bi-box-arrow-right text-lg"></i>
+            <i className="fa-solid fa-right-from-bracket text-lg"></i>
             <span className="ml-2 hidden sm:inline">Sair</span>
           </button>
         </div>

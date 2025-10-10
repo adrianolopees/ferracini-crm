@@ -14,6 +14,10 @@ import Modal from '../components/ui/Modal';
 import Navigation from '../components/ui/Navigation';
 import { formatDistanceToNow, getDaysWaiting } from '../utils/formatDate';
 import toast from 'react-hot-toast';
+import {
+  AnimatedContainer,
+  AnimatedListItem,
+} from '../components/animations';
 
 function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -110,14 +114,14 @@ function SearchCustomers() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <AnimatedContainer type="slideDown" className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
               Buscar <span className="text-blue-600">Clientes</span>
             </h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-base sm:text-lg">
               Produto chegou? Encontre quem está esperando
             </p>
-          </div>
+          </AnimatedContainer>
 
           {/* Card de Busca */}
           <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
@@ -134,7 +138,7 @@ function SearchCustomers() {
               {customers.length === 0 && searchTerm && (
                 <div className="text-center py-12">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                    <i className="bi bi-search text-2xl text-gray-400"></i>
+                    <i className="fa-solid fa-magnifying-glass text-gray-400 text-2xl"></i>
                   </div>
                   <p className="text-gray-600 font-medium">
                     Nenhum cliente encontrado
@@ -145,99 +149,100 @@ function SearchCustomers() {
                 </div>
               )}
 
-              {customers.map((customer) => (
-                <div
-                  key={customer.id}
-                  className={`bg-gray-50 rounded-lg p-5 border-l-4 hover:shadow-md transition-shadow duration-200 ${
-                    getDaysWaiting(customer.dataCriacao) > 7
-                      ? 'border-l-red-500 border-red-200'
-                      : getDaysWaiting(customer.dataCriacao) > 3
-                        ? 'border-l-yellow-500 border-yellow-200'
-                        : 'border-l-green-500 border-gray-200'
-                  }`}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {customer.cliente}
-                        </h3>
+              {customers.map((customer, index) => (
+                <AnimatedListItem key={customer.id} index={index}>
+                  <div
+                    className={`bg-gray-50 rounded-lg p-5 border-l-4 hover:shadow-md transition-shadow duration-200 ${
+                      getDaysWaiting(customer.dataCriacao) > 7
+                        ? 'border-l-red-500 border-red-200'
+                        : getDaysWaiting(customer.dataCriacao) > 3
+                          ? 'border-l-yellow-500 border-yellow-200'
+                          : 'border-l-green-500 border-gray-200'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                            {customer.cliente}
+                          </h3>
+                          <span
+                            className={`inline-block w-2 h-2 rounded-full ${
+                              getDaysWaiting(customer.dataCriacao) > 7
+                                ? 'bg-red-500'
+                                : getDaysWaiting(customer.dataCriacao) > 3
+                                  ? 'bg-yellow-500'
+                                  : 'bg-green-500'
+                            }`}
+                            title={
+                              getDaysWaiting(customer.dataCriacao) > 7
+                                ? 'Urgente - mais de 7 dias'
+                                : getDaysWaiting(customer.dataCriacao) > 3
+                                  ? 'Atenção - 3-7 dias'
+                                  : 'Recente - menos de 3 dias'
+                            }
+                          ></span>
+                        </div>
                         <span
-                          className={`inline-block w-2 h-2 rounded-full ${
+                          className={`text-xs block mb-1 ${
                             getDaysWaiting(customer.dataCriacao) > 7
-                              ? 'bg-red-500'
-                              : getDaysWaiting(customer.dataCriacao) > 3
-                                ? 'bg-yellow-500'
-                                : 'bg-green-500'
+                              ? 'text-red-600 font-semibold'
+                              : 'text-gray-500'
                           }`}
-                          title={
-                            getDaysWaiting(customer.dataCriacao) > 7
-                              ? 'Urgente - mais de 7 dias'
-                              : getDaysWaiting(customer.dataCriacao) > 3
-                                ? 'Atenção - 3-7 dias'
-                                : 'Recente - menos de 3 dias'
-                          }
-                        ></span>
-                      </div>
-                      <span
-                        className={`text-xs block mb-1 ${
-                          getDaysWaiting(customer.dataCriacao) > 7
-                            ? 'text-red-600 font-semibold'
-                            : 'text-gray-500'
-                        }`}
-                      >
-                        Aguardando há{' '}
-                        {formatDistanceToNow(customer.dataCriacao)}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-600">
-                          {customer.celular}
-                        </span>
-                        <button
-                          onClick={() => handleWhatsApp(customer)}
-                          className="inline-flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors"
-                          title="Enviar WhatsApp"
                         >
-                          <i className="fa-brands fa-whatsapp text-lg"></i>
-                        </button>
+                          Aguardando há{' '}
+                          {formatDistanceToNow(customer.dataCriacao)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm sm:text-base text-gray-600">
+                            {customer.celular}
+                          </span>
+                          <button
+                            onClick={() => handleWhatsApp(customer)}
+                            className="inline-flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors cursor-pointer"
+                            title="Enviar WhatsApp"
+                          >
+                            <i className="fa-brands fa-whatsapp text-lg"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteClick(customer)}
+                        className="inline-flex items-center justify-center w-9 h-9 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                        title="Excluir cliente"
+                      >
+                        <i className="fa-regular fa-trash-can text-lg"></i>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-500">Modelo:</span>
+                        <p className="font-medium text-gray-900">
+                          {customer.modelo}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Referência:</span>
+                        <p className="font-medium text-gray-900">
+                          {customer.referencia}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Numeração:</span>
+                        <p className="font-medium text-gray-900">
+                          {customer.numeracao}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Cor:</span>
+                        <p className="font-medium text-gray-900">
+                          {customer.cor}
+                        </p>
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleDeleteClick(customer)}
-                      className="inline-flex items-center justify-center w-9 h-9 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Excluir cliente"
-                    >
-                      <i className="fa-regular fa-trash-can text-lg"></i>
-                    </button>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-gray-500">Modelo:</span>
-                      <p className="font-medium text-gray-900">
-                        {customer.modelo}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Referência:</span>
-                      <p className="font-medium text-gray-900">
-                        {customer.referencia}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Numeração:</span>
-                      <p className="font-medium text-gray-900">
-                        {customer.numeracao}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="text-gray-500">Cor:</span>
-                      <p className="font-medium text-gray-900">
-                        {customer.cor}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                </AnimatedListItem>
               ))}
             </div>
           </div>
