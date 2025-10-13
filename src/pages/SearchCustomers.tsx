@@ -67,8 +67,7 @@ function SearchCustomers() {
   };
 
   const handleWhatsApp = (customer: Customer) => {
-    const mensagem = `Olá, ${customer.cliente}! Aqui é da Ferracini maxi shopping, estou entrando em contato sobre o modelo ${customer.modelo}, que
-  não tinha no número ${customer.numeracao} na cor ${customer.cor}. Acabou de chegar, quer que separe pra você?`;
+    const mensagem = `Oi ${customer.cliente}! Ferracini Maxi Shopping aqui! O ${customer.modelo} que você procurava chegou! Posso reservar pra você?`;
     const celularSomenteNumeros = customer.celular.replace(/\D/g, '');
     const urlWhatsApp = `https://wa.me/55${celularSomenteNumeros}?text=${encodeURIComponent(
       mensagem
