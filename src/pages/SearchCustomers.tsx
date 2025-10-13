@@ -104,9 +104,9 @@ function SearchCustomers() {
   };
 
   return (
-    <>
+    <div className="h-full flex flex-col overflow-hidden">
       <Navigation />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
+      <div className="flex-1 bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <AnimatedContainer type="slideDown" className="text-center mb-8">
@@ -253,7 +253,7 @@ function SearchCustomers() {
           title="Você já entrou em contato com o cliente?"
         />
       </div>
-    </>
+    </div>
   );
 }
 

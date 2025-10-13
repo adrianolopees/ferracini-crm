@@ -39,7 +39,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-8">
+    <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4 py-8 overflow-y-auto">
       <div className="w-full max-w-md">
         {/* Card do Login */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
@@ -98,7 +98,7 @@ function Login() {
 
         {/* Footer */}
         <p className="text-center text-gray-600 mt-6 text-sm">
-          © 2025 Ferracini Maxi CRM. Todos os direitos reservados.
+          © 2025 Adriano Lopes. Todos os direitos reservados.
         </p>
       </div>
     </div>
