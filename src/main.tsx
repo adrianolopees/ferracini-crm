@@ -10,17 +10,25 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <App />
       <Toaster
-        position="top-right"
+        position="top-center"
         toastOptions={{
           duration: 3000,
           style: {
-            background: '#fff',
-            color: '#333',
+            background: '#fff', // Cor de fundo
+            color: '#333', // Cor do texto
+            fontSize: '18px', // Tamanho da fonte (adicione isso!)
+            padding: '20px 30px', // Espaçamento interno (adicione isso!)
+            borderRadius: '12px', // Bordas arredondadas
+            boxShadow: '...', // Sombra
+            minWidth: '350px', // Largura mínima (adicione isso!)
           },
           success: {
             iconTheme: {
               primary: '#10b981',
               secondary: '#fff',
+            },
+            style: {
+              border: '2px solid #10b981',
             },
           },
         }}

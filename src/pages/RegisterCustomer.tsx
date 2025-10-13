@@ -157,7 +157,11 @@ function RegisterCustomer() {
                       Salvando...
                     </span>
                   ) : (
-                    'Salvar Cliente'
+                    <span className="flex items-center justify-center gap-2">
+                      <i className="fa-solid fa-bookmark"></i>{' '}
+                      {/* Adicione ícone */}
+                      Registrar
+                    </span>
                   )}
                 </Button>
               </div>
