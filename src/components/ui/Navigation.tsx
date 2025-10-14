@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 export default function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, isLoggingOut } = useAuth();
 
   const isRegister = location.pathname === '/register';
   const isSearch = location.pathname === '/search';
@@ -51,11 +51,18 @@ export default function Navigation() {
           {/* Botão Sair */}
           <button
             onClick={() => logout()}
-            className="inline-flex items-center px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors cursor-pointer"
+            disabled={isLoggingOut}
+            className="inline-flex items-center px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
             title="Sair do sistema"
           >
-            <i className="fa-solid fa-right-from-bracket text-lg"></i>
-            <span className="ml-2 hidden sm:inline">Sair</span>
+            {isLoggingOut ? (
+              <i className="fa-solid fa-spinner fa-spin text-lg"></i>
+            ) : (
+              <i className="fa-solid fa-person-walking-arrow-right text-lg"></i>
+            )}
+            <span className="ml-2 hidden sm:inline">
+              {isLoggingOut ? 'Saindo...' : 'Sair'}
+            </span>
           </button>
         </div>
       </div>

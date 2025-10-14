@@ -16,6 +16,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   loading: boolean;
+  isLoggingOut: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -34,12 +36,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = (email: string, password: string) => {
     return signInWithEmailAndPassword(auth, email, password);
   };
-  const logout = () => {
-    return signOut(auth);
+  const logout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut(auth);
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, loading, isLoggingOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
