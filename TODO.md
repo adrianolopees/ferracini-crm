@@ -52,41 +52,47 @@
 - [ ] Ordenação de resultados (mais urgente, alfabético, data)
 - [ ] Busca com debounce para melhor performance
 
-### Dashboard e Estatísticas
+### Dashboard - Visão Geral Unificada
 
-- [ ] Criar página de dashboard
-- [ ] Mostrar métricas (total de clientes, tempo médio de espera)
-- [ ] Gráficos de produtos mais procurados
-- [ ] Lista de clientes com mais de X dias aguardando
+- [ ] Criar página Dashboard.tsx (nova home do sistema)
+- [ ] Adicionar ao Navigation como primeira aba (📊 Dashboard)
+- [ ] **Cards de Métricas Principais:**
+  - Total de clientes aguardando (ativos)
+  - Total de clientes contactados (histórico)
+  - Taxa de conversão (contactados / total)
+  - Tempo médio de espera até contato
+- [ ] **Gráficos e Visualizações:**
+  - Gráfico de linha: contactos por período (últimos 7/30 dias)
+  - Gráfico de barras: produtos mais procurados (top 10)
+  - Gráfico de pizza: distribuição por cor/numeração
+- [ ] **Alertas e Urgências:**
+  - Lista de clientes há mais de X dias aguardando (configurável)
+  - Destaque visual para casos urgentes
+- [ ] Design responsivo com grid de cards
 
 ### Histórico de Clientes Contactados
 
-- [ ] Adicionar terceira aba "Contactados" no Navigation
-- [ ] Criar página ContactedCustomers.tsx para histórico
-- [ ] Ao clicar no WhatsApp, mover cliente para coleção `contacted` no Firebase
-- [ ] Adicionar campo `contactedAt` (data/hora do contato)
-- [ ] Criar coleção separada no Firestore para clientes contactados
-- [ ] Implementar estatísticas:
-  - Total de clientes contactados
-  - Calçados mais procurados (ranking)
+- [ ] Adicionar aba "Histórico" no Navigation (📋 Histórico)
+- [ ] Criar página ContactedCustomers.tsx
+- [ ] Criar coleção `contacted` no Firestore (separada de `customers`)
+- [ ] **Ao clicar no botão WhatsApp em SearchCustomers:**
+  - Mover documento do cliente para coleção `contacted`
+  - Adicionar campo `contactedAt` (timestamp do contato)
+  - Manter campo `createdAt` original para calcular tempo de espera
+  - Remover da coleção `customers` (ativa)
+- [ ] **Interface do Histórico:**
+  - Listar todos os clientes contactados
+  - Mostrar data de contato, tempo de espera, produto
+  - Busca e filtros (por data, modelo, cor, numeração)
+  - Ordenação (mais recente, mais antigo, maior tempo de espera)
+- [ ] **Estatísticas do Histórico:**
+  - Total de contactados no período
   - Tempo médio de espera (contactedAt - createdAt)
-  - Gráfico de contactados por período
-- [ ] Adicionar filtros (por data, modelo, vendedor)
-- [ ] Opção de restaurar cliente de volta para reservas (se necessário)
-
-### Notificações e Automação
-
-- [ ] Sistema de notificações push
-- [ ] Lembrete automático para contatar clientes após X dias
-- [ ] Envio em massa de WhatsApp
-- [ ] Templates de mensagem personalizáveis
-
-### Gestão de Estoque (futuro)
-
-- [ ] Cadastro de produtos
-- [ ] Controle de entrada/saída
-- [ ] Notificação quando produto chegar
-- [ ] Link automático entre produto e clientes aguardando
+  - Ranking de produtos mais procurados
+- [ ] **Ações disponíveis:**
+  - Visualizar detalhes do cliente
+  - Restaurar para reservas ativas (se necessário)
+  - Deletar permanentemente do histórico
 
 ## 🔜 Fase 6 - Melhorias de UX
 

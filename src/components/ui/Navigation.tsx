@@ -6,6 +6,7 @@ export default function Navigation() {
   const location = useLocation();
   const { logout, isLoggingOut } = useAuth();
 
+  const isDashboard = location.pathname === '/dashboard';
   const isRegister = location.pathname === '/register';
   const isSearch = location.pathname === '/search';
 
@@ -25,6 +26,18 @@ export default function Navigation() {
           {/* Tabs de Navegação */}
           <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
             <button
+              onClick={() => navigate('/dashboard')}
+              className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+                isDashboard
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <i className="fa-solid fa-tachometer-alt sm:mr-2"></i>
+              <span className="hidden sm:inline">Painel</span>
+            </button>
+
+            <button
               onClick={() => navigate('/register')}
               className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isRegister
@@ -35,6 +48,7 @@ export default function Navigation() {
               <i className="fa-solid fa-user-plus sm:mr-2"></i>
               <span className="hidden sm:inline">Cadastrar</span>
             </button>
+
             <button
               onClick={() => navigate('/search')}
               className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
