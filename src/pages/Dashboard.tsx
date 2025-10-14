@@ -1,11 +1,58 @@
+import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigation } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
+import { useCustomersList } from '@/hooks/useCustomersList';
+import { CustomerListModal } from '@/components/CustomerListModal';
+import { Customer } from '@/types/customer';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { db } from '@/services/firebase';
+import toast from 'react-hot-toast';
 
 function Dashboard() {
   const { user } = useAuth();
   const { metrics, loading } = useDashboardMetrics();
+
+  // Estado para controlar qual modal está aberto
+  const [modalType, setModalType] = useState<'all' | 'urgent' | null>(null);
+
+  // Hook para buscar clientes filtrados
+  const { customers, loading: customersLoading } = useCustomersList({
+    filterType: modalType || 'all',
+    isOpen: modalType !== null,
+  });
+
+  // Função para enviar WhatsApp
+  const handleWhatsApp = (customer: Customer) => {
+    const mensagem = `Oi ${customer.cliente}! Ferracini Maxi Shopping aqui! O ${customer.modelo} que você procurava chegou! Posso reservar pra você?`;
+    const celularSomenteNumeros = customer.celular.replace(/\D/g, '');
+    const urlWhatsApp = `https://wa.me/55${celularSomenteNumeros}?text=${encodeURIComponent(mensagem)}`;
+    window.open(urlWhatsApp, '_blank');
+  };
+
+  // Função para deletar cliente
+  const handleDelete = async (customer: Customer) => {
+    if (!confirm(`Deseja excluir ${customer.cliente}?`)) return;
+
+    try {
+      await deleteDoc(doc(db, 'clientes', customer.id));
+      toast.success(`Cliente ${customer.cliente} excluído!`);
+      // Recarregar a página para atualizar métricas
+      window.location.reload();
+    } catch (error) {
+      console.error('Erro ao excluir cliente:', error);
+      toast.error('Erro ao excluir cliente');
+    }
+  };
+
+  // Função para obter título do modal
+  const getModalTitle = () => {
+    if (modalType === 'all') return `Clientes Aguardando (${metrics.totalActive})`;
+    if (modalType === 'urgent') return `Clientes Urgentes (${metrics.urgentCustomers})`;
+    return '';
+  };
+
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <Navigation />
@@ -24,7 +71,7 @@ function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 max-w-7xl mx-auto">
           {/* Card 1: Clientes Aguardando */}
           <AnimatedContainer type="slideDown" delay={0.1}>
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow cursor-pointer">
+            <div onClick={() => setModalType('all')} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -50,7 +97,7 @@ function Dashboard() {
 
           {/* Card 2: Clientes Contactados */}
           <AnimatedContainer type="slideDown" delay={0.2}>
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow cursor-pointer">
+            <div onClick={() => toast.info('Histórico será implementado em breve!')} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow cursor-pointer opacity-75">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -76,7 +123,7 @@ function Dashboard() {
 
           {/* Card 3: Tempo Médio */}
           <AnimatedContainer type="slideUp" delay={0.3}>
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-shadow cursor-pointer">
+            <div onClick={() => setModalType('all')} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -102,7 +149,7 @@ function Dashboard() {
 
           {/* Card 4: Casos Urgentes */}
           <AnimatedContainer type="slideUp" delay={0.4}>
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500 hover:shadow-lg transition-shadow cursor-pointer">
+            <div onClick={() => setModalType('urgent')} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500 hover:shadow-lg transition-shadow cursor-pointer">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -126,6 +173,17 @@ function Dashboard() {
             </div>
           </AnimatedContainer>
         </div>
+
+        {/* Modal de Lista de Clientes */}
+        <CustomerListModal
+          isOpen={modalType !== null}
+          onClose={() => setModalType(null)}
+          title={getModalTitle()}
+          customers={customers}
+          loading={customersLoading}
+          onWhatsApp={handleWhatsApp}
+          onDelete={handleDelete}
+        />
       </main>
     </div>
   );

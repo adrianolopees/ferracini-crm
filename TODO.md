@@ -52,23 +52,37 @@
 - [ ] Ordenação de resultados (mais urgente, alfabético, data)
 - [ ] Busca com debounce para melhor performance
 
-### Dashboard - Visão Geral Unificada
+### Dashboard - Visão Geral Unificada ✅ (CONCLUÍDO)
 
-- [ ] Criar página Dashboard.tsx (nova home do sistema)
-- [ ] Adicionar ao Navigation como primeira aba (📊 Dashboard)
-- [ ] **Cards de Métricas Principais:**
-  - Total de clientes aguardando (ativos)
-  - Total de clientes contactados (histórico)
-  - Taxa de conversão (contactados / total)
-  - Tempo médio de espera até contato
-- [ ] **Gráficos e Visualizações:**
-  - Gráfico de linha: contactos por período (últimos 7/30 dias)
-  - Gráfico de barras: produtos mais procurados (top 10)
-  - Gráfico de pizza: distribuição por cor/numeração
-- [ ] **Alertas e Urgências:**
-  - Lista de clientes há mais de X dias aguardando (configurável)
-  - Destaque visual para casos urgentes
-- [ ] Design responsivo com grid de cards
+- [x] Criar página Dashboard.tsx (nova home do sistema)
+- [x] Adicionar ao Navigation como primeira aba (📊 Dashboard)
+- [x] Rota configurada e protegida
+- [x] **Cards de Métricas Principais:**
+  - [x] Total de clientes aguardando (ativos) - busca real do Firestore
+  - [x] Total de clientes contactados (histórico) - placeholder (aguardando implementação)
+  - [x] Tempo médio de espera até contato - calculado automaticamente
+  - [x] Casos urgentes (7+ dias) - calculado automaticamente
+- [x] **Interatividade dos Cards:**
+  - [x] Cards clicáveis que abrem modal com lista de clientes
+  - [x] Card "Aguardando" mostra todos os clientes ativos
+  - [x] Card "Urgentes" mostra apenas clientes com 7+ dias
+  - [x] Card "Contactados" mostra toast informativo (em desenvolvimento)
+  - [x] Card "Tempo Médio" mostra lista completa ordenada
+- [x] **Modal de Lista de Clientes:**
+  - [x] Componente CustomerListModal reutilizável
+  - [x] Mostra clientes com mesmo layout do SearchCustomers
+  - [x] Ações disponíveis: WhatsApp e Deletar
+  - [x] Loading states e empty states
+  - [x] Animações com AnimatedListItem
+  - [x] Indicadores visuais de urgência (cores)
+- [x] **Hooks Customizados:**
+  - [x] useDashboardMetrics - busca e calcula métricas em tempo real
+  - [x] useCustomersList - filtra clientes por tipo (all/urgent)
+- [x] Design responsivo com grid de cards (1/2/4 colunas)
+- [ ] **Gráficos e Visualizações:** (futuro)
+  - [ ] Gráfico de linha: contactos por período (últimos 7/30 dias)
+  - [ ] Gráfico de barras: produtos mais procurados (top 10)
+  - [ ] Gráfico de pizza: distribuição por cor/numeração
 
 ### Histórico de Clientes Contactados
 
@@ -133,7 +147,8 @@
 ### Melhorias de código pendentes
 
 - [ ] Extrair lógica de busca para hook customizado (useCustomerSearch)
-- [ ] Criar componente reutilizável de CustomerCard
+- [x] Criar componente reutilizável de CustomerCard (CustomerListModal implementado)
+- [x] Criar componente DialogModal genérico (para modais sem ações fixas)
 - [ ] Adicionar error boundary para capturar erros globais
 - [ ] Configurar code splitting para melhor performance
 - [ ] Otimizar re-renders com React.memo onde necessário
@@ -149,11 +164,11 @@
 
 ## 🎯 Prioridade para próxima sessão
 
-1. **Paginação na busca** - Melhorar UX quando houver muitos resultados
-2. **Filtros avançados** - Permitir filtrar por cor, numeração, data
-3. **Dashboard** - Visão geral dos clientes e métricas importantes
-4. **Animações** - Adicionar transições suaves (framer-motion)
-5. **Testes** - Começar com testes básicos dos componentes
+1. ~~**Dashboard**~~ ✅ CONCLUÍDO - Dashboard funcional com métricas e modal interativo
+2. **Histórico de Contactados** - Implementar funcionalidade de mover clientes para histórico ao clicar no WhatsApp
+3. **Paginação na busca** - Melhorar UX quando houver muitos resultados
+4. **Filtros avançados** - Permitir filtrar por cor, numeração, data
+5. **Gráficos no Dashboard** - Visualizações de dados (Chart.js ou Recharts)
 
 ---
 

@@ -1,0 +1,136 @@
+import { DialogModal } from '@/components/ui/DialogModal';
+import { Customer } from '@/types/customer';
+import { formatDistanceToNow, getDaysWaiting } from '@/utils';
+import { AnimatedListItem } from '@/components/animations';
+
+interface CustomerListModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  customers: Customer[];
+  loading: boolean;
+  onWhatsApp: (customer: Customer) => void;
+  onDelete: (customer: Customer) => void;
+}
+
+export function CustomerListModal({
+  isOpen,
+  onClose,
+  title,
+  customers,
+  loading,
+  onWhatsApp,
+  onDelete,
+}: CustomerListModalProps) {
+  return (
+    <DialogModal isOpen={isOpen} onClose={onClose} title={title}>
+      <div className="max-h-[60vh] overflow-y-auto">
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <i className="fa-solid fa-spinner fa-spin text-blue-500 text-3xl"></i>
+          </div>
+        ) : customers.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+              <i className="fa-solid fa-inbox text-gray-400 text-2xl"></i>
+            </div>
+            <p className="text-gray-600 font-medium">
+              Nenhum cliente encontrado
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {customers.map((customer, index) => (
+              <AnimatedListItem key={customer.id} index={index}>
+                <div
+                  className={`bg-gray-50 rounded-lg p-4 border-l-4 hover:shadow-md transition-shadow duration-200 ${
+    getDaysWaiting(customer.dataCriacao) > 7
+      ? 'border-l-red-500 border-red-200'
+      : getDaysWaiting(customer.dataCriacao) > 3
+        ? 'border-l-yellow-500 border-yellow-200'
+        : 'border-l-green-500 border-gray-200'
+  }`}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-semibold text-gray-900">
+                          {customer.cliente}
+                        </h3>
+                        <span
+                          className={`inline-block w-2 h-2 rounded-full ${
+                            getDaysWaiting(customer.dataCriacao) > 7
+                              ? 'bg-red-500'
+                              : getDaysWaiting(customer.dataCriacao) > 3
+                                ? 'bg-yellow-500'
+                                : 'bg-green-500'
+                          }`}
+                        ></span>
+                      </div>
+                      <span
+                        className={`text-xs block mb-1 ${
+                          getDaysWaiting(customer.dataCriacao) > 7
+                            ? 'text-red-600 font-semibold'
+                            : 'text-gray-500'
+                        }`}
+                      >
+                        Aguardando há{' '}
+                        {formatDistanceToNow(customer.dataCriacao)}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-600">
+                          {customer.celular}
+                        </span>
+                        <button
+                          onClick={() => onWhatsApp(customer)}
+                          className="inline-flex items-center justify-center w-7 h-7 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors cursor-pointer"
+                          title="Enviar WhatsApp"
+                        >
+                          <i className="fa-brands fa-whatsapp text-sm"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => onDelete(customer)}
+                      className="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                      title="Excluir cliente"
+                    >
+                      <i className="fa-regular fa-trash-can text-base"></i>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-gray-500">Modelo:</span>
+                      <p className="font-medium text-gray-900">
+                        {customer.modelo}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Ref:</span>
+                      <p className="font-medium text-gray-900">
+                        {customer.referencia}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Nº:</span>
+                      <p className="font-medium text-gray-900">
+                        {customer.numeracao}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-gray-500">Cor:</span>
+                      <p className="font-medium text-gray-900">
+                        {customer.cor}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedListItem>
+            ))}
+          </div>
+        )}
+      </div>
+    </DialogModal>
+  );
+}
