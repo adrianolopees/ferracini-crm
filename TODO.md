@@ -59,6 +59,21 @@
 - [ ] Gráficos de produtos mais procurados
 - [ ] Lista de clientes com mais de X dias aguardando
 
+### Histórico de Clientes Contactados
+
+- [ ] Adicionar terceira aba "Contactados" no Navigation
+- [ ] Criar página ContactedCustomers.tsx para histórico
+- [ ] Ao clicar no WhatsApp, mover cliente para coleção `contacted` no Firebase
+- [ ] Adicionar campo `contactedAt` (data/hora do contato)
+- [ ] Criar coleção separada no Firestore para clientes contactados
+- [ ] Implementar estatísticas:
+  - Total de clientes contactados
+  - Calçados mais procurados (ranking)
+  - Tempo médio de espera (contactedAt - createdAt)
+  - Gráfico de contactados por período
+- [ ] Adicionar filtros (por data, modelo, vendedor)
+- [ ] Opção de restaurar cliente de volta para reservas (se necessário)
+
 ### Notificações e Automação
 
 - [ ] Sistema de notificações push
