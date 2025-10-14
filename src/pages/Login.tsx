@@ -26,7 +26,7 @@ function Login() {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
-      navigate('/register');
+      navigate('/dashboard');
     } catch (error) {
       const errorMessage = getFirebaseErrorMessage(error);
       setError('root', {

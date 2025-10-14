@@ -11,6 +11,7 @@ function Dashboard() {
       <Navigation />
 
       <main className="flex-1 overflow-y-auto bg-gray-50">
+        {/* Header */}
         <AnimatedContainer type="slideDown" className="text-center mb-8 mt-8">
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
             Painel de <span className="text-blue-600">Estatísticas</span>
@@ -120,7 +121,7 @@ function Dashboard() {
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-4">
-                Mais de 3 dias aguardando
+                Mais de 7 dias aguardando
               </p>
             </div>
           </AnimatedContainer>
