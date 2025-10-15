@@ -1,27 +1,37 @@
-# Ferracini CRM - Sistema de Gestão de Reservas
+# 🏪 Ferracini CRM - Sistema de Gestão de Reservas
+
+<div align="center">
+
+![React](https://img.shields.io/badge/React-19.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-12.3-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-7.1-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+
+</div>
 
 Sistema profissional de CRM para gerenciamento de reservas de produtos da loja Ferracini. Desenvolvido com React, TypeScript, Firebase e Tailwind CSS.
 
-## Funcionalidades
+## ✨ Funcionalidades
 
-### Dashboard
-- Visualização em tempo real de métricas principais
-- Cards interativos com modals de detalhes
-- Indicadores de urgência (clientes aguardando 7+ dias)
-- Cálculo automático de tempo médio de espera
+### 📊 Dashboard
+- ⚡ Visualização em tempo real de métricas principais
+- 🎯 Cards interativos com modals de detalhes
+- ⏰ Indicadores de urgência (clientes aguardando 7+ dias)
+- 📈 Cálculo automático de tempo médio de espera
 
-### Gestão de Clientes
-- **Cadastro de Reservas**: Formulário validado com Zod para registro de novos clientes
-- **Busca Inteligente**: Pesquisa por nome, telefone, modelo ou cor
-- **Contato via WhatsApp**: Integração direta com WhatsApp Web
-- **Indicadores Visuais**: Cores para identificar urgência de atendimento
+### 👥 Gestão de Clientes
+- ✍️ **Cadastro de Reservas**: Formulário validado com Zod para registro de novos clientes
+- 🔍 **Busca Inteligente**: Pesquisa por nome, telefone, modelo ou cor
+- 💬 **Contato via WhatsApp**: Integração direta com WhatsApp Web
+- 🎨 **Indicadores Visuais**: Cores para identificar urgência de atendimento
 
-### Segurança
-- Autenticação via Firebase Auth
-- Rotas protegidas (acesso apenas para usuários autenticados)
-- Regras de segurança do Firestore configuradas
+### 🔒 Segurança
+- 🔐 Autenticação via Firebase Auth
+- 🛡️ Rotas protegidas (acesso apenas para usuários autenticados)
+- ✅ Regras de segurança do Firestore configuradas
 
-## Stack Tecnológica
+## 🛠️ Stack Tecnológica
 
 ### Core
 - **React 19** - Biblioteca UI
@@ -46,13 +56,13 @@ Sistema profissional de CRM para gerenciamento de reservas de produtos da loja F
 - **date-fns** - Manipulação de datas
 - **@hookform/resolvers** - Integração React Hook Form + Zod
 
-## Pré-requisitos
+## 📋 Pré-requisitos
 
 - Node.js 18+ ou superior
 - Yarn ou npm
 - Conta no Firebase (Firestore + Authentication)
 
-## Instalação
+## 🚀 Instalação
 
 ### 1. Clone o repositório
 ```bash
@@ -135,7 +145,7 @@ yarn format
 
 O servidor de desenvolvimento estará rodando em `http://localhost:5173`
 
-## Estrutura do Projeto
+## 📁 Estrutura do Projeto
 
 ```
 salvar-contatos-loja-v2/
@@ -180,7 +190,7 @@ salvar-contatos-loja-v2/
 └── package.json
 ```
 
-## Scripts Disponíveis
+## 📜 Scripts Disponíveis
 
 | Script | Descrição |
 |--------|-----------|
@@ -190,7 +200,7 @@ salvar-contatos-loja-v2/
 | `yarn lint` | Executa o ESLint para encontrar problemas |
 | `yarn format` | Formata código com Prettier |
 
-## Deploy
+## 🌐 Deploy
 
 ### Vercel (Recomendado)
 
@@ -225,7 +235,7 @@ yarn build
 firebase deploy
 ```
 
-## Convenções de Código
+## 📝 Convenções de Código
 
 ### TypeScript
 - Strict mode habilitado
@@ -247,7 +257,7 @@ Siga a convenção de commits semânticos:
 - `test:` Testes
 - `chore:` Manutenção
 
-## Próximas Funcionalidades (Roadmap)
+## 🗺️ Próximas Funcionalidades (Roadmap)
 
 - [ ] Histórico de clientes contactados
 - [ ] Paginação na busca de clientes
@@ -259,7 +269,7 @@ Siga a convenção de commits semânticos:
 
 Veja o arquivo `TODO.md` para o roadmap completo.
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
 ### Erro de autenticação do Firebase
 Verifique se:
@@ -283,20 +293,16 @@ server: {
 }
 ```
 
-## Contribuindo
+## 🤝 Contribuindo
 
 1. Crie uma branch para sua feature: `git checkout -b feat/nova-feature`
 2. Commit suas mudanças: `git commit -m 'feat: adiciona nova feature'`
 3. Push para a branch: `git push origin feat/nova-feature`
 4. Abra um Pull Request
 
-## Licença
+## 📄 Licença
 
 Este projeto é proprietário e confidencial. Todos os direitos reservados.
-
-## Contato
-
-Para dúvidas ou sugestões, entre em contato com a equipe de desenvolvimento.
 
 ---
 
