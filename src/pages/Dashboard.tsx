@@ -9,6 +9,7 @@ import { Customer } from '@/types/customer';
 import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
+import { TopProductsChart } from '@/components/TopProductsChart';
 
 function Dashboard() {
   const { user } = useAuth();
@@ -48,8 +49,10 @@ function Dashboard() {
 
   // Função para obter título do modal
   const getModalTitle = () => {
-    if (modalType === 'all') return `Clientes Aguardando (${metrics.totalActive})`;
-    if (modalType === 'urgent') return `Clientes Urgentes (${metrics.urgentCustomers})`;
+    if (modalType === 'all')
+      return `Clientes Aguardando (${metrics.totalActive})`;
+    if (modalType === 'urgent')
+      return `Clientes Urgentes (${metrics.urgentCustomers})`;
     return '';
   };
 
@@ -71,7 +74,10 @@ function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 max-w-7xl mx-auto">
           {/* Card 1: Clientes Aguardando */}
           <AnimatedContainer type="slideDown" delay={0.1}>
-            <div onClick={() => setModalType('all')} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow cursor-pointer">
+            <div
+              onClick={() => setModalType('all')}
+              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow cursor-pointer"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -97,7 +103,16 @@ function Dashboard() {
 
           {/* Card 2: Clientes Contactados */}
           <AnimatedContainer type="slideDown" delay={0.2}>
-            <div onClick={() => toast.info('Histórico será implementado em breve!')} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow cursor-pointer opacity-75">
+            <div
+              onClick={() =>
+                toast.custom((t) => (
+                  <div className="bg-blue-500 text-white px-4 py-3 rounded-lg shadow-lg">
+                    ℹ️ Histórico será implementado em breve!
+                  </div>
+                ))
+              }
+              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow cursor-pointer opacity-75"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -123,7 +138,10 @@ function Dashboard() {
 
           {/* Card 3: Tempo Médio */}
           <AnimatedContainer type="slideUp" delay={0.3}>
-            <div onClick={() => setModalType('all')} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-shadow cursor-pointer">
+            <div
+              onClick={() => setModalType('all')}
+              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-shadow cursor-pointer"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -149,7 +167,10 @@ function Dashboard() {
 
           {/* Card 4: Casos Urgentes */}
           <AnimatedContainer type="slideUp" delay={0.4}>
-            <div onClick={() => setModalType('urgent')} className="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500 hover:shadow-lg transition-shadow cursor-pointer">
+            <div
+              onClick={() => setModalType('urgent')}
+              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500 hover:shadow-lg transition-shadow cursor-pointer"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -172,6 +193,9 @@ function Dashboard() {
               </p>
             </div>
           </AnimatedContainer>
+        </div>
+        <div className="px-4 max-w-7xl mx-auto pb-8">
+          <TopProductsChart />
         </div>
 
         {/* Modal de Lista de Clientes */}
