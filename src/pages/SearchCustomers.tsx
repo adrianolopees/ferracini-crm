@@ -6,6 +6,7 @@ import {
   getDocs,
   deleteDoc,
   doc,
+  setDoc,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Customer } from '@/types/customer';
@@ -66,13 +67,35 @@ function SearchCustomers() {
     }
   };
 
-  const handleWhatsApp = (customer: Customer) => {
-    const mensagem = `Oi ${customer.cliente}! Ferracini Maxi Shopping aqui! O ${customer.modelo} que você procurava chegou! Posso reservar pra você?`;
-    const celularSomenteNumeros = customer.celular.replace(/\D/g, '');
-    const urlWhatsApp = `https://wa.me/55${celularSomenteNumeros}?text=${encodeURIComponent(
-      mensagem
-    )}`;
-    window.open(urlWhatsApp, '_blank');
+  const handleWhatsApp = async (customer: Customer) => {
+    try {
+      // 1. Criar cópia do cliente para adicionar ao histórico
+      const contactedCustomer = {
+        ...customer, // Copia todos os dados originais
+        dataContacto: new Date().toISOString(), // Adiciona data de contato AGORA
+      };
+
+      // 2. Adicionar à coleção 'contacted' (histórico)
+      await setDoc(doc(db, 'contacted', customer.id), contactedCustomer);
+
+      // 3. Remover da coleção 'clientes' (ativos)
+      await deleteDoc(doc(db, 'clientes', customer.id));
+
+      // 4. Abrir WhatsApp
+      const mensagem = `Oi ${customer.cliente}! Ferracini Maxi Shopping aqui! O ${customer.modelo} que você procurava chegou! Posso reservar pra você?`;
+      const celularSomenteNumeros = customer.celular.replace(/\D/g, '');
+      const urlWhatsApp = `https://wa.me/55${celularSomenteNumeros}?text=${encodeURIComponent(mensagem)}`;
+      window.open(urlWhatsApp, '_blank');
+
+      // 5. Mostrar mensagem de sucesso
+      toast.success(`${customer.cliente} movido para o histórico!`);
+
+      // 6. Atualizar lista de resultados (remove da tela)
+      setCustomers(customers.filter((c) => c.id !== customer.id));
+    } catch (error) {
+      console.error('Erro ao processar contato:', error);
+      toast.error('Erro ao mover para histórico. Tente novamente.');
+    }
   };
 
   const handleDeleteClick = (customer: Customer) => {

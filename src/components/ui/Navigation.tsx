@@ -9,6 +9,7 @@ export default function Navigation() {
   const isDashboard = location.pathname === '/dashboard';
   const isRegister = location.pathname === '/register';
   const isSearch = location.pathname === '/search';
+  const isHistory = location.pathname === '/historico';
 
   return (
     <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
@@ -59,6 +60,19 @@ export default function Navigation() {
             >
               <i className="fa-solid fa-magnifying-glass sm:mr-2"></i>
               <span className="hidden sm:inline">Buscar</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/historico')}
+              className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer
+  ${
+    isHistory
+      ? 'bg-white text-blue-600 shadow-sm'
+      : 'text-gray-600 hover:text-gray-900'
+  }`}
+            >
+              <i className="fa-solid fa-clock-rotate-left sm:mr-2"></i>
+              <span className="hidden sm:inline">Histórico</span>
             </button>
           </div>
 

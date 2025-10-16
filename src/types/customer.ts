@@ -8,3 +8,7 @@ export interface Customer {
   cor: string;
   dataCriacao: string;
 }
+
+export interface ContactedCustomer extends Customer {
+  dataContacto: string;
+}

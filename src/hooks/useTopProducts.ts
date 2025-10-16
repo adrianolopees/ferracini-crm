@@ -14,10 +14,26 @@ export function useTopProducts(limit: number = 10) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, 'clientes'));
+        // Buscar de AMBAS as coleções (clientes aguardando + contactados)
+        const [clientesSnapshot, contactedSnapshot] = await Promise.all([
+          getDocs(collection(db, 'clientes')),
+          getDocs(collection(db, 'contacted')),
+        ]);
+
         const modeloCounts: Record<string, number> = {};
 
-        querySnapshot.forEach((doc) => {
+        // Contar modelos dos clientes aguardando
+        clientesSnapshot.forEach((doc) => {
+          const data = doc.data();
+          const modelo = data.modelo;
+
+          if (modelo) {
+            modeloCounts[modelo] = (modeloCounts[modelo] || 0) + 1;
+          }
+        });
+
+        // Contar modelos dos clientes contactados (SOMA aos já contados)
+        contactedSnapshot.forEach((doc) => {
           const data = doc.data();
           const modelo = data.modelo;
 
@@ -32,8 +48,8 @@ export function useTopProducts(limit: number = 10) {
 
         const sortedProducts = productsArray.sort((a, b) => b.count - a.count);
 
-        const toProducts = sortedProducts.slice(0, limit);
-        setProducts(toProducts);
+        const topProducts = sortedProducts.slice(0, limit);
+        setProducts(topProducts);
       } catch (error) {
         console.error('Erro ao buscar produtos:', error);
       } finally {

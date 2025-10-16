@@ -3,6 +3,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import RegisterCustomer from '@/pages/RegisterCustomer';
 import SearchCustomers from '@/pages/SearchCustomers';
 import Dashboard from '@/pages/Dashboard';
+import ContactedCustomers from './pages/ContactedCustomers';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Login from '@/pages/Login';
 
@@ -10,7 +11,6 @@ function App() {
   return (
     <AuthProvider>
       <Routes>
-        <Route path="/login" element={<Login />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route
           path="/register"
@@ -36,6 +36,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="historico"
+          element={
+            <ProtectedRoute>
+              <ContactedCustomers />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </AuthProvider>
   );

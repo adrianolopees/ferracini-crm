@@ -80,8 +80,7 @@
   - [x] useCustomersList - filtra clientes por tipo (all/urgent)
 - [x] Design responsivo com grid de cards (1/2/4 colunas)
 - [ ] **Gráficos e Visualizações:** (futuro)
-  - [ ] Gráfico de linha: contactos por período (últimos 7/30 dias)
-  - [ ] Gráfico de barras: produtos mais procurados (top 10)
+  - [x] Gráfico de barras: produtos mais procurados (top 10)
   - [ ] Gráfico de pizza: distribuição por cor/numeração
 
 ### Histórico de Clientes Contactados

@@ -22,12 +22,16 @@ export function useDashboardMetrics() {
   useEffect(() => {
     async function fetchMetrics() {
       try {
+        // Buscar clientes ativos e contactados ao mesmo tempo
+        const [clientesSnapshot, contactedSnapshot] = await Promise.all([
+          getDocs(query(collection(db, 'clientes'))),
+          getDocs(query(collection(db, 'contacted'))),
+        ]);
+
         let urgentCount = 0;
         let totalDays = 0;
-        const customerQuery = query(collection(db, 'clientes'));
-        const customersSnapshot = await getDocs(customerQuery);
 
-        customersSnapshot.forEach((doc) => {
+        clientesSnapshot.forEach((doc) => {
           const data = doc.data();
           const daysWaiting = getDaysWaiting(data.dataCriacao);
 
@@ -39,13 +43,13 @@ export function useDashboardMetrics() {
         });
 
         const averageWaitTime =
-          customersSnapshot.size > 0
-            ? Math.round(totalDays / customersSnapshot.size)
+          clientesSnapshot.size > 0
+            ? Math.round(totalDays / clientesSnapshot.size)
             : 0;
 
         setMetrics({
-          totalActive: customersSnapshot.size,
-          totalContacted: 0,
+          totalActive: clientesSnapshot.size,
+          totalContacted: contactedSnapshot.size, // 👈 BUSCA REAL DO BANCO
           averageWaitTime: averageWaitTime,
           urgentCustomers: urgentCount,
         });
