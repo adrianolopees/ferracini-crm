@@ -6,7 +6,7 @@ import { db } from '@/services/firebase';
 import { formSchema, FormData } from '@/schemas/registerSchema';
 import { getFirebaseErrorMessage, maskPhone } from '@/utils';
 import toast from 'react-hot-toast';
-import { Input, Button, Navigation, Spinner } from '@/components/ui';
+import { Input, Select, Button, Navigation, Spinner } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 
 function RegisterCustomer() {
@@ -22,6 +22,15 @@ function RegisterCustomer() {
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: 'onSubmit',
+    defaultValues: {
+      cliente: '',
+      celular: '',
+      modelo: '',
+      referencia: '',
+      numeracao: '',
+      cor: '',
+      vendedor: '',
+    },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -144,6 +153,20 @@ function RegisterCustomer() {
                   placeholder="Cor do produto"
                   {...register('cor')}
                   error={errors.cor?.message}
+                  disabled={isLoading}
+                  required
+                />
+
+                <Select
+                  label="Vendedor"
+                  placeholder="Selecione o vendedor"
+                  options={[
+                    { value: 'Adriano', label: 'Adriano' },
+                    { value: 'Will', label: 'Will' },
+                    { value: 'Marcelo', label: 'Marcelo' },
+                  ]}
+                  {...register('vendedor')}
+                  error={errors.vendedor?.message}
                   disabled={isLoading}
                   required
                 />

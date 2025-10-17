@@ -6,6 +6,7 @@ export interface Customer {
   referencia: string;
   numeracao: string;
   cor: string;
+  vendedor?: string; // Opcional para compatibilidade com clientes antigos
   dataCriacao: string;
 }
 

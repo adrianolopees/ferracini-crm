@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
 import { Navigation } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
@@ -30,7 +29,7 @@ function Dashboard() {
 
   // Função para avisar cliente que tem em outra loja
   const handleWhatsApp = (customer: Customer) => {
-    notifyOtherStore(customer); // Usa a função do serviço
+    notifyOtherStore(customer);
     toast('WhatsApp aberto para contatar cliente');
   };
 

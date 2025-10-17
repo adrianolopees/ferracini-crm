@@ -55,14 +55,21 @@ export function CustomerListModal({
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-base font-semibold text-gray-900">
-                            {customer.cliente}
-                          </h3>
-                          <span
-                            className={`inline-block w-2 h-2 rounded-full ${status.dotClass}`}
-                            title={status.label}
-                          ></span>
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-base font-semibold text-gray-900">
+                              {customer.cliente}
+                            </h3>
+                            <span
+                              className={`inline-block w-2 h-2 rounded-full ${status.dotClass}`}
+                              title={status.label}
+                            ></span>
+                          </div>
+                          {customer.vendedor && (
+                            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                              {customer.vendedor}
+                            </span>
+                          )}
                         </div>
                         <span className={`text-xs block mb-1 ${status.textClass}`}>
                           Aguardando há{' '}
@@ -120,28 +127,28 @@ export function CustomerListModal({
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-gray-500">Modelo:</span>
-                      <p className="font-medium text-gray-900">
+                      <span className="text-gray-500 text-xs">Modelo:</span>
+                      <p className="font-semibold text-gray-900">
                         {customer.modelo}
                       </p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Ref:</span>
-                      <p className="font-medium text-gray-900">
+                      <span className="text-gray-500 text-xs">Ref:</span>
+                      <p className="font-semibold text-gray-900">
                         {customer.referencia}
                       </p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Nº:</span>
-                      <p className="font-medium text-gray-900">
+                      <span className="text-gray-500 text-xs">Nº:</span>
+                      <p className="font-semibold text-gray-900">
                         {customer.numeracao}
                       </p>
                     </div>
                     <div>
-                      <span className="text-gray-500">Cor:</span>
-                      <p className="font-medium text-gray-900">
+                      <span className="text-gray-500 text-xs">Cor:</span>
+                      <p className="font-semibold text-gray-900">
                         {customer.cor}
                       </p>
                     </div>

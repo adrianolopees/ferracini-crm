@@ -18,6 +18,7 @@ export const formSchema = z.object({
     .min(1, ' Cor nao pode estar em branco!')
     .trim()
     .refine((val) => isNaN(Number(val)), 'Somente letras!'),
+  vendedor: z.string().min(1, 'Vendedor não pode estar em branco!').trim(),
 });
 
 export type FormData = z.infer<typeof formSchema>;

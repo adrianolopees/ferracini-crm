@@ -179,21 +179,28 @@ function ContactedCustomers() {
   transition-shadow duration-200"
                         >
                           <div className="flex justify-between items-start mb-3">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                                  {customer.cliente}
-                                </h3>
-                                <span
-                                  className="inline-block w-2 h-2 rounded-full bg-blue-500"
-                                  title="Contactado"
-                                ></span>
+                            <div className="flex-1">
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                                    {customer.cliente}
+                                  </h3>
+                                  <span
+                                    className="inline-block w-2 h-2 rounded-full bg-blue-500"
+                                    title="Contactado"
+                                  ></span>
+                                </div>
+                                {customer.vendedor && (
+                                  <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                    {customer.vendedor}
+                                  </span>
+                                )}
                               </div>
-                              <span className="text-xs block mb-1 text-blue-600 font-medium">
+                              <span className="text-sm block mb-1 text-blue-600 font-medium">
                                 Contactado{' '}
                                 {formatDistanceToNow(customer.dataContacto)}
                               </span>
-                              <span className="text-xs text-gray-500">
+                              <span className="text-sm text-gray-500">
                                 Esperou {waitingDays} dia(s) até o contato
                               </span>
                               <div className="flex items-center gap-2 mt-2">
@@ -220,28 +227,28 @@ function ContactedCustomers() {
                             </button>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="grid grid-cols-2 gap-4 text-base">
                             <div>
-                              <span className="text-gray-500">Modelo:</span>
-                              <p className="font-medium text-gray-900">
+                              <span className="text-gray-500 text-sm">Modelo:</span>
+                              <p className="font-semibold text-gray-900">
                                 {customer.modelo}
                               </p>
                             </div>
                             <div>
-                              <span className="text-gray-500">Referência:</span>
-                              <p className="font-medium text-gray-900">
+                              <span className="text-gray-500 text-sm">Referência:</span>
+                              <p className="font-semibold text-gray-900">
                                 {customer.referencia}
                               </p>
                             </div>
                             <div>
-                              <span className="text-gray-500">Numeração:</span>
-                              <p className="font-medium text-gray-900">
+                              <span className="text-gray-500 text-sm">Numeração:</span>
+                              <p className="font-semibold text-gray-900">
                                 {customer.numeracao}
                               </p>
                             </div>
                             <div>
-                              <span className="text-gray-500">Cor:</span>
-                              <p className="font-medium text-gray-900">
+                              <span className="text-gray-500 text-sm">Cor:</span>
+                              <p className="font-semibold text-gray-900">
                                 {customer.cor}
                               </p>
                             </div>

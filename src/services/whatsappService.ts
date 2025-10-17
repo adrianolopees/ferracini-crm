@@ -1,7 +1,7 @@
 import { Customer } from '@/types/customer';
 
-const domPedroNumber = '19996821710';
-const campinasNumber = '19982215561';
+const domPedroNumber = '(19) 99682-1710';
+const campinasNumber = '(19) 98221-5561';
 
 function formatPhone(phone: string): string {
   return phone.replace(/\D/g, '');
@@ -9,10 +9,7 @@ function formatPhone(phone: string): string {
 
 function openWhatsApp(phone: string, message: string) {
   const cleanPhone = formatPhone(phone);
-
-  // Usa wa.me (formato original que funcionava)
   const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(message)}`;
-
   window.open(url, '_blank');
 }
 
