@@ -11,7 +11,8 @@ import {
 import { db } from '@/services/firebase';
 import { Customer } from '@/types/customer';
 import { Input, Modal, Navigation } from '@/components/ui';
-import { formatDistanceToNow, getDaysWaiting } from '@/utils';
+import { formatDistanceToNow } from '@/utils';
+import { getCustomerStatus } from '@/utils/customerStatus';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { notifyProductArrived } from '@/services/whatsappService';
@@ -165,50 +166,29 @@ function SearchCustomers() {
                   </div>
                 )}
 
-                {customers.map((customer, index) => (
-                  <AnimatedListItem key={customer.id} index={index}>
-                    <div
-                      className={`bg-gray-50 rounded-lg p-5 border-l-4 hover:shadow-md transition-shadow duration-200 ${
-                        getDaysWaiting(customer.dataCriacao) > 7
-                          ? 'border-l-red-500 border-red-200'
-                          : getDaysWaiting(customer.dataCriacao) > 3
-                            ? 'border-l-yellow-500 border-yellow-200'
-                            : 'border-l-green-500 border-gray-200'
-                      }`}
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="text-base sm:text-lg font-semibold text-gray-900">
-                              {customer.cliente}
-                            </h3>
-                            <span
-                              className={`inline-block w-2 h-2 rounded-full ${
-                                getDaysWaiting(customer.dataCriacao) > 7
-                                  ? 'bg-red-500'
-                                  : getDaysWaiting(customer.dataCriacao) > 3
-                                    ? 'bg-yellow-500'
-                                    : 'bg-green-500'
-                              }`}
-                              title={
-                                getDaysWaiting(customer.dataCriacao) > 7
-                                  ? 'Urgente - mais de 7 dias'
-                                  : getDaysWaiting(customer.dataCriacao) > 3
-                                    ? 'Atenção - 3-7 dias'
-                                    : 'Recente - menos de 3 dias'
-                              }
-                            ></span>
-                          </div>
-                          <span
-                            className={`text-xs block mb-1 ${
-                              getDaysWaiting(customer.dataCriacao) > 7
-                                ? 'text-red-600 font-semibold'
-                                : 'text-gray-500'
-                            }`}
-                          >
-                            Aguardando há{' '}
-                            {formatDistanceToNow(customer.dataCriacao)}
-                          </span>
+                {customers.map((customer, index) => {
+                  const status = getCustomerStatus(customer.dataCriacao);
+
+                  return (
+                    <AnimatedListItem key={customer.id} index={index}>
+                      <div
+                        className={`bg-gray-50 rounded-lg p-5 border-l-4 hover:shadow-md transition-shadow duration-200 ${status.borderClass}`}
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                                {customer.cliente}
+                              </h3>
+                              <span
+                                className={`inline-block w-2 h-2 rounded-full ${status.dotClass}`}
+                                title={status.label}
+                              ></span>
+                            </div>
+                            <span className={`text-xs block mb-1 ${status.textClass}`}>
+                              Aguardando há{' '}
+                              {formatDistanceToNow(customer.dataCriacao)}
+                            </span>
                           <div className="flex items-center gap-2">
                             <span className="text-sm sm:text-base text-gray-600">
                               {customer.celular}
@@ -259,7 +239,8 @@ function SearchCustomers() {
                       </div>
                     </div>
                   </AnimatedListItem>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </AnimatedContainer>

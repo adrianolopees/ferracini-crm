@@ -17,7 +17,6 @@ import {
 } from '@/services/whatsappService';
 
 function Dashboard() {
-  const { user } = useAuth();
   const { metrics, loading } = useDashboardMetrics();
 
   // Estado para controlar qual modal está aberto
