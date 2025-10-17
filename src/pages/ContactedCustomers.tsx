@@ -14,6 +14,7 @@ import { formatDistanceToNow } from '@/utils';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { differenceInDays, parseISO } from 'date-fns';
+import { sendGenericMessage } from '@/services/whatsappService';
 
 function ContactedCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -85,10 +86,7 @@ function ContactedCustomers() {
   };
 
   const handleWhatsApp = (customer: ContactedCustomer) => {
-    const mensagem = `Oi ${customer.cliente}! Ferracini Maxi Shopping aqui!`;
-    const celularSomenteNumeros = customer.celular.replace(/\D/g, '');
-    const urlWhatsApp = `https://wa.me/55${celularSomenteNumeros}?text=${encodeURIComponent(mensagem)}`;
-    window.open(urlWhatsApp, '_blank');
+    sendGenericMessage(customer);
   };
 
   const handleDeleteClick = (customer: ContactedCustomer) => {

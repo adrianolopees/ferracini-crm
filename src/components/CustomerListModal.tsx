@@ -11,6 +11,8 @@ interface CustomerListModalProps {
   loading: boolean;
   onWhatsApp: (customer: Customer) => void;
   onDelete: (customer: Customer) => void;
+  onCheckLojaCampinas?: (customer: Customer) => void; // Opcional
+  onCheckLojaDomPedro?: (customer: Customer) => void; // Opcional
 }
 
 export function CustomerListModal({
@@ -21,6 +23,8 @@ export function CustomerListModal({
   loading,
   onWhatsApp,
   onDelete,
+  onCheckLojaCampinas,
+  onCheckLojaDomPedro,
 }: CustomerListModalProps) {
   return (
     <DialogModal isOpen={isOpen} onClose={onClose} title={title}>
@@ -77,17 +81,47 @@ export function CustomerListModal({
                         Aguardando há{' '}
                         {formatDistanceToNow(customer.dataCriacao)}
                       </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-600">
+                      <div className="space-y-2">
+                        <span className="text-sm text-gray-600 block">
                           {customer.celular}
                         </span>
-                        <button
-                          onClick={() => onWhatsApp(customer)}
-                          className="inline-flex items-center justify-center w-7 h-7 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors cursor-pointer"
-                          title="Enviar WhatsApp"
-                        >
-                          <i className="fa-brands fa-whatsapp text-sm"></i>
-                        </button>
+
+                        {/* Botões de Ação */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {/* Botão 1: Contatar Cliente */}
+                          <button
+                            onClick={() => onWhatsApp(customer)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors"
+                            title="Avisar cliente que temos em outra loja"
+                          >
+                            <i className="fa-brands fa-whatsapp"></i>
+                            <span>Cliente</span>
+                          </button>
+
+                          {/* Botão 2: Consultar Loja Campinas (só aparece se a função foi passada) */}
+                          {onCheckLojaCampinas && (
+                            <button
+                              onClick={() => onCheckLojaCampinas(customer)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors"
+                              title="Consultar disponibilidade na Loja Campinas"
+                            >
+                              <i className="fa-solid fa-store"></i>
+                              <span>Campinas</span>
+                            </button>
+                          )}
+
+                          {/* Botão 3: Consultar Loja Dom Pedro (só aparece se a função foi passada) */}
+                          {onCheckLojaDomPedro && (
+                            <button
+                              onClick={() => onCheckLojaDomPedro(customer)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500 text-white text-xs rounded-lg hover:bg-purple-600 transition-colors"
+                              title="Consultar disponibilidade na Loja Dom Pedro"
+                            >
+                              <i className="fa-solid fa-store"></i>
+                              <span>Dom Pedro</span>
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <button

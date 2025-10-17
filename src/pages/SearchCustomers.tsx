@@ -14,6 +14,7 @@ import { Input, Modal, Navigation } from '@/components/ui';
 import { formatDistanceToNow, getDaysWaiting } from '@/utils';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
+import { notifyProductArrived } from '@/services/whatsappService';
 
 function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -82,10 +83,7 @@ function SearchCustomers() {
       await deleteDoc(doc(db, 'clientes', customer.id));
 
       // 4. Abrir WhatsApp
-      const mensagem = `Oi ${customer.cliente}! Ferracini Maxi Shopping aqui! O ${customer.modelo} que você procurava chegou! Posso reservar pra você?`;
-      const celularSomenteNumeros = customer.celular.replace(/\D/g, '');
-      const urlWhatsApp = `https://wa.me/55${celularSomenteNumeros}?text=${encodeURIComponent(mensagem)}`;
-      window.open(urlWhatsApp, '_blank');
+      notifyProductArrived(customer);
 
       // 5. Mostrar mensagem de sucesso
       toast.success(`${customer.cliente} movido para o histórico!`);

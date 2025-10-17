@@ -10,6 +10,11 @@ import { deleteDoc, doc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
 import { TopProductsChart } from '@/components/TopProductsChart';
+import {
+  notifyOtherStore,
+  checkLojaCampinas,
+  checkLojaDomPedro,
+} from '@/services/whatsappService';
 
 function Dashboard() {
   const { user } = useAuth();
@@ -24,12 +29,22 @@ function Dashboard() {
     isOpen: modalType !== null,
   });
 
-  // Função para enviar WhatsApp
+  // Função para avisar cliente que tem em outra loja
   const handleWhatsApp = (customer: Customer) => {
-    const mensagem = `Oi ${customer.cliente}! Ferracini Maxi Shopping aqui! O ${customer.modelo} que você procurava chegou! Posso reservar pra você?`;
-    const celularSomenteNumeros = customer.celular.replace(/\D/g, '');
-    const urlWhatsApp = `https://wa.me/55${celularSomenteNumeros}?text=${encodeURIComponent(mensagem)}`;
-    window.open(urlWhatsApp, '_blank');
+    notifyOtherStore(customer); // Usa a função do serviço
+    toast('WhatsApp aberto para contatar cliente');
+  };
+
+  // Função para verificar disponibilidade na Loja Campinas
+  const handleCheckLojaCampinas = (customer: Customer) => {
+    checkLojaCampinas(customer);
+    toast('Consulta enviada para Loja Campinas');
+  };
+
+  // Função para verificar disponibilidade na Loja Dom Pedro
+  const handleCheckLojaDomPedro = (customer: Customer) => {
+    checkLojaDomPedro(customer);
+    toast('Consulta enviada para Loja Dom Pedro');
   };
 
   // Função para deletar cliente
@@ -207,6 +222,8 @@ function Dashboard() {
           loading={customersLoading}
           onWhatsApp={handleWhatsApp}
           onDelete={handleDelete}
+          onCheckLojaCampinas={handleCheckLojaCampinas}
+          onCheckLojaDomPedro={handleCheckLojaDomPedro}
         />
       </main>
     </div>
