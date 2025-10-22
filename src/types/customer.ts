@@ -31,6 +31,8 @@ export interface Customer {
   motivoArquivamento?: ArchiveReason;
   dataArquivamento?: string;
   observacoes?: string;
+  consultandoLoja?: 'Campinas' | 'Dom Pedro';
+  lojaTemEstoque?: boolean;
 }
 
 export interface ContactedCustomer extends Customer {

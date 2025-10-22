@@ -22,7 +22,12 @@ import {
 } from '@/services/customerStatusService';
 
 function Dashboard() {
-  const { metrics, loading } = useDashboardMetrics();
+  // Estado para forçar atualização das métricas do dashboard
+  const [metricsRefreshTrigger, setMetricsRefreshTrigger] = useState(0);
+
+  const { metrics, loading } = useDashboardMetrics({
+    refreshTrigger: metricsRefreshTrigger,
+  });
 
   // Estado para controlar qual modal está aberto
   const [modalType, setModalType] = useState<
@@ -38,6 +43,25 @@ function Dashboard() {
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(
     null
   );
+
+  // Estado para forçar atualização da lista de clientes
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Função para atualizar as métricas do dashboard
+  const refreshMetrics = () => {
+    setMetricsRefreshTrigger((prev) => prev + 1);
+  };
+
+  // Função para atualizar a lista sem recarregar a página
+  const refreshCustomers = () => {
+    setRefreshTrigger((prev) => prev + 1);
+  };
+
+  // Função para atualizar tudo (lista + métricas)
+  const refreshAll = () => {
+    refreshCustomers();
+    refreshMetrics();
+  };
 
   // Determinar filterType baseado no modal e tab ativos
   const getFilterType = () => {
@@ -57,24 +81,101 @@ function Dashboard() {
   const { customers, loading: customersLoading } = useCustomersList({
     filterType: getFilterType(),
     isOpen: modalType !== null,
+    refreshTrigger,
   });
 
   // Função para avisar cliente que tem em outra loja
   const handleWhatsApp = (customer: Customer) => {
     notifyOtherStore(customer);
-    toast('WhatsApp aberto para contatar cliente');
   };
 
   // Função para verificar disponibilidade na Loja Campinas
-  const handleCheckLojaCampinas = (customer: Customer) => {
-    checkLojaCampinas(customer);
-    toast('Consulta enviada para Loja Campinas');
+  const handleCheckLojaCampinas = async (customer: Customer) => {
+    try {
+      await updateDoc(doc(db, 'clientes', customer.id), {
+        consultandoLoja: 'Campinas',
+      });
+      checkLojaCampinas(customer);
+      toast('WhatsApp enviado para Loja Campinas');
+      refreshCustomers();
+    } catch (error) {
+      console.error('Erro ao atualizar cliente:', error);
+      toast.error('Erro ao consultar loja');
+    }
   };
 
   // Função para verificar disponibilidade na Loja Dom Pedro
-  const handleCheckLojaDomPedro = (customer: Customer) => {
-    checkLojaDomPedro(customer);
-    toast('Consulta enviada para Loja Dom Pedro');
+  const handleCheckLojaDomPedro = async (customer: Customer) => {
+    try {
+      await updateDoc(doc(db, 'clientes', customer.id), {
+        consultandoLoja: 'Dom Pedro',
+      });
+      checkLojaDomPedro(customer); // Envia WhatsApp para loja
+      toast('WhatsApp enviado para Loja Dom Pedro');
+      refreshCustomers(); // Atualiza lista sem recarregar
+    } catch (error) {
+      console.error('Erro ao atualizar cliente:', error);
+      toast.error('Erro ao consultar loja');
+    }
+  };
+
+  // Função quando LOJA confirma que TEM estoque
+  const handleStoreHasStock = async (customer: Customer) => {
+    try {
+      await updateDoc(doc(db, 'clientes', customer.id), {
+        lojaTemEstoque: true,
+      });
+      // Envia WhatsApp para o CLIENTE perguntando se aceita transferência
+      notifyOtherStore(customer);
+      toast.success(
+        `Cliente notificado sobre disponibilidade em ${customer.consultandoLoja}!`
+      );
+      refreshCustomers(); // Atualiza lista sem recarregar
+    } catch (error) {
+      console.error('Erro ao atualizar cliente:', error);
+      toast.error('Erro ao notificar cliente');
+    }
+  };
+
+  // Função quando LOJA confirma que NÃO TEM estoque
+  const handleStoreNoStock = async (customer: Customer) => {
+    try {
+      await updateDoc(doc(db, 'clientes', customer.id), {
+        consultandoLoja: null,
+        lojaTemEstoque: false,
+      });
+      toast('Produto não disponível. Pode consultar outra loja.');
+      refreshCustomers(); // Atualiza lista sem recarregar
+    } catch (error) {
+      console.error('Erro ao atualizar cliente:', error);
+      toast.error('Erro ao atualizar status');
+    }
+  };
+
+  // Função quando CLIENTE aceita a transferência
+  const handleClientAccepted = async (customer: Customer) => {
+    try {
+      await moveToAwaitingTransfer(customer, customer.consultandoLoja!);
+      // Limpa campos auxiliares
+      await updateDoc(doc(db, 'clientes', customer.id), {
+        consultandoLoja: null,
+        lojaTemEstoque: false,
+      });
+      toast.success(
+        `Transferência confirmada de ${customer.consultandoLoja}!`
+      );
+      refreshAll(); // Atualiza lista e métricas
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      toast.error('Erro ao confirmar transferência');
+    }
+  };
+
+  // Função quando CLIENTE recusa a transferência
+  const handleClientDeclined = (customer: Customer) => {
+    setModalType(null); // Fecha o modal de lista
+    setCustomerToArchive(customer);
+    setArchiveModalOpen(true);
   };
 
   // Função para abrir modal de arquivamento
@@ -102,7 +203,7 @@ function Dashboard() {
       toast.success(`${customerToArchive.cliente} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
-      window.location.reload();
+      refreshAll(); // Atualiza lista e métricas
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
       toast.error('Erro ao arquivar cliente');
@@ -119,7 +220,7 @@ function Dashboard() {
       toast.success(
         `${customer.cliente} aguardando transferência de ${store}!`
       );
-      window.location.reload();
+      refreshAll(); // Atualiza lista e métricas
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
       toast.error('Erro ao atualizar status');
@@ -131,8 +232,8 @@ function Dashboard() {
     try {
       await markAsContacted(customer);
       notifyProductArrived(customer);
-      toast.success(`${customer.cliente} movido para Contactados!`);
-      window.location.reload();
+      toast.success(`${customer.cliente} pronto para retirada!`);
+      refreshAll(); // Atualiza lista e métricas
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
       toast.error('Erro ao atualizar status');
@@ -146,7 +247,7 @@ function Dashboard() {
         customer._isFromContactedCollection || false;
       await moveToFinished(customer, isFromContactedCollection);
       toast.success(`Venda de ${customer.cliente} finalizada!`);
-      window.location.reload();
+      refreshAll(); // Atualiza lista e métricas
     } catch (error) {
       console.error('Erro ao finalizar venda:', error);
       toast.error('Erro ao finalizar venda');
@@ -158,7 +259,7 @@ function Dashboard() {
     if (modalType === 'awaiting') return 'Clientes Aguardando';
     if (modalType === 'awaiting_transfer')
       return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
-    if (modalType === 'contacted') return 'Clientes Contactados';
+    if (modalType === 'contacted') return 'Pronto para Retirada';
     return '';
   };
 
@@ -190,9 +291,9 @@ function Dashboard() {
   const contactedTabs = [
     {
       id: 'all',
-      label: 'Todos',
+      label: 'Disponíveis',
       count: metrics.totalContacted,
-      icon: 'fa-brands fa-whatsapp',
+      icon: 'fa-solid fa-box-open',
     },
     {
       id: 'finished',
@@ -276,7 +377,7 @@ function Dashboard() {
             </div>
           </AnimatedContainer>
 
-          {/* Card 3: Clientes Contactados */}
+          {/* Card 3: Pronto para Retirada */}
           <AnimatedContainer type="slideDown" delay={0.3}>
             <div
               onClick={() => setModalType('contacted')}
@@ -285,7 +386,7 @@ function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
-                    Contactados
+                    Pronto para Retirada
                   </p>
                   <p className="text-3xl font-bold text-gray-900">
                     {loading ? (
@@ -296,21 +397,20 @@ function Dashboard() {
                   </p>
                 </div>
                 <div className="bg-green-100 rounded-full p-4">
-                  <i className="fa-brands fa-whatsapp text-2xl text-green-600"></i>
+                  <i className="fa-solid fa-box-open text-2xl text-green-600"></i>
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-4">
                 {metrics.totalFinished > 0
                   ? `${metrics.totalFinished} venda(s) finalizada(s)`
-                  : 'Total de clientes atendidos'}
+                  : 'Produtos disponíveis para o cliente'}
               </p>
             </div>
           </AnimatedContainer>
 
           {/* Card 4: Tempo Médio (apenas visual) */}
           <AnimatedContainer type="slideDown" delay={0.4}>
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500"
-            >
+            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-1">
@@ -352,6 +452,10 @@ function Dashboard() {
           onAcceptTransfer={handleAcceptTransfer}
           onProductArrived={handleProductArrived}
           onPurchaseCompleted={handlePurchaseCompleted}
+          onStoreHasStock={handleStoreHasStock}
+          onStoreNoStock={handleStoreNoStock}
+          onClientAccepted={handleClientAccepted}
+          onClientDeclined={handleClientDeclined}
           tabs={
             modalType === 'awaiting'
               ? awaitingTabs

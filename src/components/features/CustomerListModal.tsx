@@ -27,6 +27,11 @@ interface CustomerListModalProps {
   ) => void;
   onProductArrived?: (customer: Customer) => void;
   onPurchaseCompleted?: (customer: Customer) => void;
+  // Novos handlers para sub-estados
+  onStoreHasStock?: (customer: Customer) => void;
+  onStoreNoStock?: (customer: Customer) => void;
+  onClientAccepted?: (customer: Customer) => void;
+  onClientDeclined?: (customer: Customer) => void;
   // Props opcionais para tabs
   tabs?: Tab[];
   activeTab?: string;
@@ -46,6 +51,10 @@ function CustomerListModal({
   onAcceptTransfer,
   onProductArrived,
   onPurchaseCompleted,
+  onStoreHasStock,
+  onStoreNoStock,
+  onClientAccepted,
+  onClientDeclined,
   tabs,
   activeTab,
   onTabChange,
@@ -124,29 +133,22 @@ function CustomerListModal({
 
                           {/* Botões de Ação baseados no status */}
                           <div className="flex items-center gap-2 flex-wrap">
-                            {/* Status: AGUARDANDO - Mostrar botões para contatar lojas */}
+                            {/* Status: AGUARDANDO - SUB-ESTADO 1: Inicial */}
                             {(!customer.status ||
-                              customer.status === 'aguardando') && (
+                              customer.status === 'aguardando') &&
+                              !customer.consultandoLoja &&
+                              !customer.lojaTemEstoque && (
                               <>
-                                <button
-                                  onClick={() => onWhatsApp(customer)}
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors"
-                                  title="Avisar cliente que temos em outra loja"
-                                >
-                                  <i className="fa-brands fa-whatsapp"></i>
-                                  <span>Cliente</span>
-                                </button>
-
                                 {onCheckLojaCampinas && (
                                   <button
                                     onClick={() =>
                                       onCheckLojaCampinas(customer)
                                     }
                                     className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors"
-                                    title="Consultar Loja Campinas"
+                                    title="Consultar disponibilidade na Loja Campinas"
                                   >
                                     <i className="fa-solid fa-store"></i>
-                                    <span>Campinas</span>
+                                    <span>Verificar Campinas</span>
                                   </button>
                                 )}
 
@@ -156,39 +158,80 @@ function CustomerListModal({
                                       onCheckLojaDomPedro(customer)
                                     }
                                     className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500 text-white text-xs rounded-lg hover:bg-purple-600 transition-colors"
-                                    title="Consultar Loja Dom Pedro"
+                                    title="Consultar disponibilidade na Loja Dom Pedro"
                                   >
                                     <i className="fa-solid fa-store"></i>
-                                    <span>Dom Pedro</span>
+                                    <span>Verificar Dom Pedro</span>
                                   </button>
                                 )}
+                              </>
+                            )}
 
-                                {/* Botões para aceitar transferência */}
-                                {onAcceptTransfer && (
-                                  <>
-                                    <button
-                                      onClick={() =>
-                                        onAcceptTransfer(customer, 'Campinas')
-                                      }
-                                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-yellow-500 text-white text-xs rounded-lg hover:bg-yellow-600 transition-colors"
-                                      title="Cliente aceitou transferência de Campinas"
-                                    >
-                                      <i className="fa-solid fa-check"></i>
-                                      <span>Aceitou Campinas</span>
-                                    </button>
+                            {/* Status: AGUARDANDO - SUB-ESTADO 2: Aguardando resposta da LOJA */}
+                            {(!customer.status ||
+                              customer.status === 'aguardando') &&
+                              customer.consultandoLoja &&
+                              !customer.lojaTemEstoque && (
+                              <>
+                                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
+                                  📞 Aguardando resposta - {customer.consultandoLoja}
+                                </span>
 
-                                    <button
-                                      onClick={() =>
-                                        onAcceptTransfer(customer, 'Dom Pedro')
-                                      }
-                                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-500 text-white text-xs rounded-lg hover:bg-orange-600 transition-colors"
-                                      title="Cliente aceitou transferência de Dom Pedro"
-                                    >
-                                      <i className="fa-solid fa-check"></i>
-                                      <span>Aceitou Dom Pedro</span>
-                                    </button>
-                                  </>
-                                )}
+                                <button
+                                  onClick={() =>
+                                    onStoreHasStock && onStoreHasStock(customer)
+                                  }
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors"
+                                  title="Loja confirmou que tem o produto"
+                                >
+                                  <i className="fa-solid fa-check"></i>
+                                  <span>Tem Estoque</span>
+                                </button>
+
+                                <button
+                                  onClick={() =>
+                                    onStoreNoStock && onStoreNoStock(customer)
+                                  }
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors"
+                                  title="Loja não tem o produto"
+                                >
+                                  <i className="fa-solid fa-times"></i>
+                                  <span>Não Tem</span>
+                                </button>
+                              </>
+                            )}
+
+                            {/* Status: AGUARDANDO - SUB-ESTADO 3: Aguardando resposta do CLIENTE */}
+                            {(!customer.status ||
+                              customer.status === 'aguardando') &&
+                              customer.consultandoLoja &&
+                              customer.lojaTemEstoque && (
+                              <>
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
+                                  💬 Cliente notificado - {customer.consultandoLoja}
+                                </span>
+
+                                <button
+                                  onClick={() =>
+                                    onClientAccepted && onClientAccepted(customer)
+                                  }
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-colors"
+                                  title="Cliente aceitou aguardar transferência"
+                                >
+                                  <i className="fa-solid fa-check"></i>
+                                  <span>Cliente Aceitou</span>
+                                </button>
+
+                                <button
+                                  onClick={() =>
+                                    onClientDeclined && onClientDeclined(customer)
+                                  }
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors"
+                                  title="Cliente recusou a transferência"
+                                >
+                                  <i className="fa-solid fa-times"></i>
+                                  <span>Cliente Recusou</span>
+                                </button>
                               </>
                             )}
 
@@ -210,7 +253,7 @@ function CustomerListModal({
                                 </>
                               )}
 
-                            {/* Status: CONTACTADO - Botão de compra concluída */}
+                            {/* Status: PRONTO PARA RETIRADA - Botão de compra concluída */}
                             {customer.status === 'contactado' &&
                               onPurchaseCompleted && (
                                 <button

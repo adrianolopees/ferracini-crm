@@ -12,7 +12,11 @@ interface DashboardMetrics {
   urgentCustomers: number;
 }
 
-function useDashboardMetrics() {
+interface UseDashboardMetricsProps {
+  refreshTrigger?: number;
+}
+
+function useDashboardMetrics(props?: UseDashboardMetricsProps) {
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalActive: 0,
     totalContacted: 0,
@@ -68,9 +72,16 @@ function useDashboardMetrics() {
         const averageWaitTime =
           awaitingCount > 0 ? Math.round(totalDays / awaitingCount) : 0;
 
-        // Incluir dados legados do 'contacted' na contagem de contactados
-        const totalContactedWithLegacy =
-          contactedCount + contactedSnapshot.size;
+        // Incluir dados legados do 'contacted' na contagem de contactados (exceto arquivados)
+        let contactedLegacyCount = 0;
+        contactedSnapshot.forEach((doc) => {
+          const data = doc.data();
+          if (!data.arquivado) {
+            contactedLegacyCount++;
+          }
+        });
+
+        const totalContactedWithLegacy = contactedCount + contactedLegacyCount;
 
         setMetrics({
           totalActive: awaitingCount,
@@ -87,7 +98,7 @@ function useDashboardMetrics() {
       }
     }
     fetchMetrics();
-  }, []);
+  }, [props?.refreshTrigger]);
   return { metrics, loading };
 }
 

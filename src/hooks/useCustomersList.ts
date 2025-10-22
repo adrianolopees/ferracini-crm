@@ -14,9 +14,10 @@ type FilterType =
 interface UseCustomersListProps {
   filterType: FilterType;
   isOpen: boolean; // só busca quando modal abre
+  refreshTrigger?: number; // trigger para forçar atualização
 }
 
-function useCustomersList({ filterType, isOpen }: UseCustomersListProps) {
+function useCustomersList({ filterType, isOpen, refreshTrigger }: UseCustomersListProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -36,6 +37,7 @@ function useCustomersList({ filterType, isOpen }: UseCustomersListProps) {
             allCustomers.push({
               id: doc.id,
               ...doc.data(),
+              status: 'contactado', // Garante que clientes legados tenham status
               _isFromContactedCollection: true,
             } as Customer);
           });
@@ -98,7 +100,7 @@ function useCustomersList({ filterType, isOpen }: UseCustomersListProps) {
     }
 
     fetchCustomers();
-  }, [filterType, isOpen]);
+  }, [filterType, isOpen, refreshTrigger]);
 
   return { customers, loading };
 }
