@@ -260,13 +260,19 @@ function Dashboard() {
         {/* Header */}
         <AnimatedContainer type="slideDown">
           <PageHeader
-            title="Painel de"
-            highlight="Estatísticas"
-            subtitle="Acompanhe reservas, contatos e métricas em tempo real"
+            title="Gestão de"
+            highlight="Clientes"
+            subtitle="Gerencie o fluxo de clientes em tempo real"
           />
         </AnimatedContainer>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 max-w-5xl mx-auto">
+        {/* Ações Rápidas */}
+        <div className="px-4 max-w-5xl mx-auto mb-6">
+          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+            Ações Rápidas
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-5xl mx-auto">
           {/* Card 1: Clientes Aguardando */}
           <AnimatedContainer type="slideDown" delay={0.1}>
             <div
@@ -357,35 +363,110 @@ function Dashboard() {
               </p>
             </div>
           </AnimatedContainer>
+        </div>
 
-          {/* Card 4: Tempo Médio (apenas visual) */}
-          <AnimatedContainer type="slideDown" delay={0.4}>
-            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
-                    Tempo Médio
-                  </p>
-                  <p className="text-3xl font-bold text-gray-900">
+        {/* Estatísticas */}
+        <div className="px-4 max-w-5xl mx-auto mt-8 mb-6">
+          <AnimatedContainer type="slideUp" delay={0.1}>
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <h2 className="text-lg font-semibold text-gray-700 mb-6">
+                Estatísticas
+              </h2>
+
+              {/* Mini Cards de Métricas */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {/* Tempo Médio */}
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <i className="fa-solid fa-hourglass-half text-purple-600"></i>
+                    <p className="text-xs font-medium text-purple-700">
+                      Tempo Médio
+                    </p>
+                  </div>
+                  <p className="text-3xl font-bold text-purple-900">
                     {loading ? (
-                      <i className="fa-solid fa-spinner fa-spin text-purple-500"></i>
+                      <i className="fa-solid fa-spinner fa-spin text-purple-500 text-2xl"></i>
                     ) : (
                       `${metrics.averageWaitTime}d`
                     )}
                   </p>
+                  <p className="text-xs text-purple-600 mt-1">de espera</p>
                 </div>
-                <div className="bg-purple-100 rounded-full p-4">
-                  <i className="fa-solid fa-hourglass-half text-2xl text-purple-600"></i>
+
+                {/* Total Ativos */}
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <i className="fa-solid fa-users text-blue-600"></i>
+                    <p className="text-xs font-medium text-blue-700">
+                      Total Ativos
+                    </p>
+                  </div>
+                  <p className="text-3xl font-bold text-blue-900">
+                    {loading ? (
+                      <i className="fa-solid fa-spinner fa-spin text-blue-500 text-2xl"></i>
+                    ) : (
+                      metrics.totalActive +
+                      metrics.totalAwaitingTransfer +
+                      metrics.totalContacted
+                    )}
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">clientes</p>
+                </div>
+
+                {/* Taxa de Conversão */}
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <i className="fa-solid fa-chart-line text-green-600"></i>
+                    <p className="text-xs font-medium text-green-700">
+                      Taxa Conversão
+                    </p>
+                  </div>
+                  <p className="text-3xl font-bold text-green-900">
+                    {loading ? (
+                      <i className="fa-solid fa-spinner fa-spin text-green-500 text-2xl"></i>
+                    ) : (
+                      `${
+                        metrics.totalFinished > 0
+                          ? Math.round(
+                              (metrics.totalFinished /
+                                (metrics.totalActive +
+                                  metrics.totalAwaitingTransfer +
+                                  metrics.totalContacted +
+                                  metrics.totalFinished)) *
+                                100
+                            )
+                          : 0
+                      }%`
+                    )}
+                  </p>
+                  <p className="text-xs text-green-600 mt-1">finalizadas</p>
+                </div>
+
+                {/* Vendas Finalizadas */}
+                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-4 border border-emerald-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <i className="fa-solid fa-circle-check text-emerald-600"></i>
+                    <p className="text-xs font-medium text-emerald-700">
+                      Vendas
+                    </p>
+                  </div>
+                  <p className="text-3xl font-bold text-emerald-900">
+                    {loading ? (
+                      <i className="fa-solid fa-spinner fa-spin text-emerald-500 text-2xl"></i>
+                    ) : (
+                      metrics.totalFinished
+                    )}
+                  </p>
+                  <p className="text-xs text-emerald-600 mt-1">finalizadas</p>
                 </div>
               </div>
-              <p className="text-xs text-gray-500 mt-4">
-                Dias até o primeiro contato
-              </p>
+
+              {/* Gráfico de Top Produtos */}
+              <div>
+                <TopProductsChart />
+              </div>
             </div>
           </AnimatedContainer>
-        </div>
-        <div className="px-4 max-w-5xl mx-auto pb-8">
-          <TopProductsChart />
         </div>
 
         {/* Modal de Lista de Clientes */}
