@@ -3,8 +3,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import RegisterCustomer from '@/pages/RegisterCustomer';
 import SearchCustomers from '@/pages/SearchCustomers';
 import Dashboard from '@/pages/Dashboard';
-import ContactedCustomers from './pages/ContactedCustomers';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import ContactedCustomers from '@/pages/ContactedCustomers';
+import { ProtectedRoute } from '@/components/routing';
 import Login from '@/pages/Login';
 
 function App() {

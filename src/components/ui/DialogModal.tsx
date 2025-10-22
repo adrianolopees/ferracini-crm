@@ -7,19 +7,12 @@ interface DialogModalProps {
   children: React.ReactNode;
 }
 
-export function DialogModal({
-  isOpen,
-  onClose,
-  title,
-  children,
-}: DialogModalProps) {
+function DialogModal({ isOpen, onClose, title, children }: DialogModalProps) {
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
-        <Dialog.Content
-          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 w-[90vw] max-w-3xl max-h-[85vh] overflow-hidden z-50"
-        >
+        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 w-[90vw] max-w-3xl max-h-[85vh] overflow-hidden z-50">
           <div className="flex justify-between items-center mb-4">
             <Dialog.Title className="text-xl font-semibold text-gray-900">
               {title}
@@ -38,3 +31,5 @@ export function DialogModal({
     </Dialog.Root>
   );
 }
+
+export default DialogModal;

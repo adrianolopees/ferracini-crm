@@ -6,10 +6,7 @@ interface AnimatedListItemProps {
   index?: number;
 }
 
-export function AnimatedListItem({
-  children,
-  index = 0,
-}: AnimatedListItemProps) {
+function AnimatedListItem({ children, index = 0 }: AnimatedListItemProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -24,3 +21,5 @@ export function AnimatedListItem({
     </motion.div>
   );
 }
+
+export default AnimatedListItem;

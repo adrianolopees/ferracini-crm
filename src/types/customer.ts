@@ -1,3 +1,9 @@
+export type CustomerStatus =
+  | 'aguardando'
+  | 'aguardando_transferencia'
+  | 'contactado'
+  | 'finalizado';
+
 export interface Customer {
   id: string;
   cliente: string;
@@ -6,8 +12,14 @@ export interface Customer {
   referencia: string;
   numeracao: string;
   cor: string;
-  vendedor?: string; // Opcional para compatibilidade com clientes antigos
+  vendedor?: string;
   dataCriacao: string;
+  status?: CustomerStatus;
+  dataContacto?: string;
+  dataTransferencia?: string;
+  dataFinalizacao?: string;
+  lojaOrigem?: string;
+  _isFromContactedCollection?: boolean;
 }
 
 export interface ContactedCustomer extends Customer {

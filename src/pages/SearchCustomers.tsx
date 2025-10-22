@@ -192,60 +192,68 @@ function SearchCustomers() {
                                 </span>
                               )}
                             </div>
-                            <span className={`text-sm block mb-2 ${status.textClass}`}>
+                            <span
+                              className={`text-sm block mb-2 ${status.textClass}`}
+                            >
                               Aguardando há{' '}
                               {formatDistanceToNow(customer.dataCriacao)}
                             </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm sm:text-base text-gray-600">
-                              {customer.celular}
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm sm:text-base text-gray-600">
+                                {customer.celular}
+                              </span>
+                              <button
+                                onClick={() => handleWhatsApp(customer)}
+                                className="inline-flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors cursor-pointer"
+                                title="Enviar WhatsApp"
+                              >
+                                <i className="fa-brands fa-whatsapp text-lg"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteClick(customer)}
+                            className="inline-flex items-center justify-center w-9 h-9 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                            title="Excluir cliente"
+                          >
+                            <i className="fa-regular fa-trash-can text-lg"></i>
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 text-base">
+                          <div>
+                            <span className="text-gray-500 text-sm">
+                              Modelo:
                             </span>
-                            <button
-                              onClick={() => handleWhatsApp(customer)}
-                              className="inline-flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors cursor-pointer"
-                              title="Enviar WhatsApp"
-                            >
-                              <i className="fa-brands fa-whatsapp text-lg"></i>
-                            </button>
+                            <p className="font-semibold text-gray-900">
+                              {customer.modelo}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-sm">
+                              Referência:
+                            </span>
+                            <p className="font-semibold text-gray-900">
+                              {customer.referencia}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-sm">
+                              Numeração:
+                            </span>
+                            <p className="font-semibold text-gray-900">
+                              {customer.numeracao}
+                            </p>
+                          </div>
+                          <div>
+                            <span className="text-gray-500 text-sm">Cor:</span>
+                            <p className="font-semibold text-gray-900">
+                              {customer.cor}
+                            </p>
                           </div>
                         </div>
-                        <button
-                          onClick={() => handleDeleteClick(customer)}
-                          className="inline-flex items-center justify-center w-9 h-9 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                          title="Excluir cliente"
-                        >
-                          <i className="fa-regular fa-trash-can text-lg"></i>
-                        </button>
                       </div>
-
-                      <div className="grid grid-cols-2 gap-4 text-base">
-                        <div>
-                          <span className="text-gray-500 text-sm">Modelo:</span>
-                          <p className="font-semibold text-gray-900">
-                            {customer.modelo}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 text-sm">Referência:</span>
-                          <p className="font-semibold text-gray-900">
-                            {customer.referencia}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 text-sm">Numeração:</span>
-                          <p className="font-semibold text-gray-900">
-                            {customer.numeracao}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-gray-500 text-sm">Cor:</span>
-                          <p className="font-semibold text-gray-900">
-                            {customer.cor}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </AnimatedListItem>
+                    </AnimatedListItem>
                   );
                 })}
               </div>

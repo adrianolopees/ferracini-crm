@@ -7,7 +7,7 @@ interface ProductCount {
   count: number;
 }
 
-export function useTopProducts(limit: number = 10) {
+function useTopProducts(limit: number = 10) {
   const [products, setProducts] = useState<ProductCount[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -60,3 +60,5 @@ export function useTopProducts(limit: number = 10) {
   }, [limit]);
   return { products, loading };
 }
+
+export default useTopProducts;

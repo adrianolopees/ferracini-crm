@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '@/hooks';
 
-export default function Navigation() {
+function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isLoggingOut } = useAuth();
@@ -97,3 +97,5 @@ export default function Navigation() {
     </div>
   );
 }
+
+export default Navigation;

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks';
 import { loginShcema, LoginFormData } from '@/schemas/loginSchema';
 import { getFirebaseErrorMessage } from '@/utils';
 import { Spinner, Button, Input } from '@/components/ui';

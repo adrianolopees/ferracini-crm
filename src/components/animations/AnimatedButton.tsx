@@ -6,7 +6,7 @@ interface AnimatedButtonProps extends HTMLMotionProps<'button'> {
   className?: string;
 }
 
-export function AnimatedButton({
+function AnimatedButton({
   children,
   className = '',
   ...props
@@ -23,3 +23,5 @@ export function AnimatedButton({
     </motion.button>
   );
 }
+
+export default AnimatedButton;

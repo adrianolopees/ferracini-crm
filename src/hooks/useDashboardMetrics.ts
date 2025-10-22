@@ -6,14 +6,18 @@ import { getDaysWaiting } from '@/utils';
 interface DashboardMetrics {
   totalActive: number;
   totalContacted: number;
+  totalAwaitingTransfer: number;
+  totalFinished: number;
   averageWaitTime: number;
   urgentCustomers: number;
 }
 
-export function useDashboardMetrics() {
+function useDashboardMetrics() {
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalActive: 0,
     totalContacted: 0,
+    totalAwaitingTransfer: 0,
+    totalFinished: 0,
     averageWaitTime: 0,
     urgentCustomers: 0,
   });
@@ -30,26 +34,45 @@ export function useDashboardMetrics() {
 
         let urgentCount = 0;
         let totalDays = 0;
+        let awaitingCount = 0;
+        let awaitingTransferCount = 0;
+        let contactedCount = 0;
+        let finishedCount = 0;
 
         clientesSnapshot.forEach((doc) => {
           const data = doc.data();
+          const status = data.status || 'aguardando'; // backward compatibility
           const daysWaiting = getDaysWaiting(data.dataCriacao);
 
-          if (daysWaiting >= 7) {
+          // Contadores por status
+          if (status === 'aguardando') awaitingCount++;
+          if (status === 'aguardando_transferencia') awaitingTransferCount++;
+          if (status === 'contactado') contactedCount++;
+          if (status === 'finalizado') finishedCount++;
+
+          // Urgente se aguardando há 7+ dias
+          if (status === 'aguardando' && daysWaiting >= 7) {
             urgentCount++;
           }
 
-          totalDays += daysWaiting;
+          // Tempo médio apenas para aguardando
+          if (status === 'aguardando') {
+            totalDays += daysWaiting;
+          }
         });
 
         const averageWaitTime =
-          clientesSnapshot.size > 0
-            ? Math.round(totalDays / clientesSnapshot.size)
-            : 0;
+          awaitingCount > 0 ? Math.round(totalDays / awaitingCount) : 0;
+
+        // Incluir dados legados do 'contacted' na contagem de contactados
+        const totalContactedWithLegacy =
+          contactedCount + contactedSnapshot.size;
 
         setMetrics({
-          totalActive: clientesSnapshot.size,
-          totalContacted: contactedSnapshot.size, // 👈 BUSCA REAL DO BANCO
+          totalActive: awaitingCount,
+          totalContacted: totalContactedWithLegacy,
+          totalAwaitingTransfer: awaitingTransferCount,
+          totalFinished: finishedCount,
           averageWaitTime: averageWaitTime,
           urgentCustomers: urgentCount,
         });
@@ -64,10 +87,4 @@ export function useDashboardMetrics() {
   return { metrics, loading };
 }
 
-/* function calculateDaysWaiting(createdAt: string): number {
-  const now = new Date();
-  const created = new Date(createdAt);
-  const diffTime = Math.abs(now.getTime() - created.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
-} */
+export default useDashboardMetrics;

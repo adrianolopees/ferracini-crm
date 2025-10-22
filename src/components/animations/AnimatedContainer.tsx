@@ -14,7 +14,7 @@ interface AnimatedContainerProps {
     | 'scale';
 }
 
-export function AnimatedContainer({
+function AnimatedContainer({
   children,
   className = '',
   delay = 0,
@@ -58,3 +58,5 @@ export function AnimatedContainer({
     </motion.div>
   );
 }
+
+export default AnimatedContainer;

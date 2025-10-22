@@ -9,10 +9,10 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import { useTopProducts } from '@/hooks/useTopProducts';
+import { useTopProducts } from '@/hooks';
 import { AnimatedContainer } from '@/components/animations';
 
-export function TopProductsChart() {
+function TopProductsChart() {
   const { products, loading } = useTopProducts(10);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -156,3 +156,5 @@ export function TopProductsChart() {
     </AnimatedContainer>
   );
 }
+
+export default TopProductsChart;
