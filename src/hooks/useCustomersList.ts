@@ -58,25 +58,28 @@ function useCustomersList({ filterType, isOpen }: UseCustomersListProps) {
           });
         }
 
+        // Primeiro: filtrar clientes arquivados (não mostrar em nenhuma lista)
+        const activeCustomers = allCustomers.filter((c) => !c.arquivado);
+
         // Filtrar baseado no tipo
-        let filtered = allCustomers;
+        let filtered = activeCustomers;
 
         if (filterType === 'all') {
-          filtered = allCustomers.filter(
+          filtered = activeCustomers.filter(
             (c) => !c.status || c.status === 'aguardando'
           );
         } else if (filterType === 'urgent') {
-          filtered = allCustomers.filter(
+          filtered = activeCustomers.filter(
             (c) =>
               (!c.status || c.status === 'aguardando') &&
               getDaysWaiting(c.dataCriacao) >= 7
           );
         } else if (filterType === 'awaiting_transfer') {
-          filtered = allCustomers.filter(
+          filtered = activeCustomers.filter(
             (c) => c.status === 'aguardando_transferencia'
           );
         } else if (filterType === 'finished') {
-          filtered = allCustomers.filter((c) => c.status === 'finalizado');
+          filtered = activeCustomers.filter((c) => c.status === 'finalizado');
         }
         // filterType === 'contacted' já está filtrado acima
 

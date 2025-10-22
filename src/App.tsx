@@ -4,6 +4,7 @@ import RegisterCustomer from '@/pages/RegisterCustomer';
 import SearchCustomers from '@/pages/SearchCustomers';
 import Dashboard from '@/pages/Dashboard';
 import ContactedCustomers from '@/pages/ContactedCustomers';
+import History from '@/pages/History';
 import { ProtectedRoute } from '@/components/routing';
 import Login from '@/pages/Login';
 
@@ -37,10 +38,18 @@ function App() {
           }
         />
         <Route
-          path="historico"
+          path="/historico"
           element={
             <ProtectedRoute>
               <ContactedCustomers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedRoute>
+              <History />
             </ProtectedRoute>
           }
         />

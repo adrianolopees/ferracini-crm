@@ -4,6 +4,13 @@ export type CustomerStatus =
   | 'contactado'
   | 'finalizado';
 
+export type ArchiveReason =
+  | 'Desistiu'
+  | 'Não respondeu'
+  | 'Comprou concorrente'
+  | 'Produto não disponível'
+  | 'Outro';
+
 export interface Customer {
   id: string;
   cliente: string;
@@ -20,6 +27,10 @@ export interface Customer {
   dataFinalizacao?: string;
   lojaOrigem?: string;
   _isFromContactedCollection?: boolean;
+  arquivado?: boolean;
+  motivoArquivamento?: ArchiveReason;
+  dataArquivamento?: string;
+  observacoes?: string;
 }
 
 export interface ContactedCustomer extends Customer {

@@ -161,13 +161,205 @@
 
 ---
 
+## 🎯 ROADMAP ESTRATÉGICO - Preparação para Portfólio/Vendas
+
+### 🔥 FASE CRÍTICA - Sistema de Proteção de Dados & Métricas (PRIORIDADE MÁXIMA)
+
+> **Objetivo:** Transformar o app em ferramenta de vendas com dados mensuráveis de ROI
+
+#### ✅ Melhorias em Clientes Finalizados (CONCLUÍDO)
+- [x] Remover marcações de urgência para status 'finalizado'
+- [x] Trocar bolinha por ícone de check verde
+- [x] Background verde suave (bg-emerald-50/50)
+- [x] Mostrar "Finalizada em DD/MM/AAAA" ao invés de "Aguardando há X dias"
+
+#### 🚀 FASE 1 - Controle de Exclusão & Arquivamento (FAZER HOJE)
+
+**1.1 - Sistema de Arquivamento (ao invés de exclusão completa)**
+- [ ] Adicionar campo `arquivado: boolean` ao tipo Customer
+- [ ] Adicionar campo `motivoArquivamento?: string` (dropdown)
+- [ ] Adicionar campo `dataArquivamento?: string`
+- [ ] Criar enum com motivos: "Desistiu", "Não respondeu", "Comprou concorrente", "Produto não disponível", "Outro"
+- [ ] Modificar queries para filtrar `arquivado === false` por padrão
+- [ ] **REGRA CRÍTICA:** Clientes com `status === 'finalizado'` NÃO podem ser arquivados/excluídos
+
+**1.2 - Modal de Arquivamento (substituir exclusão simples)**
+- [ ] Criar componente `ArchiveModal.tsx`
+- [ ] Campos: Dropdown de motivo + textarea opcional para observações
+- [ ] Botão "Arquivar" ao invés de "Excluir"
+- [ ] Substituir chamadas de `deleteDoc()` por `updateDoc()` com flag `arquivado: true`
+
+**1.3 - Página de Clientes Arquivados**
+- [ ] Criar rota `/archived`
+- [ ] Adicionar ao Navigation (apenas para gerente/admin)
+- [ ] Listar clientes arquivados com motivo
+- [ ] Ação: "Restaurar" (volta para ativo)
+- [ ] Busca e filtros por motivo de arquivamento
+
+**1.4 - Proteção de Vendas Concluídas**
+- [ ] Esconder botão de exclusão/arquivamento quando `status === 'finalizado'`
+- [ ] Adicionar tooltip: "Vendas concluídas não podem ser removidas para preservar histórico"
+- [ ] Validação no backend (Firebase Rules): bloquear exclusão de documentos com `status: 'finalizado'`
+
+---
+
+#### 🚀 FASE 2 - Sistema de Métricas & Analytics (FAZER HOJE/AMANHÃ)
+
+**2.1 - Estrutura de Dados para Analytics**
+- [ ] Criar coleção `analytics` no Firebase
+- [ ] Documento `global` com métricas gerais:
+  ```typescript
+  {
+    totalReservas: number,
+    totalContactados: number,
+    totalVendasConcluidas: number,
+    taxaConversao: number, // (vendas / reservas) * 100
+    receitaTotal?: number, // se souber valores
+    ultimaAtualizacao: timestamp
+  }
+  ```
+- [ ] Documento `por_vendedor/{vendedorId}`:
+  ```typescript
+  {
+    nome: string,
+    totalAtendimentos: number,
+    totalVendas: number,
+    taxaConversao: number,
+    receitaGerada?: number
+  }
+  ```
+- [ ] Documento `por_produto/{modelo}`:
+  ```typescript
+  {
+    modelo: string,
+    referencia: string,
+    quantidadeReservas: number,
+    quantidadeVendas: number,
+    taxaConversao: number
+  }
+  ```
+
+**2.2 - Funções de Atualização de Métricas**
+- [ ] Criar `analyticsService.ts`
+- [ ] Função `updateGlobalMetrics()` - atualiza após cada ação
+- [ ] Função `updateVendedorMetrics(vendedor)` - rastreia performance individual
+- [ ] Função `updateProdutoMetrics(modelo, referencia)` - produtos mais vendidos
+- [ ] Chamar funções ao:
+  - Cadastrar novo cliente
+  - Mover para contactado
+  - Finalizar venda
+  - Arquivar cliente
+
+**2.3 - Dashboard de Analytics (nova página)**
+- [ ] Criar rota `/analytics`
+- [ ] Adicionar ao Navigation (📊 Analytics - apenas gerente/admin)
+- [ ] **Cards de Métricas Principais:**
+  - Total de Reservas (histórico completo)
+  - Total de Vendas Concluídas
+  - Taxa de Conversão Geral (%)
+  - Receita Gerada (se disponível)
+- [ ] **Gráficos:**
+  - Gráfico de linha: Evolução de vendas por mês (Chart.js ou Recharts)
+  - Gráfico de barras: Ranking de vendedores
+  - Gráfico de pizza: Motivos de arquivamento (para melhorar processo)
+  - Tabela: Top 10 produtos mais vendidos
+- [ ] **Comparações temporais:**
+  - Este mês vs mês anterior
+  - Indicadores de crescimento (↑ +15% nas vendas)
+
+---
+
+#### 🚀 FASE 3 - Sistema de Permissões Básico (OPCIONAL - se houver tempo)
+
+**3.1 - Tipos de Usuário**
+- [ ] Adicionar campo `role: 'vendedor' | 'gerente' | 'admin'` no Firebase Auth
+- [ ] Criar contexto `usePermissions()`
+
+**3.2 - Regras de Permissão**
+- **Vendedor:**
+  - ✅ Ver clientes
+  - ✅ Cadastrar clientes
+  - ✅ Contactar via WhatsApp
+  - ✅ Marcar como finalizado
+  - ❌ Arquivar clientes
+  - ❌ Ver Analytics
+  - ❌ Ver clientes arquivados
+
+- **Gerente:**
+  - ✅ Tudo do vendedor +
+  - ✅ Arquivar clientes (exceto finalizados)
+  - ✅ Ver Analytics
+  - ✅ Ver e restaurar clientes arquivados
+  - ❌ Excluir permanentemente
+
+- **Admin:**
+  - ✅ Acesso total
+  - ✅ Gerenciar usuários
+  - ✅ Exportar dados
+
+**3.3 - UI Condicional**
+- [ ] Mostrar/esconder botões baseado em permissões
+- [ ] Esconder rotas protegidas no Navigation
+- [ ] Mensagem de erro ao tentar ação sem permissão
+
+---
+
+## 🎯 ORDEM DE IMPLEMENTAÇÃO RECOMENDADA (HOJE)
+
+### ✅ Etapa 1: Proteção de Dados (1-2h)
+1. Adicionar campos de arquivamento ao tipo Customer
+2. Bloquear exclusão de clientes finalizados (esconder botão)
+3. Criar ArchiveModal com dropdown de motivos
+4. Substituir `deleteDoc()` por arquivamento
+
+### ✅ Etapa 2: Página de Arquivados (1h)
+5. Criar página ArchivedCustomers
+6. Listar clientes arquivados
+7. Função de restaurar
+
+### ✅ Etapa 3: Estrutura de Métricas (1-2h)
+8. Criar analyticsService.ts
+9. Criar coleção analytics no Firebase
+10. Implementar funções de atualização
+11. Integrar com ações existentes (cadastro, finalização)
+
+### ⏰ Etapa 4: Dashboard de Analytics (2-3h - se houver tempo)
+12. Criar página Analytics
+13. Buscar dados da coleção analytics
+14. Implementar cards de métricas
+15. Adicionar gráfico básico (produtos mais vendidos já existe!)
+
+---
+
+## 💼 ARGUMENTOS PARA PORTFÓLIO/ENTREVISTAS
+
+### Antes do Sistema:
+❌ Clientes esquecidos sem controle
+❌ Zero rastreamento de conversão
+❌ Impossível medir performance de vendedores
+❌ Dados perdidos com exclusões acidentais
+❌ Sem noção de quanto o processo ajuda a vender
+
+### Depois do Sistema:
+✅ Taxa de conversão de X% (dados reais!)
+✅ Tempo médio de atendimento: Y dias
+✅ R$ XXX em vendas rastreadas pelo sistema
+✅ Ranking de vendedores para motivar equipe
+✅ Histórico protegido (vendas nunca são apagadas)
+✅ Métricas em tempo real para tomada de decisão
+✅ ROI mensurável: "Este app aumentou vendas em X%"
+
+---
+
 ## 🎯 Prioridade para próxima sessão
 
 1. ~~**Dashboard**~~ ✅ CONCLUÍDO - Dashboard funcional com métricas e modal interativo
-2. **Histórico de Contactados** - Implementar funcionalidade de mover clientes para histórico ao clicar no WhatsApp
-3. **Paginação na busca** - Melhorar UX quando houver muitos resultados
-4. **Filtros avançados** - Permitir filtrar por cor, numeração, data
-5. **Gráficos no Dashboard** - Visualizações de dados (Chart.js ou Recharts)
+2. ✅ **Melhorias em Finalizados** ✅ CONCLUÍDO
+3. 🔥 **Sistema de Arquivamento** - CRÍTICO para preservar dados
+4. 🔥 **Analytics Service** - CRÍTICO para métricas de vendas
+5. **Dashboard de Analytics** - Para demonstrações e portfólio
+6. **Paginação na busca** - Melhorar UX quando houver muitos resultados
+7. **Gráficos no Dashboard** - Visualizações de dados (Chart.js ou Recharts)
 
 ---
 

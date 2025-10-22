@@ -41,6 +41,10 @@ function useDashboardMetrics() {
 
         clientesSnapshot.forEach((doc) => {
           const data = doc.data();
+
+          // PROTEÇÃO: Ignorar clientes arquivados
+          if (data.arquivado) return;
+
           const status = data.status || 'aguardando'; // backward compatibility
           const daysWaiting = getDaysWaiting(data.dataCriacao);
 

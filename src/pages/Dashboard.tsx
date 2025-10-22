@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Navigation, PageHeader } from '@/components/ui';
+import { Navigation, PageHeader, ArchiveModal } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 import { useDashboardMetrics } from '@/hooks';
 import { useCustomersList } from '@/hooks';
 import { CustomerListModal } from '@/components/features';
-import { Customer } from '@/types/customer';
-import { deleteDoc, doc } from 'firebase/firestore';
+import { Customer, ArchiveReason } from '@/types/customer';
+import { updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
 import { TopProductsChart } from '@/components/charts';
@@ -28,6 +28,12 @@ function Dashboard() {
   const [modalType, setModalType] = useState<
     'all' | 'urgent' | 'awaiting_transfer' | 'contacted' | 'finished' | null
   >(null);
+
+  // Estado para controlar modal de arquivamento
+  const [archiveModalOpen, setArchiveModalOpen] = useState(false);
+  const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(
+    null
+  );
 
   // Hook para buscar clientes filtrados
   const { customers, loading: customersLoading } = useCustomersList({
@@ -53,17 +59,35 @@ function Dashboard() {
     toast('Consulta enviada para Loja Dom Pedro');
   };
 
-  // Função para deletar cliente
-  const handleDelete = async (customer: Customer) => {
-    if (!confirm(`Deseja excluir ${customer.cliente}?`)) return;
+  // Função para abrir modal de arquivamento
+  const handleDelete = (customer: Customer) => {
+    setModalType(null); // Fecha o modal de lista primeiro
+    setCustomerToArchive(customer);
+    setArchiveModalOpen(true);
+  };
+
+  // Função para arquivar cliente
+  const handleArchiveCustomer = async (
+    reason: ArchiveReason,
+    notes?: string
+  ) => {
+    if (!customerToArchive) return;
 
     try {
-      await deleteDoc(doc(db, 'clientes', customer.id));
-      toast.success(`Cliente ${customer.cliente} excluído!`);
+      await updateDoc(doc(db, 'clientes', customerToArchive.id), {
+        arquivado: true,
+        motivoArquivamento: reason,
+        dataArquivamento: new Date().toISOString(),
+        observacoes: notes,
+      });
+
+      toast.success(`${customerToArchive.cliente} arquivado com sucesso!`);
+      setArchiveModalOpen(false);
+      setCustomerToArchive(null);
       window.location.reload();
     } catch (error) {
-      console.error('Erro ao excluir cliente:', error);
-      toast.error('Erro ao excluir cliente');
+      console.error('Erro ao arquivar cliente:', error);
+      toast.error('Erro ao arquivar cliente');
     }
   };
 
@@ -332,6 +356,14 @@ function Dashboard() {
           onAcceptTransfer={handleAcceptTransfer}
           onProductArrived={handleProductArrived}
           onPurchaseCompleted={handlePurchaseCompleted}
+        />
+
+        {/* Modal de Arquivamento */}
+        <ArchiveModal
+          isOpen={archiveModalOpen}
+          onClose={() => setArchiveModalOpen(false)}
+          onConfirm={handleArchiveCustomer}
+          customerName={customerToArchive?.cliente || ''}
         />
       </main>
     </div>

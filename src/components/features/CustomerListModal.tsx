@@ -60,7 +60,8 @@ function CustomerListModal({
               return (
                 <AnimatedListItem key={customer.id} index={index}>
                   <div
-                    className={`bg-gray-50 rounded-lg p-4 border-l-4 hover:shadow-md transition-shadow duration-200 ${status.borderClass}`}
+                    className={`${customer.status === 'finalizado' ? 'bg-emerald-50/50 border-l-emerald-500' : `bg-gray-50 ${status.borderClass}`}
+                    rounded-lg p-4 border-l-4 hover:shadow-md transition-shadow duration-200`}
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
@@ -69,10 +70,17 @@ function CustomerListModal({
                             <h3 className="text-base font-semibold text-gray-900">
                               {customer.cliente}
                             </h3>
-                            <span
-                              className={`inline-block w-2 h-2 rounded-full ${status.dotClass}`}
-                              title={status.label}
-                            ></span>
+                            {customer.status === 'finalizado' ? (
+                              <i
+                                className="fa-solid fa-circle-check text-emerald-600"
+                                title="Venda Concluída"
+                              ></i>
+                            ) : (
+                              <span
+                                className={`inline-block w-2 h-2 rounded-full ${status.dotClass}`}
+                                title={status.label}
+                              ></span>
+                            )}
                           </div>
                           {customer.vendedor && (
                             <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
@@ -80,12 +88,22 @@ function CustomerListModal({
                             </span>
                           )}
                         </div>
-                        <span
-                          className={`text-xs block mb-1 ${status.textClass}`}
-                        >
-                          Aguardando há{' '}
-                          {formatDistanceToNow(customer.dataCriacao)}
-                        </span>
+                        {customer.status === 'finalizado' &&
+                        customer.dataFinalizacao ? (
+                          <span className="text-xs block mb-1 text-emerald-600 font-medium">
+                            Finalizada em{' '}
+                            {new Date(
+                              customer.dataFinalizacao
+                            ).toLocaleDateString('pt-BR')}
+                          </span>
+                        ) : (
+                          <span
+                            className={`text-xs block mb-1 ${status.textClass}`}
+                          >
+                            Aguardando há{' '}
+                            {formatDistanceToNow(customer.dataCriacao)}
+                          </span>
+                        )}
                         <div className="space-y-2">
                           <span className="text-sm text-gray-600 block">
                             {customer.celular}
@@ -201,13 +219,16 @@ function CustomerListModal({
                           </div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => onDelete(customer)}
-                        className="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                        title="Excluir cliente"
-                      >
-                        <i className="fa-regular fa-trash-can text-base"></i>
-                      </button>
+                      {/* Só mostra botão de excluir se NÃO for finalizado */}
+                      {customer.status !== 'finalizado' && (
+                        <button
+                          onClick={() => onDelete(customer)}
+                          className="inline-flex items-center justify-center w-8 h-8 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                          title="Arquivar cliente"
+                        >
+                          <i className="fa-regular fa-trash-can text-base"></i>
+                        </button>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 text-sm">
