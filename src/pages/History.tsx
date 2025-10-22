@@ -16,11 +16,12 @@ import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { differenceInDays, parseISO } from 'date-fns';
 import { sendGenericMessage } from '@/services/whatsappService';
 
-type TabType = 'contacted' | 'archived';
+type TabType = 'finalized' | 'contacted' | 'archived';
 
 function History() {
-  const [activeTab, setActiveTab] = useState<TabType>('contacted');
+  const [activeTab, setActiveTab] = useState<TabType>('finalized');
   const [searchTerm, setSearchTerm] = useState('');
+  const [finalizedCustomers, setFinalizedCustomers] = useState<Customer[]>([]);
   const [contactedCustomers, setContactedCustomers] = useState<
     ContactedCustomer[]
   >([]);
@@ -41,7 +42,11 @@ function History() {
     setSearchTerm('');
 
     const customers =
-      activeTab === 'contacted' ? contactedCustomers : archivedCustomers;
+      activeTab === 'finalized'
+        ? finalizedCustomers
+        : activeTab === 'contacted'
+          ? contactedCustomers
+          : archivedCustomers;
 
     if (searchTerm.trim() === '') {
       setFilteredCustomers(customers);
@@ -56,62 +61,61 @@ function History() {
       );
       setFilteredCustomers(filtered);
     }
-  }, [searchTerm, activeTab, contactedCustomers, archivedCustomers]);
+  }, [
+    searchTerm,
+    activeTab,
+    finalizedCustomers,
+    contactedCustomers,
+    archivedCustomers,
+  ]);
 
   const fetchAllCustomers = async () => {
     try {
       setLoading(true);
 
-      // Buscar contactados (coleção 'contacted' + status 'contactado' e 'finalizado' da coleção 'clientes')
+      const finalized: Customer[] = [];
+      const contacted: ContactedCustomer[] = [];
+      const archived: Customer[] = [];
+      const contactedIds = new Set<string>(); // Evitar duplicatas
+
+      // Buscar da coleção 'contacted' (dados legados)
       const contactedQuery = query(collection(db, 'contacted'));
       const contactedSnapshot = await getDocs(contactedQuery);
-      const contacted: ContactedCustomer[] = [];
-      const contactedIds = new Set<string>(); // PROTEÇÃO: rastrear IDs para evitar duplicatas
 
       contactedSnapshot.forEach((doc) => {
         const data = doc.data();
-        // PROTEÇÃO: Não adicionar se foi arquivado
         if (!data.arquivado) {
-          contacted.push({ id: doc.id, ...data } as ContactedCustomer);
-          contactedIds.add(doc.id); // Marcar ID como já adicionado
-        }
-      });
-
-      // Buscar também da coleção 'clientes' com status contactado/finalizado
-      const clientesQuery = query(collection(db, 'clientes'));
-      const clientesSnapshot = await getDocs(clientesQuery);
-
-      clientesSnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (
-          (data.status === 'contactado' || data.status === 'finalizado') &&
-          !data.arquivado &&
-          !contactedIds.has(doc.id) // PROTEÇÃO: Só adiciona se ID ainda não existe
-        ) {
           contacted.push({ id: doc.id, ...data } as ContactedCustomer);
           contactedIds.add(doc.id);
         }
       });
 
-      // Buscar arquivados (EXCLUINDO finalizados que foram arquivados por engano)
-      const archivedQuery = query(
-        collection(db, 'clientes'),
-        where('arquivado', '==', true)
-      );
-      const archivedSnapshot = await getDocs(archivedQuery);
-      const archived: Customer[] = [];
+      // Buscar da coleção 'clientes'
+      const clientesQuery = query(collection(db, 'clientes'));
+      const clientesSnapshot = await getDocs(clientesQuery);
 
-      archivedSnapshot.forEach((doc) => {
+      clientesSnapshot.forEach((doc) => {
         const data = doc.data();
-        // Só adiciona se NÃO for finalizado (proteção contra dados inconsistentes)
-        if (data.status !== 'finalizado') {
-          archived.push({ id: doc.id, ...data } as Customer);
+
+        if (data.arquivado) {
+          // Arquivados (exceto finalizados)
+          if (data.status !== 'finalizado') {
+            archived.push({ id: doc.id, ...data } as Customer);
+          }
+        } else if (data.status === 'finalizado') {
+          // Vendas finalizadas
+          finalized.push({ id: doc.id, ...data } as Customer);
+        } else if (data.status === 'contactado' && !contactedIds.has(doc.id)) {
+          // Contactados (excluindo duplicatas da coleção contacted)
+          contacted.push({ id: doc.id, ...data } as ContactedCustomer);
+          contactedIds.add(doc.id);
         }
       });
 
+      setFinalizedCustomers(finalized);
       setContactedCustomers(contacted);
       setArchivedCustomers(archived);
-      setFilteredCustomers(contacted); // Por padrão mostra contactados
+      setFilteredCustomers(finalized); // Por padrão mostra finalizados
     } catch (error) {
       console.error('Erro ao buscar histórico:', error);
       toast.error('Erro ao carregar histórico');
@@ -153,10 +157,16 @@ function History() {
 
   const tabs = [
     {
+      id: 'finalized',
+      label: 'Vendas Finalizadas',
+      count: finalizedCustomers.length,
+      icon: 'fa-solid fa-circle-check',
+    },
+    {
       id: 'contacted',
       label: 'Contactados',
       count: contactedCustomers.length,
-      icon: 'fa-solid fa-circle-check',
+      icon: 'fa-solid fa-box-open',
     },
     {
       id: 'archived',
@@ -176,7 +186,7 @@ function History() {
             <PageHeader
               title="Histórico de"
               highlight="Clientes"
-              subtitle="Acompanhe clientes contactados e arquivados"
+              subtitle="Vendas finalizadas, contactados e arquivados"
             />
           </AnimatedContainer>
 
@@ -191,7 +201,13 @@ function History() {
                 {/* Busca */}
                 <div className="mb-6">
                   <Input
-                    label={`Buscar em ${activeTab === 'contacted' ? 'Contactados' : 'Arquivados'}`}
+                    label={`Buscar em ${
+                      activeTab === 'finalized'
+                        ? 'Vendas Finalizadas'
+                        : activeTab === 'contacted'
+                          ? 'Contactados'
+                          : 'Arquivados'
+                    }`}
                     type="search"
                     placeholder="Digite nome, modelo, referência ou telefone..."
                     value={searchTerm}
@@ -211,18 +227,22 @@ function History() {
                       <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
                         <i
                           className={`text-gray-400 text-2xl ${
-                            activeTab === 'contacted'
+                            activeTab === 'finalized'
                               ? 'fa-solid fa-circle-check'
-                              : 'fa-solid fa-archive'
+                              : activeTab === 'contacted'
+                                ? 'fa-solid fa-box-open'
+                                : 'fa-solid fa-archive'
                           }`}
                         ></i>
                       </div>
                       <p className="text-gray-600 font-medium">
                         {searchTerm
                           ? 'Nenhum resultado encontrado'
-                          : activeTab === 'contacted'
-                            ? 'Nenhum cliente contactado ainda'
-                            : 'Nenhum cliente arquivado'}
+                          : activeTab === 'finalized'
+                            ? 'Nenhuma venda finalizada ainda'
+                            : activeTab === 'contacted'
+                              ? 'Nenhum cliente contactado ainda'
+                              : 'Nenhum cliente arquivado'}
                       </p>
                       <p className="text-gray-500 text-sm mt-1">
                         {searchTerm && 'Tente outro termo de busca'}
@@ -230,14 +250,21 @@ function History() {
                     </div>
                   ) : (
                     filteredCustomers.map((customer, index) => {
+                      const isFinalized = activeTab === 'finalized';
                       const isContactedTab = activeTab === 'contacted';
-                      const isFinalized = customer.status === 'finalizado';
+                      const isArchivedTab = activeTab === 'archived';
 
                       return (
                         <AnimatedListItem key={customer.id} index={index}>
                           <div
                             className={`
-                              ${isFinalized ? 'bg-emerald-50/50 border-l-emerald-500' : isContactedTab ? 'bg-blue-50 border-l-blue-500' : 'bg-orange-50 border-l-orange-500'}
+                              ${
+                                isFinalized
+                                  ? 'bg-emerald-50/50 border-l-emerald-500'
+                                  : isContactedTab
+                                    ? 'bg-blue-50 border-l-blue-500'
+                                    : 'bg-orange-50 border-l-orange-500'
+                              }
                               rounded-lg p-5 border-l-4 hover:shadow-md transition-shadow duration-200
                             `}
                           >
@@ -255,11 +282,13 @@ function History() {
                                       ></i>
                                     ) : (
                                       <span
-                                        className={`inline-block w-2 h-2 rounded-full ${isContactedTab ? 'bg-blue-500' : 'bg-orange-500'}`}
-                                        title={
+                                        className={`inline-block w-2 h-2 rounded-full ${
                                           isContactedTab
-                                            ? 'Contactado'
-                                            : 'Arquivado'
+                                            ? 'bg-blue-500'
+                                            : 'bg-orange-500'
+                                        }`}
+                                        title={
+                                          isContactedTab ? 'Contactado' : 'Arquivado'
                                         }
                                       ></span>
                                     )}
@@ -272,40 +301,34 @@ function History() {
                                 </div>
 
                                 {/* Data info */}
-                                {isContactedTab && 'dataContacto' in customer ? (
-                                  isFinalized && customer.dataFinalizacao ? (
-                                    <span className="text-sm block mb-1 text-emerald-600 font-medium">
-                                      Finalizada em{' '}
-                                      {new Date(
-                                        customer.dataFinalizacao
-                                      ).toLocaleDateString('pt-BR')}
+                                {isFinalized && customer.dataFinalizacao ? (
+                                  <span className="text-sm block mb-1 text-emerald-600 font-medium">
+                                    Finalizada em{' '}
+                                    {new Date(
+                                      customer.dataFinalizacao
+                                    ).toLocaleDateString('pt-BR')}
+                                  </span>
+                                ) : isContactedTab && 'dataContacto' in customer ? (
+                                  <>
+                                    <span className="text-sm block mb-1 text-blue-600 font-medium">
+                                      Contactado{' '}
+                                      {formatDistanceToNow(customer.dataContacto)}
                                     </span>
-                                  ) : (
-                                    <>
-                                      <span className="text-sm block mb-1 text-blue-600 font-medium">
-                                        Contactado{' '}
-                                        {formatDistanceToNow(
-                                          customer.dataContacto
-                                        )}
-                                      </span>
-                                      <span className="text-sm text-gray-500">
-                                        Esperou{' '}
-                                        {calculateWaitingTime(
-                                          customer.dataCriacao,
-                                          customer.dataContacto
-                                        )}{' '}
-                                        dia(s) até o contato
-                                      </span>
-                                    </>
-                                  )
-                                ) : (
+                                    <span className="text-sm text-gray-500">
+                                      Esperou{' '}
+                                      {calculateWaitingTime(
+                                        customer.dataCriacao,
+                                        customer.dataContacto
+                                      )}{' '}
+                                      dia(s) até o contato
+                                    </span>
+                                  </>
+                                ) : isArchivedTab ? (
                                   <>
                                     <span className="text-sm block mb-1 text-orange-600 font-medium">
                                       Arquivado{' '}
                                       {customer.dataArquivamento &&
-                                        formatDistanceToNow(
-                                          customer.dataArquivamento
-                                        )}
+                                        formatDistanceToNow(customer.dataArquivamento)}
                                     </span>
                                     {customer.motivoArquivamento && (
                                       <span className="text-sm text-gray-600">
@@ -316,7 +339,7 @@ function History() {
                                       </span>
                                     )}
                                   </>
-                                )}
+                                ) : null}
 
                                 {/* WhatsApp */}
                                 <div className="flex items-center gap-2 mt-2">
@@ -334,7 +357,7 @@ function History() {
                               </div>
 
                               {/* Botão de ação */}
-                              {!isContactedTab && (
+                              {isArchivedTab && (
                                 <button
                                   onClick={() => handleRestore(customer)}
                                   className="inline-flex items-center justify-center w-9 h-9 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer"

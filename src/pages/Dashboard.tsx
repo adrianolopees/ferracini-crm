@@ -34,10 +34,6 @@ function Dashboard() {
     'awaiting' | 'awaiting_transfer' | 'contacted' | null
   >(null);
 
-  // Estado para controlar tabs dentro dos modais
-  const [awaitingTab, setAwaitingTab] = useState<'all' | 'urgent'>('all');
-  const [contactedTab, setContactedTab] = useState<'all' | 'finished'>('all');
-
   // Estado para controlar modal de arquivamento
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(
@@ -63,17 +59,11 @@ function Dashboard() {
     refreshMetrics();
   };
 
-  // Determinar filterType baseado no modal e tab ativos
+  // Determinar filterType baseado no modal ativo
   const getFilterType = () => {
-    if (modalType === 'awaiting') {
-      return awaitingTab === 'urgent' ? 'urgent' : 'all';
-    }
-    if (modalType === 'contacted') {
-      return contactedTab === 'finished' ? 'finished' : 'contacted';
-    }
-    if (modalType === 'awaiting_transfer') {
-      return 'awaiting_transfer';
-    }
+    if (modalType === 'awaiting') return 'all';
+    if (modalType === 'contacted') return 'contacted';
+    if (modalType === 'awaiting_transfer') return 'awaiting_transfer';
     return 'all';
   };
 
@@ -263,46 +253,6 @@ function Dashboard() {
     return '';
   };
 
-  // Funções para gerenciar tabs dos modais
-  const handleAwaitingTabChange = (tabId: string) => {
-    setAwaitingTab(tabId as 'all' | 'urgent');
-  };
-
-  const handleContactedTabChange = (tabId: string) => {
-    setContactedTab(tabId as 'all' | 'finished');
-  };
-
-  // Definir tabs para cada modal
-  const awaitingTabs = [
-    {
-      id: 'all',
-      label: 'Todos',
-      count: metrics.totalActive,
-      icon: 'fa-solid fa-users',
-    },
-    {
-      id: 'urgent',
-      label: 'Urgentes',
-      count: metrics.urgentCustomers,
-      icon: 'fa-solid fa-triangle-exclamation',
-    },
-  ];
-
-  const contactedTabs = [
-    {
-      id: 'all',
-      label: 'Disponíveis',
-      count: metrics.totalContacted,
-      icon: 'fa-solid fa-box-open',
-    },
-    {
-      id: 'finished',
-      label: 'Finalizados',
-      count: metrics.totalFinished,
-      icon: 'fa-solid fa-circle-check',
-    },
-  ];
-
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <Navigation />
@@ -456,27 +406,6 @@ function Dashboard() {
           onStoreNoStock={handleStoreNoStock}
           onClientAccepted={handleClientAccepted}
           onClientDeclined={handleClientDeclined}
-          tabs={
-            modalType === 'awaiting'
-              ? awaitingTabs
-              : modalType === 'contacted'
-                ? contactedTabs
-                : undefined
-          }
-          activeTab={
-            modalType === 'awaiting'
-              ? awaitingTab
-              : modalType === 'contacted'
-                ? contactedTab
-                : undefined
-          }
-          onTabChange={
-            modalType === 'awaiting'
-              ? handleAwaitingTabChange
-              : modalType === 'contacted'
-                ? handleContactedTabChange
-                : undefined
-          }
         />
 
         {/* Modal de Arquivamento */}
