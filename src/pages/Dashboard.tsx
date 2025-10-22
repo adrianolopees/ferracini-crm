@@ -26,8 +26,12 @@ function Dashboard() {
 
   // Estado para controlar qual modal está aberto
   const [modalType, setModalType] = useState<
-    'all' | 'urgent' | 'awaiting_transfer' | 'contacted' | 'finished' | null
+    'awaiting' | 'awaiting_transfer' | 'contacted' | null
   >(null);
+
+  // Estado para controlar tabs dentro dos modais
+  const [awaitingTab, setAwaitingTab] = useState<'all' | 'urgent'>('all');
+  const [contactedTab, setContactedTab] = useState<'all' | 'finished'>('all');
 
   // Estado para controlar modal de arquivamento
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
@@ -35,9 +39,23 @@ function Dashboard() {
     null
   );
 
+  // Determinar filterType baseado no modal e tab ativos
+  const getFilterType = () => {
+    if (modalType === 'awaiting') {
+      return awaitingTab === 'urgent' ? 'urgent' : 'all';
+    }
+    if (modalType === 'contacted') {
+      return contactedTab === 'finished' ? 'finished' : 'contacted';
+    }
+    if (modalType === 'awaiting_transfer') {
+      return 'awaiting_transfer';
+    }
+    return 'all';
+  };
+
   // Hook para buscar clientes filtrados
   const { customers, loading: customersLoading } = useCustomersList({
-    filterType: modalType || 'all',
+    filterType: getFilterType(),
     isOpen: modalType !== null,
   });
 
@@ -137,18 +155,52 @@ function Dashboard() {
 
   // Função para obter título do modal
   const getModalTitle = () => {
-    if (modalType === 'all')
-      return `Clientes Aguardando (${metrics.totalActive})`;
-    if (modalType === 'urgent')
-      return `Clientes Urgentes (${metrics.urgentCustomers})`;
+    if (modalType === 'awaiting') return 'Clientes Aguardando';
     if (modalType === 'awaiting_transfer')
       return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
-    if (modalType === 'contacted')
-      return `Clientes Contactados (${metrics.totalContacted})`;
-    if (modalType === 'finished')
-      return `Vendas Finalizadas (${metrics.totalFinished})`;
+    if (modalType === 'contacted') return 'Clientes Contactados';
     return '';
   };
+
+  // Funções para gerenciar tabs dos modais
+  const handleAwaitingTabChange = (tabId: string) => {
+    setAwaitingTab(tabId as 'all' | 'urgent');
+  };
+
+  const handleContactedTabChange = (tabId: string) => {
+    setContactedTab(tabId as 'all' | 'finished');
+  };
+
+  // Definir tabs para cada modal
+  const awaitingTabs = [
+    {
+      id: 'all',
+      label: 'Todos',
+      count: metrics.totalActive,
+      icon: 'fa-solid fa-users',
+    },
+    {
+      id: 'urgent',
+      label: 'Urgentes',
+      count: metrics.urgentCustomers,
+      icon: 'fa-solid fa-triangle-exclamation',
+    },
+  ];
+
+  const contactedTabs = [
+    {
+      id: 'all',
+      label: 'Todos',
+      count: metrics.totalContacted,
+      icon: 'fa-brands fa-whatsapp',
+    },
+    {
+      id: 'finished',
+      label: 'Finalizados',
+      count: metrics.totalFinished,
+      icon: 'fa-solid fa-circle-check',
+    },
+  ];
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -163,11 +215,11 @@ function Dashboard() {
           />
         </AnimatedContainer>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4 max-w-5xl mx-auto">
           {/* Card 1: Clientes Aguardando */}
           <AnimatedContainer type="slideDown" delay={0.1}>
             <div
-              onClick={() => setModalType('all')}
+              onClick={() => setModalType('awaiting')}
               className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow cursor-pointer"
             >
               <div className="flex items-center justify-between">
@@ -188,7 +240,9 @@ function Dashboard() {
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-4">
-                Clientes na fila de espera
+                {metrics.urgentCustomers > 0
+                  ? `${metrics.urgentCustomers} urgente(s)`
+                  : 'Clientes na fila de espera'}
               </p>
             </div>
           </AnimatedContainer>
@@ -223,7 +277,7 @@ function Dashboard() {
           </AnimatedContainer>
 
           {/* Card 3: Clientes Contactados */}
-          <AnimatedContainer type="slideUp" delay={0.3}>
+          <AnimatedContainer type="slideDown" delay={0.3}>
             <div
               onClick={() => setModalType('contacted')}
               className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow cursor-pointer"
@@ -246,74 +300,16 @@ function Dashboard() {
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-4">
-                Total de clientes atendidos
+                {metrics.totalFinished > 0
+                  ? `${metrics.totalFinished} venda(s) finalizada(s)`
+                  : 'Total de clientes atendidos'}
               </p>
             </div>
           </AnimatedContainer>
 
-          {/* Card 4: Casos Urgentes */}
-          <AnimatedContainer type="slideUp" delay={0.4}>
-            <div
-              onClick={() => setModalType('urgent')}
-              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500 hover:shadow-lg transition-shadow cursor-pointer"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
-                    Urgentes
-                  </p>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {loading ? (
-                      <i className="fa-solid fa-spinner fa-spin text-red-500"></i>
-                    ) : (
-                      metrics.urgentCustomers
-                    )}
-                  </p>
-                </div>
-                <div className="bg-red-100 rounded-full p-4">
-                  <i className="fa-solid fa-triangle-exclamation text-2xl text-red-600"></i>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-4">
-                Mais de 7 dias aguardando
-              </p>
-            </div>
-          </AnimatedContainer>
-
-          {/* Card 5: Vendas Finalizadas */}
-          <AnimatedContainer type="slideUp" delay={0.5}>
-            <div
-              onClick={() => setModalType('finished')}
-              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-emerald-500 hover:shadow-lg transition-shadow cursor-pointer"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">
-                    Finalizados
-                  </p>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {loading ? (
-                      <i className="fa-solid fa-spinner fa-spin text-emerald-500"></i>
-                    ) : (
-                      metrics.totalFinished
-                    )}
-                  </p>
-                </div>
-                <div className="bg-emerald-100 rounded-full p-4">
-                  <i className="fa-solid fa-circle-check text-2xl text-emerald-600"></i>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500 mt-4">
-                Vendas concluídas com sucesso
-              </p>
-            </div>
-          </AnimatedContainer>
-
-          {/* Card 6: Tempo Médio */}
-          <AnimatedContainer type="slideUp" delay={0.6}>
-            <div
-              onClick={() => setModalType('all')}
-              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition-shadow cursor-pointer"
+          {/* Card 4: Tempo Médio (apenas visual) */}
+          <AnimatedContainer type="slideDown" delay={0.4}>
+            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -338,7 +334,7 @@ function Dashboard() {
             </div>
           </AnimatedContainer>
         </div>
-        <div className="px-4 max-w-7xl mx-auto pb-8">
+        <div className="px-4 max-w-5xl mx-auto pb-8">
           <TopProductsChart />
         </div>
 
@@ -356,6 +352,27 @@ function Dashboard() {
           onAcceptTransfer={handleAcceptTransfer}
           onProductArrived={handleProductArrived}
           onPurchaseCompleted={handlePurchaseCompleted}
+          tabs={
+            modalType === 'awaiting'
+              ? awaitingTabs
+              : modalType === 'contacted'
+                ? contactedTabs
+                : undefined
+          }
+          activeTab={
+            modalType === 'awaiting'
+              ? awaitingTab
+              : modalType === 'contacted'
+                ? contactedTab
+                : undefined
+          }
+          onTabChange={
+            modalType === 'awaiting'
+              ? handleAwaitingTabChange
+              : modalType === 'contacted'
+                ? handleContactedTabChange
+                : undefined
+          }
         />
 
         {/* Modal de Arquivamento */}

@@ -25,7 +25,10 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
             return (
               <button
                 key={tab.id}
-                onClick={() => onTabChange(tab.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onTabChange(tab.id);
+                }}
                 className={`
                   px-6 py-3 text-sm font-medium border-b-2 transition-colors
                   ${

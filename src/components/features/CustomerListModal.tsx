@@ -1,8 +1,15 @@
-import { DialogModal } from '@/components/ui';
+import { DialogModal, Tabs } from '@/components/ui';
 import { Customer } from '@/types/customer';
 import { formatDistanceToNow } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
 import { AnimatedListItem } from '@/components/animations';
+
+interface Tab {
+  id: string;
+  label: string;
+  count?: number;
+  icon?: string;
+}
 
 interface CustomerListModalProps {
   isOpen: boolean;
@@ -20,6 +27,10 @@ interface CustomerListModalProps {
   ) => void;
   onProductArrived?: (customer: Customer) => void;
   onPurchaseCompleted?: (customer: Customer) => void;
+  // Props opcionais para tabs
+  tabs?: Tab[];
+  activeTab?: string;
+  onTabChange?: (tabId: string) => void;
 }
 
 function CustomerListModal({
@@ -35,10 +46,12 @@ function CustomerListModal({
   onAcceptTransfer,
   onProductArrived,
   onPurchaseCompleted,
+  tabs,
+  activeTab,
+  onTabChange,
 }: CustomerListModalProps) {
-  return (
-    <DialogModal isOpen={isOpen} onClose={onClose} title={title}>
-      <div className="max-h-[60vh] overflow-y-auto">
+  const content = (
+    <div className="max-h-[60vh] overflow-y-auto">
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <i className="fa-solid fa-spinner fa-spin text-blue-500 text-3xl"></i>
@@ -264,6 +277,17 @@ function CustomerListModal({
           </div>
         )}
       </div>
+  );
+
+  return (
+    <DialogModal isOpen={isOpen} onClose={onClose} title={title}>
+      {tabs && activeTab && onTabChange ? (
+        <Tabs tabs={tabs} activeTab={activeTab} onTabChange={onTabChange}>
+          {content}
+        </Tabs>
+      ) : (
+        content
+      )}
     </DialogModal>
   );
 }
