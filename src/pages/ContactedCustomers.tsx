@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { ContactedCustomer } from '@/types/customer';
-import { Input, Modal, Navigation } from '@/components/ui';
+import { Input, Modal, Navigation, PageHeader } from '@/components/ui';
 import { formatDistanceToNow } from '@/utils';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
@@ -117,16 +117,15 @@ function ContactedCustomers() {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <Navigation />
-      <div className="flex-1 bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 ">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <AnimatedContainer type="slideDown" className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-              Histórico de <span className="text-blue-600">Contatos</span>
-            </h1>
-            <p className="text-gray-600 text-base sm:text-lg">
-              {allCustomers.length} cliente(s) contactado(s)
-            </p>
+          <AnimatedContainer type="slideDown">
+            <PageHeader
+              title="Histórico de"
+              highlight="Contatos"
+              subtitle={`${allCustomers.length} cliente(s) contactado(s)`}
+            />
           </AnimatedContainer>
 
           {/* Card de Busca */}
@@ -229,25 +228,33 @@ function ContactedCustomers() {
 
                           <div className="grid grid-cols-2 gap-4 text-base">
                             <div>
-                              <span className="text-gray-500 text-sm">Modelo:</span>
+                              <span className="text-gray-500 text-sm">
+                                Modelo:
+                              </span>
                               <p className="font-semibold text-gray-900">
                                 {customer.modelo}
                               </p>
                             </div>
                             <div>
-                              <span className="text-gray-500 text-sm">Referência:</span>
+                              <span className="text-gray-500 text-sm">
+                                Referência:
+                              </span>
                               <p className="font-semibold text-gray-900">
                                 {customer.referencia}
                               </p>
                             </div>
                             <div>
-                              <span className="text-gray-500 text-sm">Numeração:</span>
+                              <span className="text-gray-500 text-sm">
+                                Numeração:
+                              </span>
                               <p className="font-semibold text-gray-900">
                                 {customer.numeracao}
                               </p>
                             </div>
                             <div>
-                              <span className="text-gray-500 text-sm">Cor:</span>
+                              <span className="text-gray-500 text-sm">
+                                Cor:
+                              </span>
                               <p className="font-semibold text-gray-900">
                                 {customer.cor}
                               </p>

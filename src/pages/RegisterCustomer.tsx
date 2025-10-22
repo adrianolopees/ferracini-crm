@@ -6,7 +6,14 @@ import { db } from '@/services/firebase';
 import { formSchema, FormData } from '@/schemas/registerSchema';
 import { getFirebaseErrorMessage, maskPhone } from '@/utils';
 import toast from 'react-hot-toast';
-import { Input, Select, Button, Navigation, Spinner } from '@/components/ui';
+import {
+  Input,
+  Select,
+  Button,
+  Navigation,
+  Spinner,
+  PageHeader,
+} from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 
 function RegisterCustomer() {
@@ -63,16 +70,15 @@ function RegisterCustomer() {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <Navigation />
-      <div className="flex-1 bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 ">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
-          <AnimatedContainer type="slideDown" className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-              Reserva de <span className="text-blue-600">Cliente</span>
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Produto fora de estoque? Registre aqui
-            </p>
+          <AnimatedContainer type="slideDown">
+            <PageHeader
+              title="Reservas de"
+              highlight="Clientes"
+              subtitle="Produto fora de estoque? Registre aqui"
+            />
           </AnimatedContainer>
 
           {/* Card do Formulário */}

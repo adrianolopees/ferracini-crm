@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navigation } from '@/components/ui';
+import { Navigation, PageHeader } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 import { useDashboardMetrics } from '@/hooks';
 import { useCustomersList } from '@/hooks';
@@ -129,16 +129,14 @@ function Dashboard() {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <Navigation />
-
-      <main className="flex-1 overflow-y-auto bg-gray-50">
+      <main className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
         {/* Header */}
-        <AnimatedContainer type="slideDown" className="text-center mb-8 mt-8">
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-            Painel de <span className="text-blue-600">Estatísticas</span>
-          </h1>
-          <p className="text-gray-600 text-base sm:text-lg">
-            Acompanhe reservas, contatos e métricas em tempo real
-          </p>
+        <AnimatedContainer type="slideDown">
+          <PageHeader
+            title="Painel de"
+            highlight="Estatísticas"
+            subtitle="Acompanhe reservas, contatos e métricas em tempo real"
+          />
         </AnimatedContainer>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 max-w-7xl mx-auto">

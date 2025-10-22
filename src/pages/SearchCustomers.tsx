@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Customer } from '@/types/customer';
-import { Input, Modal, Navigation } from '@/components/ui';
+import { Input, Modal, Navigation, PageHeader } from '@/components/ui';
 import { formatDistanceToNow } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
 import toast from 'react-hot-toast';
@@ -127,16 +127,15 @@ function SearchCustomers() {
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <Navigation />
-      <div className="flex-1 bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 ">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <AnimatedContainer type="slideDown" className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-              Buscar <span className="text-blue-600">Clientes</span>
-            </h1>
-            <p className="text-gray-600 text-base sm:text-lg">
-              Produto chegou? Encontre quem está esperando
-            </p>
+          <AnimatedContainer type="slideDown">
+            <PageHeader
+              title="Buscar"
+              highlight="Clientes"
+              subtitle="Produto chegou? Encontre quem está esperando"
+            />
           </AnimatedContainer>
 
           {/* Card de Busca */}
