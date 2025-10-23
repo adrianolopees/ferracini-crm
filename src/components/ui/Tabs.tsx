@@ -16,10 +16,13 @@ interface TabsProps {
 
 function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
   return (
-    <div className="w-full">
+    <div className="w-full overflow-hidden">
       {/* Tab Headers */}
-      <div className="border-b border-gray-200 mb-6">
-        <nav className="flex gap-2" aria-label="Tabs">
+      <div className="border-b border-gray-200 mb-6 ">
+        <nav
+          className="flex w-full max-w-full overflow-hidden border-collapse"
+          aria-label="Tabs"
+        >
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -30,7 +33,8 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
                   onTabChange(tab.id);
                 }}
                 className={`
-                  px-6 py-3 text-sm font-medium border-b-2 transition-colors
+                  flex-1 px-1 sm:px-3 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors
+  flex items-center justify-center gap-1.5 sm:gap-2 box-border
                   ${
                     isActive
                       ? 'border-blue-500 text-blue-600'
@@ -38,13 +42,24 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
                   }
                 `}
               >
-                <div className="flex items-center gap-2">
-                  {tab.icon && <i className={tab.icon}></i>}
-                  <span>{tab.label}</span>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  {tab.icon && (
+                    <i className={`${tab.icon} text-xs sm:text-base`}></i>
+                  )}
+                  <span className="hidden min-[500px]:inline">{tab.label}</span>
+                  <span className="min-[500px]:hidden">
+                    {tab.label.includes('Finalizadas')
+                      ? 'Vendas'
+                      : tab.label.includes('Contactados')
+                        ? 'Contato'
+                        : tab.label.includes('Arquivados')
+                          ? 'Arquivo'
+                          : tab.label}
+                  </span>
                   {tab.count !== undefined && (
                     <span
                       className={`
-                      px-2 py-0.5 rounded-full text-xs font-semibold
+                      px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-semibold
                       ${
                         isActive
                           ? 'bg-blue-100 text-blue-600'

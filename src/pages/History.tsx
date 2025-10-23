@@ -176,15 +176,8 @@ function History() {
             {/* Busca */}
             <div className="mb-6">
               <Input
-                label={`Buscar em ${
-                  activeTab === 'finalized'
-                    ? 'Vendas Finalizadas'
-                    : activeTab === 'contacted'
-                      ? 'Contactados'
-                      : 'Arquivados'
-                }`}
                 type="search"
-                placeholder="Digite nome, modelo, referência ou telefone..."
+                placeholder="Digite nome, modelo, referência..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -232,7 +225,6 @@ function History() {
                       <CustomerCard
                         customer={customer}
                         variant="compact"
-                        onWhatsApp={handleWhatsApp}
                         onRestore={isArchivedTab ? handleRestore : undefined}
                       />
                     </AnimatedListItem>
