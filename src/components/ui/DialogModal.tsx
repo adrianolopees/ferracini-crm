@@ -26,7 +26,7 @@ function DialogModal({ isOpen, onClose, title, children }: DialogModalProps) {
             </Dialog.Title>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
               aria-label="Fechar"
             >
               <i className="fa-solid fa-xmark text-2xl"></i>
