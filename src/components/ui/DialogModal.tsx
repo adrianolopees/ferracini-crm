@@ -18,6 +18,7 @@ function DialogModal({ isOpen, onClose, title, children }: DialogModalProps) {
         <Dialog.Content
           className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 w-[90vw] max-w-3xl max-h-[85vh] overflow-hidden z-50"
           onInteractOutside={(e) => e.preventDefault()}
+          aria-describedby={undefined}
         >
           <div className="flex justify-between items-center mb-4">
             <Dialog.Title className="text-xl font-semibold text-gray-900">

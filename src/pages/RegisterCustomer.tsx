@@ -13,6 +13,7 @@ import {
   Navigation,
   Spinner,
   PageHeader,
+  PageLayout,
 } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 
@@ -68,137 +69,127 @@ function RegisterCustomer() {
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      <Navigation />
-      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 ">
-        <div className="max-w-2xl mx-auto">
-          {/* Header */}
-          <AnimatedContainer type="slideDown">
-            <PageHeader
-              title="Reservas de"
-              highlight="Clientes"
-              subtitle="Produto fora de estoque? Registre aqui"
+    <PageLayout
+      title="Reservas de"
+      highlight="Clientes"
+      subtitle="Produto fora de estoque? Registre aqui"
+    >
+      {/* Card do Formulário */}
+      <AnimatedContainer
+        type="slideUp"
+        delay={0.2}
+        className="bg-white rounded-2xl shadow-xl p-8"
+      >
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          {/* Mensagem de erro global */}
+          {errorMessage && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-4">
+              <span className="bi bi-exclamation-triangle-fill"></span>
+              <span className="text-sm">{errorMessage}</span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <Input
+                label="Cliente"
+                placeholder="Nome e sobrenome"
+                {...register('cliente')}
+                error={errors.cliente?.message}
+                disabled={isLoading}
+                required
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <Input
+                label="Celular"
+                type="tel"
+                placeholder="(00) 00000-0000"
+                {...register('celular')}
+                onChange={(e) => {
+                  const masked = maskPhone(e.target.value);
+                  setValue('celular', masked);
+                }}
+                error={errors.celular?.message}
+                disabled={isLoading}
+                required
+              />
+            </div>
+
+            <Input
+              label="Modelo"
+              placeholder="Nome da linha"
+              {...register('modelo')}
+              error={errors.modelo?.message}
+              disabled={isLoading}
+              required
             />
-          </AnimatedContainer>
 
-          {/* Card do Formulário */}
-          <AnimatedContainer
-            type="slideUp"
-            delay={0.2}
-            className="bg-white rounded-2xl shadow-xl p-8"
-          >
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-              {/* Mensagem de erro global */}
-              {errorMessage && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center gap-2 mb-4">
-                  <span className="bi bi-exclamation-triangle-fill"></span>
-                  <span className="text-sm">{errorMessage}</span>
-                </div>
+            <Input
+              label="Referência"
+              placeholder="Referência completa"
+              {...register('referencia')}
+              error={errors.referencia?.message}
+              disabled={isLoading}
+              required
+            />
+
+            <Input
+              label="Numeração"
+              type="number"
+              placeholder="37-47"
+              {...register('numeracao')}
+              error={errors.numeracao?.message}
+              disabled={isLoading}
+              min="37"
+              max="47"
+              required
+            />
+
+            <Input
+              label="Cor"
+              placeholder="Cor do produto"
+              {...register('cor')}
+              error={errors.cor?.message}
+              disabled={isLoading}
+              required
+            />
+
+            <Select
+              label="Vendedor"
+              placeholder="Selecione o vendedor"
+              options={[
+                { value: 'Adriano', label: 'Adriano' },
+                { value: 'Will', label: 'Will' },
+                { value: 'Marcelo', label: 'Marcelo' },
+              ]}
+              {...register('vendedor')}
+              error={errors.vendedor?.message}
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          <div className="pt-4">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Spinner size="sm" />
+                  Salvando...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <i className="fa-solid fa-bookmark"></i>{' '}
+                  {/* Adicione ícone */}
+                  Registrar
+                </span>
               )}
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <Input
-                    label="Cliente"
-                    placeholder="Nome e sobrenome"
-                    {...register('cliente')}
-                    error={errors.cliente?.message}
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <Input
-                    label="Celular"
-                    type="tel"
-                    placeholder="(00) 00000-0000"
-                    {...register('celular')}
-                    onChange={(e) => {
-                      const masked = maskPhone(e.target.value);
-                      setValue('celular', masked);
-                    }}
-                    error={errors.celular?.message}
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-
-                <Input
-                  label="Modelo"
-                  placeholder="Nome da linha"
-                  {...register('modelo')}
-                  error={errors.modelo?.message}
-                  disabled={isLoading}
-                  required
-                />
-
-                <Input
-                  label="Referência"
-                  placeholder="Referência completa"
-                  {...register('referencia')}
-                  error={errors.referencia?.message}
-                  disabled={isLoading}
-                  required
-                />
-
-                <Input
-                  label="Numeração"
-                  type="number"
-                  placeholder="37-47"
-                  {...register('numeracao')}
-                  error={errors.numeracao?.message}
-                  disabled={isLoading}
-                  min="37"
-                  max="47"
-                  required
-                />
-
-                <Input
-                  label="Cor"
-                  placeholder="Cor do produto"
-                  {...register('cor')}
-                  error={errors.cor?.message}
-                  disabled={isLoading}
-                  required
-                />
-
-                <Select
-                  label="Vendedor"
-                  placeholder="Selecione o vendedor"
-                  options={[
-                    { value: 'Adriano', label: 'Adriano' },
-                    { value: 'Will', label: 'Will' },
-                    { value: 'Marcelo', label: 'Marcelo' },
-                  ]}
-                  {...register('vendedor')}
-                  error={errors.vendedor?.message}
-                  disabled={isLoading}
-                  required
-                />
-              </div>
-
-              <div className="pt-4">
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Spinner size="sm" />
-                      Salvando...
-                    </span>
-                  ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <i className="fa-solid fa-bookmark"></i>{' '}
-                      {/* Adicione ícone */}
-                      Registrar
-                    </span>
-                  )}
-                </Button>
-              </div>
-            </form>
-          </AnimatedContainer>
-        </div>
-      </div>
-    </div>
+            </Button>
+          </div>
+        </form>
+      </AnimatedContainer>
+    </PageLayout>
   );
 }
 

@@ -8,3 +8,4 @@ export { default as DialogModal } from './DialogModal';
 export { default as PageHeader } from './PageHeader';
 export { default as ArchiveModal } from './ArchiveModal';
 export { default as Tabs } from './Tabs';
+export { default as PageLayout } from './PageLayout';

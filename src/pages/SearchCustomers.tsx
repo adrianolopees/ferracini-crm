@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Customer } from '@/types/customer';
-import { Input, Modal, Navigation, PageHeader } from '@/components/ui';
+import { Input,Modal, PageLayout } from '@/components/ui';
 import { formatDistanceToNow } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
 import toast from 'react-hot-toast';
@@ -125,150 +125,141 @@ function SearchCustomers() {
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
-      <Navigation />
-      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 ">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <AnimatedContainer type="slideDown">
-            <PageHeader
-              title="Buscar"
-              highlight="Clientes"
-              subtitle="Produto chegou? Encontre quem está esperando"
-            />
-          </AnimatedContainer>
+    <PageLayout
+      title="Buscar"
+      highlight="Clientes"
+      subtitle="Produto chegou? Encontre quem está esperando"
+      maxWidth="4xl"
+    >
+      {/* Card de Busca */}
+      <AnimatedContainer type="slideUp" delay={0.2}>
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+          <Input
+            label="Buscar Clientes"
+            type="search"
+            placeholder="Digite o modelo ou referência..."
+            value={searchTerm}
+            onChange={handleSearch}
+          />
 
-          {/* Card de Busca */}
-          <AnimatedContainer type="slideUp" delay={0.2}>
-            <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
-              <Input
-                label="Buscar Clientes"
-                type="search"
-                placeholder="Digite o modelo ou referência..."
-                value={searchTerm}
-                onChange={handleSearch}
-              />
+          {/* Resultados */}
+          <div className="mt-6 space-y-4">
+            {customers.length === 0 && searchTerm && (
+              <div className="text-center py-12">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                  <i className="fa-solid fa-magnifying-glass text-gray-400 text-2xl"></i>
+                </div>
+                <p className="text-gray-600 font-medium">
+                  Nenhum cliente encontrado
+                </p>
+                <p className="text-gray-500 text-sm mt-1">
+                  Tente buscar por outro modelo ou referência
+                </p>
+              </div>
+            )}
 
-              {/* Resultados */}
-              <div className="mt-6 space-y-4">
-                {customers.length === 0 && searchTerm && (
-                  <div className="text-center py-12">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                      <i className="fa-solid fa-magnifying-glass text-gray-400 text-2xl"></i>
-                    </div>
-                    <p className="text-gray-600 font-medium">
-                      Nenhum cliente encontrado
-                    </p>
-                    <p className="text-gray-500 text-sm mt-1">
-                      Tente buscar por outro modelo ou referência
-                    </p>
-                  </div>
-                )}
+            {customers.map((customer, index) => {
+              const status = getCustomerStatus(customer.dataCriacao);
 
-                {customers.map((customer, index) => {
-                  const status = getCustomerStatus(customer.dataCriacao);
-
-                  return (
-                    <AnimatedListItem key={customer.id} index={index}>
-                      <div
-                        className={`bg-gray-50 rounded-lg p-5 border-l-4 hover:shadow-md transition-shadow duration-200 ${status.borderClass}`}
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <div className="flex items-center gap-2">
-                                <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
-                                  {customer.cliente}
-                                </h3>
-                                <span
-                                  className={`inline-block w-2 h-2 rounded-full ${status.dotClass}`}
-                                  title={status.label}
-                                ></span>
-                              </div>
-                              {customer.vendedor && (
-                                <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                                  {customer.vendedor}
-                                </span>
-                              )}
-                            </div>
+              return (
+                <AnimatedListItem key={customer.id} index={index}>
+                  <div
+                    className={`bg-gray-50 rounded-lg p-5 border-l-4 hover:shadow-md transition-shadow duration-200 ${status.borderClass}`}
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">
+                              {customer.cliente}
+                            </h3>
                             <span
-                              className={`text-sm block mb-2 ${status.textClass}`}
-                            >
-                              Aguardando há{' '}
-                              {formatDistanceToNow(customer.dataCriacao)}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm sm:text-base text-gray-600">
-                                {customer.celular}
-                              </span>
-                              <button
-                                onClick={() => handleWhatsApp(customer)}
-                                className="inline-flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors cursor-pointer"
-                                title="Enviar WhatsApp"
-                              >
-                                <i className="fa-brands fa-whatsapp text-lg"></i>
-                              </button>
-                            </div>
+                              className={`inline-block w-2 h-2 rounded-full ${status.dotClass}`}
+                              title={status.label}
+                            ></span>
                           </div>
+                          {customer.vendedor && (
+                            <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                              {customer.vendedor}
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={`text-sm block mb-2 ${status.textClass}`}
+                        >
+                          Aguardando há{' '}
+                          {formatDistanceToNow(customer.dataCriacao)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm sm:text-base text-gray-600">
+                            {customer.celular}
+                          </span>
                           <button
-                            onClick={() => handleDeleteClick(customer)}
-                            className="inline-flex items-center justify-center w-9 h-9 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                            title="Excluir cliente"
+                            onClick={() => handleWhatsApp(customer)}
+                            className="inline-flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors cursor-pointer"
+                            title="Enviar WhatsApp"
                           >
-                            <i className="fa-regular fa-trash-can text-lg"></i>
+                            <i className="fa-brands fa-whatsapp text-lg"></i>
                           </button>
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4 text-base">
-                          <div>
-                            <span className="text-gray-500 text-sm">
-                              Modelo:
-                            </span>
-                            <p className="font-semibold text-gray-900">
-                              {customer.modelo}
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 text-sm">
-                              Referência:
-                            </span>
-                            <p className="font-semibold text-gray-900">
-                              {customer.referencia}
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 text-sm">
-                              Numeração:
-                            </span>
-                            <p className="font-semibold text-gray-900">
-                              {customer.numeracao}
-                            </p>
-                          </div>
-                          <div>
-                            <span className="text-gray-500 text-sm">Cor:</span>
-                            <p className="font-semibold text-gray-900">
-                              {customer.cor}
-                            </p>
-                          </div>
-                        </div>
                       </div>
-                    </AnimatedListItem>
-                  );
-                })}
-              </div>
-            </div>
-          </AnimatedContainer>
-        </div>
+                      <button
+                        onClick={() => handleDeleteClick(customer)}
+                        className="inline-flex items-center justify-center w-9 h-9 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+                        title="Excluir cliente"
+                      >
+                        <i className="fa-regular fa-trash-can text-lg"></i>
+                      </button>
+                    </div>
 
-        <Modal
-          isOpen={modalOpen}
-          onConfirm={handleConfirmDelete}
-          onCancel={handleCancelDelete}
-          onClose={handleCancelDelete}
-          title="Você já entrou em contato com o cliente?"
-        />
-      </div>
-    </div>
+                    <div className="grid grid-cols-2 gap-4 text-base">
+                      <div>
+                        <span className="text-gray-500 text-sm">
+                          Modelo:
+                        </span>
+                        <p className="font-semibold text-gray-900">
+                          {customer.modelo}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 text-sm">
+                          Referência:
+                        </span>
+                        <p className="font-semibold text-gray-900">
+                          {customer.referencia}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 text-sm">
+                          Numeração:
+                        </span>
+                        <p className="font-semibold text-gray-900">
+                          {customer.numeracao}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500 text-sm">Cor:</span>
+                        <p className="font-semibold text-gray-900">
+                          {customer.cor}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </AnimatedListItem>
+              );
+            })}
+          </div>
+        </div>
+      </AnimatedContainer>
+
+      <Modal
+        isOpen={modalOpen}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        onClose={handleCancelDelete}
+        title="Você já entrou em contato com o cliente?"
+      />
+    </PageLayout>
   );
 }
 
