@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import {
-  Navigation,
-  PageHeader,
-  ArchiveModal,
-  PageLayout,
-} from '@/components/ui';
+import { ArchiveModal, PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 import { useDashboardMetrics } from '@/hooks';
 import { useCustomersList } from '@/hooks';
-import { CustomerListModal } from '@/components/features';
+import {
+  CustomerListModal,
+  ActionCard,
+  MetricCard,
+} from '@/components/features';
 import { Customer, ArchiveReason } from '@/types/customer';
 import { updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
@@ -265,93 +264,49 @@ function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-5xl mx-auto">
         {/* Card 1: Clientes Aguardando */}
         <AnimatedContainer type="slideDown" delay={0.1}>
-          <div
-            onClick={() => setModalType('awaiting')}
-            className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  Aguardando
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {loading ? (
-                    <i className="fa-solid fa-spinner fa-spin text-blue-500"></i>
-                  ) : (
-                    metrics.totalActive
-                  )}
-                </p>
-              </div>
-              <div className="bg-blue-100 rounded-full p-4">
-                <i className="fa-solid fa-clock text-2xl text-blue-600"></i>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-4">
-              {metrics.urgentCustomers > 0
+          <ActionCard
+            title="Aguardando"
+            value={metrics.totalActive}
+            subtitle={
+              metrics.urgentCustomers > 0
                 ? `${metrics.urgentCustomers} urgente(s)`
-                : 'Clientes na fila de espera'}
-            </p>
-          </div>
+                : 'Clientes na fila de espera'
+            }
+            icon="fa-solid fa-clock"
+            colorScheme="blue"
+            loading={loading}
+            onClick={() => setModalType('awaiting')}
+          />
         </AnimatedContainer>
 
         {/* Card 2: Aguardando Transferência */}
         <AnimatedContainer type="slideDown" delay={0.2}>
-          <div
+          <ActionCard
+            title="Aguardando Transferência"
+            value={metrics.totalAwaitingTransfer}
+            subtitle="Produtos em transferência"
+            icon="fa-solid fa-truck"
+            colorScheme="yellow"
+            loading={loading}
             onClick={() => setModalType('awaiting_transfer')}
-            className="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500 hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1 whitespace-nowrap">
-                  Aguardando Transferência
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {loading ? (
-                    <i className="fa-solid fa-spinner fa-spin text-yellow-500"></i>
-                  ) : (
-                    metrics.totalAwaitingTransfer
-                  )}
-                </p>
-              </div>
-              <div className="bg-yellow-100 rounded-full p-4">
-                <i className="fa-solid fa-truck text-2xl text-yellow-600"></i>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-4">
-              Produtos em transferência
-            </p>
-          </div>
+          />
         </AnimatedContainer>
 
         {/* Card 3: Pronto para Retirada */}
         <AnimatedContainer type="slideDown" delay={0.3}>
-          <div
-            onClick={() => setModalType('contacted')}
-            className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition-shadow cursor-pointer"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  Pronto para Retirada
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {loading ? (
-                    <i className="fa-solid fa-spinner fa-spin text-green-500"></i>
-                  ) : (
-                    metrics.totalContacted
-                  )}
-                </p>
-              </div>
-              <div className="bg-green-100 rounded-full p-4">
-                <i className="fa-solid fa-box-open text-2xl text-green-600"></i>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500 mt-4">
-              {metrics.totalFinished > 0
+          <ActionCard
+            title="Pronto para Retirada"
+            value={metrics.totalContacted}
+            subtitle={
+              metrics.totalFinished > 0
                 ? `${metrics.totalFinished} venda(s) finalizada(s)`
-                : 'Produtos disponíveis para o cliente'}
-            </p>
-          </div>
+                : 'Produtos disponíveis para o cliente'
+            }
+            icon="fa-solid fa-box-open"
+            colorScheme="green"
+            loading={loading}
+            onClick={() => setModalType('contacted')}
+          />
         </AnimatedContainer>
       </div>
 
@@ -365,88 +320,56 @@ function Dashboard() {
 
             {/* Mini Cards de Métricas */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              {/* Tempo Médio */}
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <i className="fa-solid fa-hourglass-half text-purple-600"></i>
-                  <p className="text-xs font-medium text-purple-700">
-                    Tempo Médio
-                  </p>
-                </div>
-                <p className="text-3xl font-bold text-purple-900">
-                  {loading ? (
-                    <i className="fa-solid fa-spinner fa-spin text-purple-500 text-2xl"></i>
-                  ) : (
-                    `${metrics.averageWaitTime}d`
-                  )}
-                </p>
-                <p className="text-xs text-purple-600 mt-1">de espera</p>
-              </div>
+              <MetricCard
+                title="Tempo Médio"
+                value={`${metrics.averageWaitTime}d`}
+                subtitle="de espera"
+                icon="fa-solid fa-hourglass-half"
+                colorScheme="purple"
+                loading={loading}
+              />
 
-              {/* Total Ativos */}
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <i className="fa-solid fa-users text-blue-600"></i>
-                  <p className="text-xs font-medium text-blue-700">
-                    Total Ativos
-                  </p>
-                </div>
-                <p className="text-3xl font-bold text-blue-900">
-                  {loading ? (
-                    <i className="fa-solid fa-spinner fa-spin text-blue-500 text-2xl"></i>
-                  ) : (
-                    metrics.totalActive +
-                    metrics.totalAwaitingTransfer +
-                    metrics.totalContacted
-                  )}
-                </p>
-                <p className="text-xs text-blue-600 mt-1">clientes</p>
-              </div>
+              <MetricCard
+                title="Total Ativos"
+                value={
+                  metrics.totalActive +
+                  metrics.totalAwaitingTransfer +
+                  metrics.totalContacted
+                }
+                subtitle="clientes"
+                icon="fa-solid fa-users"
+                colorScheme="blue"
+                loading={loading}
+              />
 
-              {/* Taxa de Conversão */}
-              <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-lg p-4 border border-green-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <i className="fa-solid fa-chart-line text-cyan-600"></i>
-                  <p className="text-xs font-medium text-cyan-700 ">
-                    Taxa Conversão
-                  </p>
-                </div>
-                <p className="text-3xl font-bold text-cyan-900 ">
-                  {loading ? (
-                    <i className="fa-solid fa-spinner fa-spin text-cyan-600  text-2xl"></i>
-                  ) : (
-                    `${
-                      metrics.totalFinished > 0
-                        ? Math.round(
-                            (metrics.totalFinished /
-                              (metrics.totalActive +
-                                metrics.totalAwaitingTransfer +
-                                metrics.totalContacted +
-                                metrics.totalFinished)) *
-                              100
-                          )
-                        : 0
-                    }%`
-                  )}
-                </p>
-                <p className="text-xs text-cyan-600  mt-1">vendidos</p>
-              </div>
+              <MetricCard
+                title="Taxa Conversão"
+                value={`${
+                  metrics.totalFinished > 0
+                    ? Math.round(
+                        (metrics.totalFinished /
+                          (metrics.totalActive +
+                            metrics.totalAwaitingTransfer +
+                            metrics.totalContacted +
+                            metrics.totalFinished)) *
+                          100
+                      )
+                    : 0
+                }%`}
+                subtitle="vendidos"
+                icon="fa-solid fa-chart-line"
+                colorScheme="cyan"
+                loading={loading}
+              />
 
-              {/* Vendas Finalizadas */}
-              <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-4 border border-emerald-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <i className="fa-solid fa-circle-check text-emerald-600"></i>
-                  <p className="text-xs font-medium text-emerald-700">Vendas</p>
-                </div>
-                <p className="text-3xl font-bold text-emerald-900">
-                  {loading ? (
-                    <i className="fa-solid fa-spinner fa-spin text-emerald-500 text-2xl"></i>
-                  ) : (
-                    metrics.totalFinished
-                  )}
-                </p>
-                <p className="text-xs text-emerald-600 mt-1">finalizadas</p>
-              </div>
+              <MetricCard
+                title="Vendas"
+                value={metrics.totalFinished}
+                subtitle="finalizadas"
+                icon="fa-solid fa-circle-check"
+                colorScheme="emerald"
+                loading={loading}
+              />
             </div>
 
             {/* Gráfico de Top Produtos */}
