@@ -55,7 +55,7 @@ function TopProductsChart() {
     return (
       <div className="bg-white rounded-lg shadow-md p-6 mt-8">
         <h2 className="text-xl font-bold text-gray-900 mb-4">
-          📊 Produtos Mais Procurados
+          Produtos Mais Procurados
         </h2>
         <p className="text-gray-500 text-center py-8">
           Nenhum produto cadastrado ainda
@@ -67,19 +67,67 @@ function TopProductsChart() {
   return (
     <div>
       {/* Título */}
-      <h3 className="text-base font-semibold text-gray-700 mb-4">
+      <h3 className="text-base text-center font-semibold text-gray-700 mb-4 flex items-center justify-center gap-2">
+        <i className="fa-solid fa-fire text-orange-500"></i>
         Produtos Mais Procurados
       </h3>
 
-      {/* Gráfico */}
-      <ResponsiveContainer width="100%" height={isMobile ? 300 : 400}>
+      {/* Lista com Ranking para Mobile */}
+      {isMobile && (
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <div className="space-y-3">
+            {products.slice(0, 5).map((product, index) => {
+              // Definir medalhas e emojis
+              const medals = ['🥇', '🥈', '🥉'];
+              const numberEmojis = ['4️⃣', '5️⃣'];
+              const icon = index < 3 ? medals[index] : numberEmojis[index - 3];
+
+              return (
+                <div
+                  key={product.name}
+                  className="flex items-center justify-between gap-3 pb-3 border-b border-gray-100 last:border-0 last:pb-0"
+                >
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <span className="text-xl flex-shrink-0">{icon}</span>
+                    <span className="text-sm text-gray-700 font-medium truncate">
+                      {product.name}
+                    </span>
+                  </div>
+                  <span className="text-base font-bold text-blue-600 flex-shrink-0">
+                    {product.count}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Mensagem e Total */}
+          <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
+            {products.length > 5 && (
+              <p className="text-xs text-gray-500 text-center">
+                +{products.length - 5} produtos • Ver todos no desktop
+              </p>
+            )}
+            <div className="flex items-center justify-center gap-2">
+              <i className="fa-solid fa-chart-simple text-blue-500"></i>
+              <span className="text-xs text-gray-600">
+                Total: {products.reduce((sum, p) => sum + p.count, 0)} reservas
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Gráfico - Oculto em Mobile */}
+      {!isMobile && (
+        <ResponsiveContainer width="100%" height={400}>
         <BarChart
           data={products}
           layout="vertical"
           margin={{
             top: 5,
-            right: isMobile ? 10 : 30,
-            left: isMobile ? 10 : 20,
+            right: 20,
+            left: 0,
             bottom: 5,
           }}
         >
@@ -89,15 +137,15 @@ function TopProductsChart() {
           {/* Eixo X (quantidade) */}
           <XAxis
             type="number"
-            tick={{ fill: '#6B7280', fontSize: isMobile ? 10 : 12 }}
+            tick={{ fill: '#6B7280', fontSize: 12 }}
           />
 
           {/* Eixo Y (nomes dos produtos) */}
           <YAxis
             type="category"
             dataKey="name"
-            width={isMobile ? 80 : 150}
-            tick={{ fill: '#6B7280', fontSize: isMobile ? 9 : 12 }}
+            width={80}
+            tick={{ fill: '#6B7280', fontSize: 12 }}
           />
 
           {/* Tooltip ao passar mouse */}
@@ -128,7 +176,7 @@ function TopProductsChart() {
           <Bar
             dataKey="count"
             radius={[0, 8, 8, 0]}
-            barSize={isMobile ? 15 : 25}
+            barSize={25}
           >
             {products.map((entry, index) => (
               <Cell
@@ -139,11 +187,16 @@ function TopProductsChart() {
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      )}
 
-      {/* Legenda */}
-      <p className="text-xs text-gray-500 text-center mt-4">
-        Baseado em {products.reduce((sum, p) => sum + p.count, 0)} reservas ativas
-      </p>
+      {/* Legenda - Apenas Desktop */}
+      {!isMobile && (
+        <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1">
+          <i className="fa-solid fa-chart-simple text-blue-500"></i>
+          Baseado em {products.reduce((sum, p) => sum + p.count, 0)} reservas
+          ativas
+        </p>
+      )}
     </div>
   );
 }
