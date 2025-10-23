@@ -18,59 +18,59 @@ function Navigation() {
           {/* Logo/Brand */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 hidden sm:inline">
                 Ferracini <span className="text-blue-600">CRM</span>
               </h2>
             </div>
           </div>
 
           {/* Tabs de Navegação */}
-          <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+          <div className="flex space-x-2 bg-gray-100 rounded-xl px-4 py-2 sm:rounded-lg sm:space-x-1 sm:px-1 sm:py-1">
             <button
               onClick={() => navigate('/dashboard')}
-              className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isDashboard
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-tachometer-alt sm:mr-2"></i>
+              <i className="fa-solid fa-tachometer-alt text-2xl sm:text-base sm:mr-2"></i>
               <span className="hidden sm:inline">Painel</span>
             </button>
 
             <button
               onClick={() => navigate('/register')}
-              className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isRegister
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-user-plus sm:mr-2"></i>
+              <i className="fa-solid fa-user-plus text-2xl sm:text-base sm:mr-2"></i>
               <span className="hidden sm:inline">Cadastrar</span>
             </button>
 
             <button
               onClick={() => navigate('/search')}
-              className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isSearch
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-magnifying-glass sm:mr-2"></i>
+              <i className="fa-solid fa-magnifying-glass text-2xl sm:text-base sm:mr-2"></i>
               <span className="hidden sm:inline">Buscar</span>
             </button>
 
             <button
               onClick={() => navigate('/history')}
-              className={`px-3 sm:px-6 py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isHistory
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-clock-rotate-left sm:mr-2"></i>
+              <i className="fa-solid fa-clock-rotate-left text-2xl sm:text-base sm:mr-2"></i>
               <span className="hidden sm:inline">Histórico</span>
             </button>
           </div>
