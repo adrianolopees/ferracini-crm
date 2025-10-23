@@ -10,7 +10,6 @@ import {
   Cell,
 } from 'recharts';
 import { useTopProducts } from '@/hooks';
-import { AnimatedContainer } from '@/components/animations';
 
 function TopProductsChart() {
   const { products, loading } = useTopProducts(10);
@@ -27,7 +26,7 @@ function TopProductsChart() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Paleta de cores para as barras (tons de azul profissional)
+  // Paleta de cores para as barras
   const COLORS = [
     '#1E3A8A', // blue-900
     '#1E40AF', // blue-800
@@ -121,72 +120,65 @@ function TopProductsChart() {
       {/* Gráfico - Oculto em Mobile */}
       {!isMobile && (
         <ResponsiveContainer width="100%" height={400}>
-        <BarChart
-          data={products}
-          layout="vertical"
-          margin={{
-            top: 5,
-            right: 20,
-            left: 0,
-            bottom: 5,
-          }}
-        >
-          {/* Grid de fundo */}
-          <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-
-          {/* Eixo X (quantidade) */}
-          <XAxis
-            type="number"
-            tick={{ fill: '#6B7280', fontSize: 12 }}
-          />
-
-          {/* Eixo Y (nomes dos produtos) */}
-          <YAxis
-            type="category"
-            dataKey="name"
-            width={80}
-            tick={{ fill: '#6B7280', fontSize: 12 }}
-          />
-
-          {/* Tooltip ao passar mouse */}
-          <Tooltip
-            contentStyle={{
-              backgroundColor: '#FFFFFF',
-              border: '2px solid #3B82F6',
-              borderRadius: '12px',
-              color: '#1F2937',
-              padding: '12px 16px',
-              fontSize: '14px',
-              boxShadow: '0 10px 25px rgba(59, 130, 246, 0.15)',
+          <BarChart
+            data={products}
+            layout="vertical"
+            margin={{
+              top: 5,
+              right: 20,
+              left: 0,
+              bottom: 5,
             }}
-            formatter={(value: number) => [
-              `${value} ${value === 1 ? 'cliente' : 'clientes'}`,
-              'Total',
-            ]}
-            labelStyle={{
-              fontWeight: 'bold',
-              marginBottom: '4px',
-              color: '#3B82F6',
-              fontSize: '13px',
-            }}
-            cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
-          />
-
-          {/* Barras */}
-          <Bar
-            dataKey="count"
-            radius={[0, 8, 8, 0]}
-            barSize={25}
           >
-            {products.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+            {/* Grid de fundo */}
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+
+            {/* Eixo X (quantidade) */}
+            <XAxis type="number" tick={{ fill: '#6B7280', fontSize: 12 }} />
+
+            {/* Eixo Y (nomes dos produtos) */}
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={80}
+              tick={{ fill: '#6B7280', fontSize: 12 }}
+            />
+
+            {/* Tooltip ao passar mouse */}
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#FFFFFF',
+                border: '2px solid #3B82F6',
+                borderRadius: '12px',
+                color: '#1F2937',
+                padding: '12px 16px',
+                fontSize: '14px',
+                boxShadow: '0 10px 25px rgba(59, 130, 246, 0.15)',
+              }}
+              formatter={(value: number) => [
+                `${value} ${value === 1 ? 'cliente' : 'clientes'}`,
+                'Total',
+              ]}
+              labelStyle={{
+                fontWeight: 'bold',
+                marginBottom: '4px',
+                color: '#3B82F6',
+                fontSize: '13px',
+              }}
+              cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
+            />
+
+            {/* Barras */}
+            <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={25}>
+              {products.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       )}
 
       {/* Legenda - Apenas Desktop */}
