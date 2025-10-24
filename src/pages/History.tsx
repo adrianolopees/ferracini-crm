@@ -5,7 +5,6 @@ import { Customer, ContactedCustomer } from '@/types/customer';
 import { Input, PageLayout, Tabs } from '@/components/ui';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
-import { sendGenericMessage } from '@/services/whatsappService';
 import { CustomerCard } from '@/components/features';
 
 type TabType = 'finalized' | 'contacted' | 'archived';
@@ -28,11 +27,13 @@ function History() {
     fetchAllCustomers();
   }, []);
 
-  // Filtrar quando mudar busca ou tab
+  // Limpar busca ao trocar de tab
   useEffect(() => {
-    // Limpar busca ao trocar de tab
     setSearchTerm('');
+  }, [activeTab]);
 
+  // Filtrar quando mudar busca ou listas
+  useEffect(() => {
     const customers =
       activeTab === 'finalized'
         ? finalizedCustomers
@@ -114,10 +115,6 @@ function History() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleWhatsApp = (customer: Customer | ContactedCustomer) => {
-    sendGenericMessage(customer);
   };
 
   const handleRestore = async (customer: Customer) => {

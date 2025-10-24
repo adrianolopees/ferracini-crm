@@ -7,7 +7,7 @@ interface PageLayoutProps {
   highlight: string;
   subtitle: string;
   color?: string;
-  maxWidth?: '2xl' | '4xl' | '5xl' | 'none';
+  maxWidth?: '2xl' | '3xl' | '4xl' | '5xl' | 'none';
   children: ReactNode;
 }
 
@@ -22,9 +22,10 @@ function PageLayout({
   // Map maxWidth values to complete Tailwind classes
   const maxWidthClasses = {
     '2xl': 'max-w-2xl',
+    '3xl': 'max-w-3xl',
     '4xl': 'max-w-4xl',
     '5xl': 'max-w-5xl',
-    'none': ''
+    none: '',
   };
 
   const maxWidthClass = maxWidthClasses[maxWidth];
