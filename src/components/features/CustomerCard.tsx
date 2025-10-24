@@ -1,5 +1,9 @@
 import { Customer } from '@/types/customer';
-import { formatDistanceToNow, formatDateTime, formatDaysElapsed } from '@/utils';
+import {
+  formatDistanceToNow,
+  formatDateTime,
+  formatDaysElapsed,
+} from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
 
 interface CustomerCardProps {
@@ -110,7 +114,10 @@ function CustomerCard({
               <div className="flex items-center gap-1.5">
                 <i className="fa-solid fa-hourglass-end text-purple-600 text-xs"></i>
                 <span className="text-purple-700">
-                  {formatDaysElapsed(customer.dataCriacao, customer.dataFinalizacao)}
+                  {formatDaysElapsed(
+                    customer.dataCriacao,
+                    customer.dataFinalizacao
+                  )}
                 </span>
               </div>
               {customer.lojaOrigem && (
@@ -131,7 +138,10 @@ function CustomerCard({
               </span>
               {customer.motivoArquivamento && (
                 <div className="text-gray-600">
-                  Motivo: <span className="font-medium">{customer.motivoArquivamento}</span>
+                  Motivo:{' '}
+                  <span className="font-medium">
+                    {customer.motivoArquivamento}
+                  </span>
                 </div>
               )}
             </div>
@@ -164,7 +174,8 @@ function CustomerCard({
               </div>
               {customer.dataTransferencia && (
                 <span className="text-xs text-gray-600 block ml-5">
-                  Em trânsito há {formatDistanceToNow(customer.dataTransferencia)}
+                  Em trânsito há{' '}
+                  {formatDistanceToNow(customer.dataTransferencia)}
                 </span>
               )}
             </div>
@@ -198,11 +209,15 @@ function CustomerCard({
         <div className="bg-gray-50/50 rounded-lg p-3 space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <i className="fa-solid fa-box text-gray-400 text-sm"></i>
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Produto</span>
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              Produto
+            </span>
           </div>
           <div className="space-y-1.5 text-sm">
             <div>
-              <p className="font-bold text-gray-900 text-base">{customer.modelo}</p>
+              <p className="font-bold text-gray-900 text-base">
+                {customer.modelo}
+              </p>
             </div>
             <div>
               <p className="text-gray-700 font-medium">{customer.referencia}</p>

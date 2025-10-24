@@ -125,6 +125,90 @@
 
 ## 🔜 Próximas Melhorias
 
+### 🎯 PRIORIDADE: Refatoração de CustomerCard no Dashboard
+**Estimativa:** 2-3 horas | **Objetivo:** Eliminar duplicação de código e garantir consistência visual
+
+#### Contexto
+Atualmente temos **2 implementações diferentes** de cards de cliente:
+- ✅ **CustomerCard.tsx** - Usado em History e Search (novo layout 2 colunas)
+- ❌ **CustomerListModal.tsx** - Implementação inline (~200 linhas JSX duplicado)
+
+#### Problemas
+- **Duplicação de código:** Mesma lógica de status/cores em 2 lugares
+- **Inconsistência visual:** Dashboard tem visual diferente das outras páginas
+- **Manutenção difícil:** Mudanças precisam ser feitas em 2 arquivos
+- **Violação DRY:** Bug fixes precisam ser duplicados
+
+#### Plano de Execução
+
+**1. Expandir CustomerCard.tsx (30 min)**
+- [ ] Adicionar props opcionais para botões contextuais do Dashboard:
+  ```typescript
+  interface CustomerCardProps {
+    // Existentes
+    customer: Customer;
+    variant?: 'default' | 'compact' | 'finalized';
+    onWhatsApp?: (customer: Customer) => void;
+    onDelete?: (customer: Customer) => void;
+    onRestore?: (customer: Customer) => void;
+    showActions?: boolean;
+
+    // NOVOS - Dashboard específicos
+    onCheckLojaCampinas?: (customer: Customer) => void;
+    onCheckLojaDomPedro?: (customer: Customer) => void;
+    onAcceptTransfer?: (customer: Customer, store: 'Campinas' | 'Dom Pedro') => void;
+    onProductArrived?: (customer: Customer) => void;
+    onPurchaseCompleted?: (customer: Customer) => void;
+    onStoreHasStock?: (customer: Customer) => void;
+    onStoreNoStock?: (customer: Customer) => void;
+    onClientAccepted?: (customer: Customer) => void;
+    onClientDeclined?: (customer: Customer) => void;
+  }
+  ```
+- [ ] Adicionar seção condicional de "Botões Contextuais" baseada no status do cliente
+- [ ] Manter layout 2 colunas (Cliente | Produto) com botões no canto superior direito
+
+**2. Refatorar CustomerListModal.tsx (60 min)**
+- [ ] Remover todo JSX inline do card (linhas 82-300+)
+- [ ] Substituir por:
+  ```tsx
+  <CustomerCard
+    customer={customer}
+    variant="compact"
+    onWhatsApp={onWhatsApp}
+    onDelete={onDelete}
+    onCheckLojaCampinas={onCheckLojaCampinas}
+    onCheckLojaDomPedro={onCheckLojaDomPedro}
+    // ... demais callbacks
+  />
+  ```
+- [ ] Manter apenas lógica de modal e listagem
+- [ ] Reduzir arquivo de ~400 linhas para ~150 linhas
+
+**3. Testes e Validação (60 min)**
+- [ ] Testar todos os fluxos do Dashboard:
+  - [ ] Status "Aguardando" → Sub-estados (verificar lojas, resposta loja, resposta cliente)
+  - [ ] Status "Aguardando Transferência" → Produto chegou
+  - [ ] Status "Contactado" → Cliente comprou
+- [ ] Verificar botões contextuais aparecem corretamente em cada estado
+- [ ] Garantir callbacks funcionam (WhatsApp, arquivamento, etc)
+- [ ] Testar responsividade mobile/desktop
+- [ ] Validar consistência visual entre Dashboard/History/Search
+
+#### Benefícios
+- ✅ **DRY:** Um componente único para todos os cards
+- ✅ **Consistência:** Visual idêntico em todo o app
+- ✅ **Manutenção:** Mudanças em 1 lugar só
+- ✅ **Performance:** Melhor re-render com React.memo
+- ✅ **Testabilidade:** Lógica centralizada
+
+#### Arquivos Afetados
+- `src/components/features/CustomerCard.tsx` (expandir props)
+- `src/components/features/CustomerListModal.tsx` (simplificar)
+- `src/pages/Dashboard.tsx` (sem mudanças, só testar)
+
+---
+
 ### Performance & Paginação
 - [ ] Implementar paginação na página de busca
 - [ ] Busca com debounce para melhor performance
