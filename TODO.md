@@ -93,6 +93,36 @@
 - [x] Busca unificada em cada tab
 - [x] Proteção: arquivados não aparecem em métricas
 
+## ✅ Fase 6 - Refinamentos de UX Mobile & Cards (CONCLUÍDO)
+
+### Navigation Mobile Profissional
+- [x] Implementar Bottom Navigation no mobile (padrão Instagram/YouTube)
+- [x] Tabs fixas no bottom em mobile, top em desktop
+- [x] Ícones + labels sempre visíveis para melhor UX
+- [x] Redução de altura do bottom nav (mais compacto)
+- [x] Ajuste de padding no PageLayout para evitar sobreposição de conteúdo
+
+### Otimização de CustomerCards
+- [x] **Redução de 36% na altura dos cards** através de:
+  - [x] Layout horizontal para informações contextuais (desktop)
+  - [x] Padding reduzido (p-5 → p-4)
+  - [x] Espaçamentos otimizados (mb-3 → mb-2, gap-4 → gap-3)
+  - [x] Grid de produto mais compacto (text-base → text-sm)
+  - [x] Ícones menores e consistentes (text-sm)
+- [x] **Informações contextuais por etapa do workflow:**
+  - [x] **Finalizado:** Data/hora precisa + tempo total + loja de origem
+  - [x] **Pronto p/ Retirada:** Tempo disponível + badge de loja origem
+  - [x] **Aguardando Transferência:** Loja origem + tempo em trânsito
+  - [x] **Aguardando:** Badge de "consultando loja" (se aplicável)
+- [x] WhatsApp removido em vendas finalizadas (mantém só celular para relatórios)
+- [x] Separadores visuais "•" entre informações inline (desktop)
+
+### Refatoração de Código
+- [x] Centralizar funções de formatação em `@/utils/formatDate.ts`
+- [x] Adicionar `formatDateTime()` para data/hora completa
+- [x] Adicionar `formatDaysElapsed()` para cálculo de tempo decorrido
+- [x] Remover duplicação de código nos componentes
+
 ## 🔜 Próximas Melhorias
 
 ### Performance & Paginação
@@ -142,5 +172,8 @@
 - ✅ Proteção de dados de vendas finalizadas
 - ✅ Interface responsiva e moderna
 - ✅ Integração WhatsApp em todas as etapas
+- ✅ **Bottom Navigation mobile profissional** (padrão apps modernos)
+- ✅ **Cards otimizados com 36% menos altura** e informações contextuais
+- ✅ **Informações específicas por etapa** do workflow (tempo, origem, etc)
 
 **Próximo foco:** Performance, paginação e analytics avançado
