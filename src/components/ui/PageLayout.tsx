@@ -24,7 +24,7 @@ function PageLayout({
   return (
     <div className="h-full flex flex-col overflow-hidden">
       <Navigation />
-      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4 pb-20 sm:pb-8">
         <div className={maxWidth === 'none' ? '' : `${maxWidthClass} mx-auto`}>
           {/* Header */}
           <AnimatedContainer type="slideDown">

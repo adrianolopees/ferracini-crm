@@ -25,10 +25,10 @@ function Navigation() {
           </div>
 
           {/* Tabs de Navegação */}
-          <div className="flex justify-around sm:justify-center sm:space-x-1 bg-gray-100 rounded-t-lg sm:rounded-lg px-2 sm:px-1 py-2 sm:py-1 fixed sm:sticky sm:top-0 bottom-0 right-0 left-0 z-50 border-t sm:border-0 border-gray-200 shadow-lg sm:shadow-none">
+          <div className="flex justify-around sm:justify-center sm:space-x-1 bg-gray-100 rounded-t-lg sm:rounded-lg px-2 sm:px-1 py-1 sm:py-1 fixed sm:sticky sm:top-0 bottom-0 right-0 left-0 z-50 border-t sm:border-0 border-gray-200 shadow-lg sm:shadow-none">
             <button
               onClick={() => navigate('/dashboard')}
-              className={`flex flex-col sm:flex-row items-center gap-1 px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center gap-0.5 px-3 sm:px-6 py-2 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isDashboard
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 sm:hover:text-gray-900'
@@ -40,10 +40,10 @@ function Navigation() {
 
             <button
               onClick={() => navigate('/register')}
-              className={`flex flex-col sm:flex-row items-center gap-1 px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center gap-0.5 px-3 sm:px-6 py-2 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isRegister
                   ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
               <i className="fa-solid fa-user-plus text-xl sm:text-base"></i>
@@ -52,10 +52,10 @@ function Navigation() {
 
             <button
               onClick={() => navigate('/search')}
-              className={`flex flex-col sm:flex-row items-center gap-1 px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center gap-0.5 px-3 sm:px-6 py-2 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isSearch
                   ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
               <i className="fa-solid fa-magnifying-glass text-xl sm:text-base"></i>
@@ -64,10 +64,10 @@ function Navigation() {
 
             <button
               onClick={() => navigate('/history')}
-              className={`flex flex-col sm:flex-row items-center gap-1 px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center gap-0.5 px-3 sm:px-6 py-2 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isHistory
                   ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
               <i className="fa-solid fa-clock-rotate-left text-xl sm:text-base"></i>
