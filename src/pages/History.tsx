@@ -163,7 +163,7 @@ function History() {
       title="Histórico de"
       highlight="Clientes"
       subtitle="Vendas finalizadas, contactados e arquivados"
-      maxWidth="4xl"
+      maxWidth="2xl"
     >
       {/* Tabs e Conteúdo */}
       <AnimatedContainer type="slideUp" delay={0.2}>

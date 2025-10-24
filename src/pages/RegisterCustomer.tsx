@@ -73,12 +73,13 @@ function RegisterCustomer() {
       title="Reservas de"
       highlight="Clientes"
       subtitle="Produto fora de estoque? Registre aqui"
+      maxWidth="2xl"
     >
       {/* Card do Formulário */}
       <AnimatedContainer
         type="slideUp"
         delay={0.2}
-        className="bg-white rounded-2xl shadow-xl p-8"
+        className="bg-white rounded-2xl shadow-xl p-8 "
       >
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Mensagem de erro global */}

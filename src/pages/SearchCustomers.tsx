@@ -128,7 +128,7 @@ function SearchCustomers() {
       title="Buscar"
       highlight="Clientes"
       subtitle="Produto chegou? Encontre quem está esperando"
-      maxWidth="4xl"
+      maxWidth="2xl"
     >
       {/* Card de Busca */}
       <AnimatedContainer type="slideUp" delay={0.2}>

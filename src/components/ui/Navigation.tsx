@@ -18,60 +18,60 @@ function Navigation() {
           {/* Logo/Brand */}
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 hidden sm:inline">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 ">
                 Ferracini <span className="text-blue-600">CRM</span>
               </h2>
             </div>
           </div>
 
           {/* Tabs de Navegação */}
-          <div className="flex space-x-2 bg-gray-100 rounded-xl px-4 py-2 sm:rounded-lg sm:space-x-1 sm:px-1 sm:py-1">
+          <div className="flex justify-around sm:justify-center sm:space-x-1 bg-gray-100 rounded-t-lg sm:rounded-lg px-2 sm:px-1 py-2 sm:py-1 fixed sm:sticky sm:top-0 bottom-0 right-0 left-0 z-50 border-t sm:border-0 border-gray-200 shadow-lg sm:shadow-none">
             <button
               onClick={() => navigate('/dashboard')}
-              className={`px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center gap-1 px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isDashboard
                   ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-tachometer-alt text-2xl sm:text-base sm:mr-2"></i>
-              <span className="hidden sm:inline">Painel</span>
+              <i className="fa-solid fa-tachometer-alt text-xl sm:text-base"></i>
+              <span className="text-[10px] sm:text-sm">Painel</span>
             </button>
 
             <button
               onClick={() => navigate('/register')}
-              className={`px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center gap-1 px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isRegister
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-user-plus text-2xl sm:text-base sm:mr-2"></i>
-              <span className="hidden sm:inline">Cadastrar</span>
+              <i className="fa-solid fa-user-plus text-xl sm:text-base"></i>
+              <span className="text-[10px] sm:text-sm">Cadastrar</span>
             </button>
 
             <button
               onClick={() => navigate('/search')}
-              className={`px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center gap-1 px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isSearch
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-magnifying-glass text-2xl sm:text-base sm:mr-2"></i>
-              <span className="hidden sm:inline">Buscar</span>
+              <i className="fa-solid fa-magnifying-glass text-xl sm:text-base"></i>
+              <span className="text-[10px] sm:text-sm">Buscar</span>
             </button>
 
             <button
               onClick={() => navigate('/history')}
-              className={`px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col sm:flex-row items-center gap-1 px-4 sm:px-6 py-3 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
                 isHistory
                   ? 'bg-white text-blue-600 shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-clock-rotate-left text-2xl sm:text-base sm:mr-2"></i>
-              <span className="hidden sm:inline">Histórico</span>
+              <i className="fa-solid fa-clock-rotate-left text-xl sm:text-base"></i>
+              <span className="text-[10px] sm:text-sm">Histórico</span>
             </button>
           </div>
 
