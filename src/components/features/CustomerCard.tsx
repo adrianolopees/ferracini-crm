@@ -1,5 +1,5 @@
 import { Customer } from '@/types/customer';
-import { formatDistanceToNow } from '@/utils';
+import { formatDistanceToNow, formatDateTime, formatDaysElapsed } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
 
 interface CustomerCardProps {
@@ -32,10 +32,10 @@ function CustomerCard({
 
   return (
     <div
-      className={`${borderClass} rounded-lg p-5 border-l-4 hover:shadow-md transition-shadow duration-200`}
+      className={`${borderClass} rounded-lg p-4 border-l-4 hover:shadow-md transition-shadow duration-200`}
     >
       {/* Header */}
-      <div className="flex justify-between items-start mb-3">
+      <div className="flex justify-between items-start mb-2">
         <div className="flex-1">
           {/* Nome e Status Badge */}
           <div className="flex items-center justify-between gap-2 mb-1">
@@ -64,13 +64,37 @@ function CustomerCard({
             )}
           </div>
 
-          {/* Data Info */}
+          {/* Data Info Contextual por Etapa */}
           {isFinalized && customer.dataFinalizacao ? (
-            <span className="text-sm block mb-2 text-emerald-600 font-medium">
-              Finalizada em{' '}
-              {new Date(customer.dataFinalizacao).toLocaleDateString('pt-BR')}
-            </span>
+            // FINALIZADO - Layout compacto e horizontal em desktop
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-3 mb-2">
+              <div className="flex items-center gap-1.5">
+                <i className="fa-solid fa-calendar-check text-emerald-600 text-sm"></i>
+                <span className="text-sm font-medium text-emerald-700">
+                  {formatDateTime(customer.dataFinalizacao)}
+                </span>
+              </div>
+              <span className="hidden sm:inline text-gray-300">•</span>
+              <div className="flex items-center gap-1.5">
+                <i className="fa-solid fa-hourglass-end text-purple-600 text-sm"></i>
+                <span className="text-sm text-purple-700">
+                  {formatDaysElapsed(customer.dataCriacao, customer.dataFinalizacao)}
+                </span>
+              </div>
+              {customer.lojaOrigem && (
+                <>
+                  <span className="hidden sm:inline text-gray-300">•</span>
+                  <div className="flex items-center gap-1.5">
+                    <i className="fa-solid fa-store text-blue-600 text-sm"></i>
+                    <span className="text-sm text-blue-700">
+                      {customer.lojaOrigem}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
           ) : isArchived && customer.dataArquivamento ? (
+            // ARQUIVADO (mantém atual)
             <>
               <span className="text-sm block mb-1 text-orange-600 font-medium">
                 Arquivado {formatDistanceToNow(customer.dataArquivamento)}
@@ -84,19 +108,65 @@ function CustomerCard({
                 </span>
               )}
             </>
+          ) : customer.status === 'contactado' && customer.dataContacto ? (
+            // PRONTO PARA RETIRADA - Layout horizontal
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <i className="fa-solid fa-box-open text-green-600 text-sm"></i>
+                <span className="text-sm font-medium text-green-700">
+                  Pronto há {formatDistanceToNow(customer.dataContacto)}
+                </span>
+              </div>
+              {customer.lojaOrigem && (
+                <>
+                  <span className="hidden sm:inline text-gray-300">•</span>
+                  <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+                    🏪 {customer.lojaOrigem}
+                  </span>
+                </>
+              )}
+            </div>
+          ) : customer.status === 'aguardando_transferencia' ? (
+            // AGUARDANDO TRANSFERÊNCIA - Compacto
+            <div className="space-y-0.5 mb-2">
+              <div className="flex items-center gap-1.5">
+                <i className="fa-solid fa-truck text-blue-600 text-sm"></i>
+                <span className="text-sm font-medium text-blue-700">
+                  Transferência de {customer.lojaOrigem || '...'}
+                </span>
+              </div>
+              {customer.dataTransferencia && (
+                <span className="text-xs text-gray-600 block ml-5">
+                  Em trânsito há {formatDistanceToNow(customer.dataTransferencia)}
+                </span>
+              )}
+            </div>
           ) : (
-            <span className={`text-sm block mb-2 ${status.textClass}`}>
-              Aguardando há {formatDistanceToNow(customer.dataCriacao)}
-            </span>
+            // AGUARDANDO (padrão) - Compacto
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className={`text-sm ${status.textClass}`}>
+                Aguardando há {formatDistanceToNow(customer.dataCriacao)}
+              </span>
+              {customer.consultandoLoja && (
+                <>
+                  <span className="hidden sm:inline text-gray-300">•</span>
+                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
+                    🔍 {customer.consultandoLoja}
+                  </span>
+                </>
+              )}
+            </div>
           )}
 
-          {/* WhatsApp */}
+          {/* Celular/WhatsApp */}
           {showActions && (
             <div className="flex items-center gap-2">
+              <i className="fa-solid fa-phone text-gray-500 text-sm"></i>
               <span className="text-sm sm:text-base text-gray-600">
                 {customer.celular}
               </span>
-              {onWhatsApp && (
+              {/* WhatsApp - NÃO mostrar em finalizado */}
+              {onWhatsApp && !isFinalized && (
                 <button
                   onClick={() => onWhatsApp(customer)}
                   className="inline-flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 transition-colors cursor-pointer"
@@ -134,22 +204,22 @@ function CustomerCard({
         )}
       </div>
 
-      {/* Product Details */}
-      <div className="grid grid-cols-2 gap-4 text-base">
+      {/* Product Details - Grid Compacto */}
+      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
         <div>
-          <span className="text-gray-500 text-sm">Modelo:</span>
+          <span className="text-gray-500 text-xs">Modelo:</span>
           <p className="font-semibold text-gray-900">{customer.modelo}</p>
         </div>
         <div>
-          <span className="text-gray-500 text-sm">Referência:</span>
+          <span className="text-gray-500 text-xs">Referência:</span>
           <p className="font-semibold text-gray-900">{customer.referencia}</p>
         </div>
         <div>
-          <span className="text-gray-500 text-sm">Numeração:</span>
+          <span className="text-gray-500 text-xs">Numeração:</span>
           <p className="font-semibold text-gray-900">{customer.numeracao}</p>
         </div>
         <div>
-          <span className="text-gray-500 text-sm">Cor:</span>
+          <span className="text-gray-500 text-xs">Cor:</span>
           <p className="font-semibold text-gray-900">{customer.cor}</p>
         </div>
       </div>
