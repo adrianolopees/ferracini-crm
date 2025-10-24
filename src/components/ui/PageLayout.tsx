@@ -19,7 +19,15 @@ function PageLayout({
   maxWidth = '4xl',
   children,
 }: PageLayoutProps) {
-  const maxWidthClass = maxWidth === 'none' ? '' : `max-w-${maxWidth}`;
+  // Map maxWidth values to complete Tailwind classes
+  const maxWidthClasses = {
+    '2xl': 'max-w-2xl',
+    '4xl': 'max-w-4xl',
+    '5xl': 'max-w-5xl',
+    'none': ''
+  };
+
+  const maxWidthClass = maxWidthClasses[maxWidth];
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
