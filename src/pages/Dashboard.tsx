@@ -391,7 +391,6 @@ function Dashboard() {
         onDelete={handleDelete}
         onCheckLojaCampinas={handleCheckLojaCampinas}
         onCheckLojaDomPedro={handleCheckLojaDomPedro}
-        onAcceptTransfer={handleAcceptTransfer}
         onProductArrived={handleProductArrived}
         onPurchaseCompleted={handlePurchaseCompleted}
         onStoreHasStock={handleStoreHasStock}

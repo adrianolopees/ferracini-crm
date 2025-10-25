@@ -13,6 +13,16 @@ interface CustomerCardProps {
   onDelete?: (customer: Customer) => void;
   onRestore?: (customer: Customer) => void;
   showActions?: boolean;
+
+  // Dashboard-specific actions
+  onCheckLojaCampinas?: (customer: Customer) => void;
+  onCheckLojaDomPedro?: (customer: Customer) => void;
+  onStoreHasStock?: (customer: Customer) => void;
+  onStoreNoStock?: (customer: Customer) => void;
+  onClientAccepted?: (customer: Customer) => void;
+  onClientDeclined?: (customer: Customer) => void;
+  onProductArrived?: (customer: Customer) => void;
+  onPurchaseCompleted?: (customer: Customer) => void;
 }
 
 function CustomerCard({
@@ -22,6 +32,15 @@ function CustomerCard({
   onDelete,
   onRestore,
   showActions = true,
+  // Dashboard-specific actions
+  onCheckLojaCampinas,
+  onCheckLojaDomPedro,
+  onStoreHasStock,
+  onStoreNoStock,
+  onClientAccepted,
+  onClientDeclined,
+  onProductArrived,
+  onPurchaseCompleted,
 }: CustomerCardProps) {
   const status = getCustomerStatus(customer.dataCriacao);
   const isFinalized = customer.status === 'finalizado';
@@ -203,6 +222,141 @@ function CustomerCard({
               <span className="text-sm text-gray-600">{customer.celular}</span>
             </div>
           )}
+
+          {/* Botões Contextuais do Dashboard */}
+          <div className="flex items-center gap-2 flex-wrap mt-2">
+            {/* Status: AGUARDANDO - SUB-ESTADO 1: Inicial */}
+            {(!customer.status || customer.status === 'aguardando') &&
+              !customer.consultandoLoja &&
+              !customer.lojaTemEstoque && (
+                <>
+                  {onCheckLojaCampinas && (
+                    <button
+                      onClick={() => onCheckLojaCampinas(customer)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors cursor-pointer"
+                      title="Consultar disponibilidade na Loja Campinas"
+                    >
+                      <i className="fa-solid fa-store"></i>
+                      <span>Verificar Campinas</span>
+                    </button>
+                  )}
+
+                  {onCheckLojaDomPedro && (
+                    <button
+                      onClick={() => onCheckLojaDomPedro(customer)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500 text-white text-xs rounded-lg hover:bg-purple-600 transition-colors cursor-pointer"
+                      title="Consultar disponibilidade na Loja Dom Pedro"
+                    >
+                      <i className="fa-solid fa-store"></i>
+                      <span>Verificar Dom Pedro</span>
+                    </button>
+                  )}
+                </>
+              )}
+
+            {/* Status: AGUARDANDO - SUB-ESTADO 2: Aguardando resposta da LOJA */}
+            {(!customer.status || customer.status === 'aguardando') &&
+              customer.consultandoLoja &&
+              !customer.lojaTemEstoque && (
+                <>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
+                    📞 Aguardando resposta - {customer.consultandoLoja}
+                  </span>
+
+                  {onStoreHasStock && (
+                    <button
+                      onClick={() => onStoreHasStock(customer)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
+                      title="Loja confirmou que tem o produto"
+                    >
+                      <i className="fa-solid fa-check"></i>
+                      <span>Tem Estoque</span>
+                    </button>
+                  )}
+
+                  {onStoreNoStock && (
+                    <button
+                      onClick={() => onStoreNoStock(customer)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
+                      title="Loja não tem o produto"
+                    >
+                      <i className="fa-solid fa-times"></i>
+                      <span>Não Tem</span>
+                    </button>
+                  )}
+                </>
+              )}
+
+            {/* Status: AGUARDANDO - SUB-ESTADO 3: Aguardando resposta do CLIENTE */}
+            {(!customer.status || customer.status === 'aguardando') &&
+              customer.consultandoLoja &&
+              customer.lojaTemEstoque && (
+                <>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
+                    💬 Cliente notificado - {customer.consultandoLoja}
+                  </span>
+
+                  {onClientAccepted && (
+                    <button
+                      onClick={() => onClientAccepted(customer)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-colors cursor-pointer"
+                      title="Cliente aceitou aguardar transferência"
+                    >
+                      <i className="fa-solid fa-check"></i>
+                      <span>Cliente Aceitou</span>
+                    </button>
+                  )}
+
+                  {onClientDeclined && (
+                    <button
+                      onClick={() => onClientDeclined(customer)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
+                      title="Cliente recusou a transferência"
+                    >
+                      <i className="fa-solid fa-times"></i>
+                      <span>Cliente Recusou</span>
+                    </button>
+                  )}
+                </>
+              )}
+
+            {/* Status: AGUARDANDO TRANSFERÊNCIA - Botão de produto chegou */}
+            {customer.status === 'aguardando_transferencia' &&
+              onProductArrived && (
+                <>
+                  <span className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded">
+                    De: {customer.lojaOrigem}
+                  </span>
+                  <button
+                    onClick={() => onProductArrived(customer)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
+                    title="Produto chegou"
+                  >
+                    <i className="fa-solid fa-box"></i>
+                    <span>Produto Chegou</span>
+                  </button>
+                </>
+              )}
+
+            {/* Status: PRONTO PARA RETIRADA - Botão de compra concluída */}
+            {customer.status === 'contactado' && onPurchaseCompleted && (
+              <button
+                onClick={() => onPurchaseCompleted(customer)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-colors cursor-pointer"
+                title="Cliente comprou"
+              >
+                <i className="fa-solid fa-circle-check"></i>
+                <span>Cliente Comprou</span>
+              </button>
+            )}
+
+            {/* Status: FINALIZADO - Mostrar apenas info */}
+            {customer.status === 'finalizado' && onPurchaseCompleted && (
+              <span className="text-xs text-emerald-700 bg-emerald-100 px-2 py-1 rounded">
+                ✓ Venda Concluída
+              </span>
+            )}
+          </div>
         </div>
 
         {/* COLUNA DIREITA: Produto */}
