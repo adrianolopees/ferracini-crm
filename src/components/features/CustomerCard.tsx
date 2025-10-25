@@ -72,19 +72,19 @@ function CustomerCard({
           {onDelete && !isFinalized && (
             <button
               onClick={() => onDelete(customer)}
-              className="inline-flex items-center justify-center w-9 h-9 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer shadow-sm"
-              title="Excluir cliente"
+              className="inline-flex items-center justify-center w-9 h-9 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer shadow-sm"
+              title="Arquivar cliente"
             >
-              <i className="fa-regular fa-trash-can text-lg" />
+              <i className="fa-solid fa-box-archive text-lg" />
             </button>
           )}
           {onWhatsApp && !isFinalized && (
             <button
               onClick={() => onWhatsApp(customer)}
-              className="inline-flex items-center justify-center w-9 h-9 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors cursor-pointer shadow-sm"
+              className="inline-flex items-center justify-center w-9 h-9 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer shadow-sm"
               title="Enviar WhatsApp"
             >
-              <i className="fa-brands fa-whatsapp text-lg" />
+              <i className="fa-brands fa-whatsapp text-lg text-green-600" />
             </button>
           )}
         </div>
@@ -204,6 +204,7 @@ function CustomerCard({
             // AGUARDANDO (padrão)
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className={status.textClass}>
+                <i className="fa-solid fa-clock text-gray-500 text-xs pr-1.5"></i>
                 Aguardando há {formatDistanceToNow(customer.dataCriacao)}
               </span>
             </div>
@@ -349,7 +350,7 @@ function CustomerCard({
         </div>
 
         {/* COLUNA DIREITA: Produto */}
-        <div className="bg-gray-50/50 rounded-lg p-3 space-y-2">
+        <div className="space-y-2">
           <div className="flex items-center gap-2 mb-2">
             <i className="fa-solid fa-box text-gray-400 text-sm"></i>
             <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
@@ -369,7 +370,7 @@ function CustomerCard({
               <span className="text-gray-600">
                 <span className="font-semibold">Nº</span> {customer.numeracao}
               </span>
-              <span className="text-gray-300">•</span>
+              <span className="text-gray-400">•</span>
               <span className="text-gray-600">
                 <span className="font-semibold">Cor</span> {customer.cor}
               </span>

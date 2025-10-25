@@ -123,91 +123,71 @@
 - [x] Adicionar `formatDaysElapsed()` para cálculo de tempo decorrido
 - [x] Remover duplicação de código nos componentes
 
-## 🔜 Próximas Melhorias
+## ✅ Fase 7 - Refatoração CustomerCard & Melhorias UX (CONCLUÍDO)
 
-### 🎯 PRIORIDADE: Refatoração de CustomerCard no Dashboard
-**Estimativa:** 2-3 horas | **Objetivo:** Eliminar duplicação de código e garantir consistência visual
+### 🎯 Refatoração de CustomerCard no Dashboard
+**Concluído em:** 25/10/2025 | **Resultado:** -67% código duplicado, UX profissional
 
-#### Contexto
-Atualmente temos **2 implementações diferentes** de cards de cliente:
-- ✅ **CustomerCard.tsx** - Usado em History e Search (novo layout 2 colunas)
-- ❌ **CustomerListModal.tsx** - Implementação inline (~200 linhas JSX duplicado)
+#### Implementações Realizadas
 
-#### Problemas
-- **Duplicação de código:** Mesma lógica de status/cores em 2 lugares
-- **Inconsistência visual:** Dashboard tem visual diferente das outras páginas
-- **Manutenção difícil:** Mudanças precisam ser feitas em 2 arquivos
-- **Violação DRY:** Bug fixes precisam ser duplicados
+**1. Expandir CustomerCard.tsx** ✅
+- [x] Adicionadas 8 props opcionais para botões contextuais do Dashboard
+- [x] Props implementadas: `onCheckLojaCampinas`, `onCheckLojaDomPedro`, `onStoreHasStock`, `onStoreNoStock`, `onClientAccepted`, `onClientDeclined`, `onProductArrived`, `onPurchaseCompleted`
+- [x] Seção de "Botões Contextuais" condicional baseada no status
+- [x] Layout 2 colunas mantido com botões no canto superior direito
 
-#### Plano de Execução
+**2. Refatorar CustomerListModal.tsx** ✅
+- [x] Removidas ~230 linhas de JSX duplicado (linhas 82-318)
+- [x] Substituído por componente `<CustomerCard />` reutilizável
+- [x] Arquivo reduzido de **341 → 113 linhas** (67% de redução!)
+- [x] Mantida apenas lógica de modal e listagem
 
-**1. Expandir CustomerCard.tsx (30 min)**
-- [ ] Adicionar props opcionais para botões contextuais do Dashboard:
-  ```typescript
-  interface CustomerCardProps {
-    // Existentes
-    customer: Customer;
-    variant?: 'default' | 'compact' | 'finalized';
-    onWhatsApp?: (customer: Customer) => void;
-    onDelete?: (customer: Customer) => void;
-    onRestore?: (customer: Customer) => void;
-    showActions?: boolean;
+**3. Limpeza de Código Legado** ✅
+- [x] Removida prop `onAcceptTransfer` obsoleta (nunca foi usada)
+- [x] Identificada função `handleAcceptTransfer` desconectada
 
-    // NOVOS - Dashboard específicos
-    onCheckLojaCampinas?: (customer: Customer) => void;
-    onCheckLojaDomPedro?: (customer: Customer) => void;
-    onAcceptTransfer?: (customer: Customer, store: 'Campinas' | 'Dom Pedro') => void;
-    onProductArrived?: (customer: Customer) => void;
-    onPurchaseCompleted?: (customer: Customer) => void;
-    onStoreHasStock?: (customer: Customer) => void;
-    onStoreNoStock?: (customer: Customer) => void;
-    onClientAccepted?: (customer: Customer) => void;
-    onClientDeclined?: (customer: Customer) => void;
-  }
-  ```
-- [ ] Adicionar seção condicional de "Botões Contextuais" baseada no status do cliente
-- [ ] Manter layout 2 colunas (Cliente | Produto) com botões no canto superior direito
+**4. Otimização de Badges Informativos** ✅
+- [x] Removido badge da loja em status "aguardando" (redundante)
+- [x] Removido badge "De: [Loja]" em "aguardando_transferencia" (redundante)
+- [x] Informações contextuais aparecem apenas quando relevantes
 
-**2. Refatorar CustomerListModal.tsx (60 min)**
-- [ ] Remover todo JSX inline do card (linhas 82-300+)
-- [ ] Substituir por:
-  ```tsx
-  <CustomerCard
-    customer={customer}
-    variant="compact"
-    onWhatsApp={onWhatsApp}
-    onDelete={onDelete}
-    onCheckLojaCampinas={onCheckLojaCampinas}
-    onCheckLojaDomPedro={onCheckLojaDomPedro}
-    // ... demais callbacks
-  />
-  ```
-- [ ] Manter apenas lógica de modal e listagem
-- [ ] Reduzir arquivo de ~400 linhas para ~150 linhas
+**5. SearchCustomers.tsx - Sistema de Arquivamento Profissional** ✅
+- [x] Substituído `deleteDoc` por `updateDoc` com arquivamento
+- [x] Removido `Modal` genérico e implementado `ArchiveModal` profissional
+- [x] Adicionado dropdown de motivos de arquivamento
+- [x] Dados preservados (não deletados permanentemente)
+- [x] Sistema consistente com Dashboard
 
-**3. Testes e Validação (60 min)**
-- [ ] Testar todos os fluxos do Dashboard:
-  - [ ] Status "Aguardando" → Sub-estados (verificar lojas, resposta loja, resposta cliente)
-  - [ ] Status "Aguardando Transferência" → Produto chegou
-  - [ ] Status "Contactado" → Cliente comprou
-- [ ] Verificar botões contextuais aparecem corretamente em cada estado
-- [ ] Garantir callbacks funcionam (WhatsApp, arquivamento, etc)
-- [ ] Testar responsividade mobile/desktop
-- [ ] Validar consistência visual entre Dashboard/History/Search
+**6. Ícone de Arquivar - Padrão da Indústria** ✅
+- [x] Trocado `fa-trash-can` (vermelho) por `fa-box-archive` (cinza)
+- [x] Cor neutra (padrão Gmail, Slack, Outlook, Discord)
+- [x] Título atualizado: "Arquivar cliente"
+- [x] Botões com cores discretas e profissionais
 
-#### Benefícios
+**7. SearchCustomers.tsx - Busca Inteligente** ✅
+- [x] Busca apenas clientes aguardando produto NOVO (não transferências)
+- [x] Filtro: status "aguardando" + não consultando outra loja
+- [x] Exclui: arquivados, em transferência, contactados, finalizados
+- [x] Subtitle atualizado: "Produto novo chegou? Encontre quem está aguardando"
+
+#### Resultados Alcançados
+- ✅ **-67% de código duplicado** (230 linhas removidas)
 - ✅ **DRY:** Um componente único para todos os cards
-- ✅ **Consistência:** Visual idêntico em todo o app
+- ✅ **Consistência:** Visual idêntico em Dashboard/History/Search
 - ✅ **Manutenção:** Mudanças em 1 lugar só
-- ✅ **Performance:** Melhor re-render com React.memo
-- ✅ **Testabilidade:** Lógica centralizada
+- ✅ **UX Profissional:** Ícones e cores padrão da indústria
+- ✅ **Busca focada:** Caso de uso correto (produto novo chegou)
+- ✅ **Segurança:** Nenhum dado deletado permanentemente
 
-#### Arquivos Afetados
-- `src/components/features/CustomerCard.tsx` (expandir props)
-- `src/components/features/CustomerListModal.tsx` (simplificar)
-- `src/pages/Dashboard.tsx` (sem mudanças, só testar)
+#### Arquivos Modificados
+- `src/components/features/CustomerCard.tsx` (expandido: 242 → 383 linhas)
+- `src/components/features/CustomerListModal.tsx` (simplificado: 341 → 113 linhas)
+- `src/pages/SearchCustomers.tsx` (refatorado: arquivamento + busca inteligente)
+- `src/pages/Dashboard.tsx` (limpeza: removida prop obsoleta)
 
 ---
+
+## 🔜 Próximas Melhorias
 
 ### Performance & Paginação
 - [ ] Implementar paginação na página de busca
@@ -259,5 +239,9 @@ Atualmente temos **2 implementações diferentes** de cards de cliente:
 - ✅ **Bottom Navigation mobile profissional** (padrão apps modernos)
 - ✅ **Cards otimizados com 36% menos altura** e informações contextuais
 - ✅ **Informações específicas por etapa** do workflow (tempo, origem, etc)
+- ✅ **Componente CustomerCard unificado** (-67% código duplicado)
+- ✅ **Ícones e cores padrão da indústria** (arquivar, WhatsApp, restaurar)
+- ✅ **Busca inteligente** (apenas clientes aguardando produto novo)
+- ✅ **Sistema de arquivamento profissional** (dados preservados, motivos rastreados)
 
 **Próximo foco:** Performance, paginação e analytics avançado

@@ -4,13 +4,13 @@ import {
   query,
   where,
   getDocs,
-  deleteDoc,
   doc,
   setDoc,
+  updateDoc,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
-import { Customer } from '@/types/customer';
-import { Input, Modal, PageLayout } from '@/components/ui';
+import { Customer, ArchiveReason } from '@/types/customer';
+import { Input, PageLayout, ArchiveModal } from '@/components/ui';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { notifyProductArrived } from '@/services/whatsappService';
@@ -19,8 +19,8 @@ import { CustomerCard } from '@/components/features';
 function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+  const [archiveModalOpen, setArchiveModalOpen] = useState(false);
+  const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(
     null
   );
 
@@ -36,6 +36,7 @@ function SearchCustomers() {
     try {
       const valorBuscado = value.toLowerCase().trim();
 
+      // Busca por referência e modelo
       const refQuery = query(
         collection(db, 'clientes'),
         where('referencia', '==', valorBuscado)
@@ -52,13 +53,33 @@ function SearchCustomers() {
       ]);
 
       const results: Customer[] = [];
+
+      // Adiciona resultados por referência
       refSnapshot.forEach((doc) => {
-        results.push({ id: doc.id, ...doc.data() } as Customer);
+        const customer = { id: doc.id, ...doc.data() } as Customer;
+        // Filtra apenas clientes aguardando produto NOVO:
+        // - Não arquivados
+        // - Status inicial (aguardando)
+        // - Não consultando outra loja (não está em processo de transferência)
+        if (
+          !customer.arquivado &&
+          (!customer.status || customer.status === 'aguardando') &&
+          !customer.consultandoLoja
+        ) {
+          results.push(customer);
+        }
       });
 
+      // Adiciona resultados por modelo (sem duplicar)
       modeloSnapshot.forEach((doc) => {
-        if (!results.some((customer) => customer.id === doc.id)) {
-          results.push({ id: doc.id, ...doc.data() } as Customer);
+        const customer = { id: doc.id, ...doc.data() } as Customer;
+        if (
+          !results.some((c) => c.id === doc.id) &&
+          !customer.arquivado &&
+          (!customer.status || customer.status === 'aguardando') &&
+          !customer.consultandoLoja
+        ) {
+          results.push(customer);
         }
       });
 
@@ -79,9 +100,6 @@ function SearchCustomers() {
       // 2. Adicionar à coleção 'contacted' (histórico)
       await setDoc(doc(db, 'contacted', customer.id), contactedCustomer);
 
-      // 3. Remover da coleção 'clientes' (ativos)
-      await deleteDoc(doc(db, 'clientes', customer.id));
-
       // 4. Abrir WhatsApp
       notifyProductArrived(customer);
 
@@ -97,37 +115,41 @@ function SearchCustomers() {
   };
 
   const handleDeleteClick = (customer: Customer) => {
-    setSelectedCustomer(customer);
-    setModalOpen(true);
+    setCustomerToArchive(customer);
+    setArchiveModalOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!selectedCustomer) return;
+  const handleArchiveCustomer = async (
+    reason: ArchiveReason,
+    notes?: string
+  ) => {
+    if (!customerToArchive) return;
 
     try {
-      await deleteDoc(doc(db, 'clientes', selectedCustomer.id));
-      toast.success(`Cliente ${selectedCustomer.cliente} excluído(a)!`);
-      setModalOpen(false);
-      setSelectedCustomer(null);
-      handleSearch({
-        target: { value: searchTerm },
-      } as ChangeEvent<HTMLInputElement>);
-    } catch (error) {
-      console.error('Erro ao excluir cliente:', error);
-      toast.error('Erro ao excluir cliente. Tente novamente.');
-    }
-  };
+      await updateDoc(doc(db, 'clientes', customerToArchive.id), {
+        arquivado: true,
+        dataArquivamento: new Date().toISOString(),
+        motivoArquivamento: reason,
+        observacoes: notes || '',
+      });
 
-  const handleCancelDelete = () => {
-    setModalOpen(false);
-    setSelectedCustomer(null);
+      toast.success(`${customerToArchive.cliente} arquivado com sucesso!`);
+      setArchiveModalOpen(false);
+      setCustomerToArchive(null);
+
+      // Atualiza lista de resultados (remove da tela)
+      setCustomers(customers.filter((c) => c.id !== customerToArchive.id));
+    } catch (error) {
+      console.error('Erro ao arquivar cliente:', error);
+      toast.error('Erro ao arquivar cliente');
+    }
   };
 
   return (
     <PageLayout
       title="Buscar"
       highlight="Clientes"
-      subtitle="Produto chegou? Encontre quem está esperando"
+      subtitle="Produto novo chegou? Encontre quem está aguardando"
       maxWidth="2xl"
     >
       {/* Card de Busca */}
@@ -170,12 +192,11 @@ function SearchCustomers() {
         </div>
       </AnimatedContainer>
 
-      <Modal
-        isOpen={modalOpen}
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
-        onClose={handleCancelDelete}
-        title="Você já entrou em contato com o cliente?"
+      <ArchiveModal
+        isOpen={archiveModalOpen}
+        onClose={() => setArchiveModalOpen(false)}
+        onConfirm={handleArchiveCustomer}
+        customerName={customerToArchive?.cliente || ''}
       />
     </PageLayout>
   );
