@@ -168,15 +168,17 @@ function CustomerCard({
             // PRONTO PARA RETIRADA
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <div className="flex items-center gap-1.5">
-                <i className="fa-solid fa-box-open text-green-600 text-xs"></i>
-                <span className="font-medium text-green-700">
+                <i className="fa-solid fa-clock text-green-600 text-xs"></i>
+                <span className="font-medium text-green-700 ">
                   Pronto há {formatDistanceToNow(customer.dataContacto)}
                 </span>
               </div>
+              {/* Badge Loja Origem */}
               {customer.lojaOrigem && (
                 <>
-                  <span className="text-gray-300">•</span>
+                  <span className="text-gray-400">•</span>
                   <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
+                    <i className="fa-solid fa-store pr-1.5"></i>
                     {customer.lojaOrigem}
                   </span>
                 </>
@@ -204,14 +206,6 @@ function CustomerCard({
               <span className={status.textClass}>
                 Aguardando há {formatDistanceToNow(customer.dataCriacao)}
               </span>
-              {customer.consultandoLoja && (
-                <>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
-                    {customer.consultandoLoja}
-                  </span>
-                </>
-              )}
             </div>
           )}
 
@@ -323,19 +317,14 @@ function CustomerCard({
             {/* Status: AGUARDANDO TRANSFERÊNCIA - Botão de produto chegou */}
             {customer.status === 'aguardando_transferencia' &&
               onProductArrived && (
-                <>
-                  <span className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded">
-                    De: {customer.lojaOrigem}
-                  </span>
-                  <button
-                    onClick={() => onProductArrived(customer)}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
-                    title="Produto chegou"
-                  >
-                    <i className="fa-solid fa-box"></i>
-                    <span>Produto Chegou</span>
-                  </button>
-                </>
+                <button
+                  onClick={() => onProductArrived(customer)}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
+                  title="Produto chegou"
+                >
+                  <i className="fa-solid fa-box"></i>
+                  <span>Produto Chegou</span>
+                </button>
               )}
 
             {/* Status: PRONTO PARA RETIRADA - Botão de compra concluída */}
