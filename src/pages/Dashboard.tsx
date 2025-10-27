@@ -86,8 +86,8 @@ function Dashboard() {
   // Função para verificar disponibilidade na Loja Campinas
   const handleCheckLojaCampinas = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'clientes', customer.id), {
-        consultandoLoja: 'Campinas',
+      await updateDoc(doc(db, 'customers', customer.id), {
+        consultingStore: 'Campinas',
       });
       checkLojaCampinas(customer);
       toast('WhatsApp enviado para Loja Campinas');
@@ -101,8 +101,8 @@ function Dashboard() {
   // Função para verificar disponibilidade na Loja Dom Pedro
   const handleCheckLojaDomPedro = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'clientes', customer.id), {
-        consultandoLoja: 'Dom Pedro',
+      await updateDoc(doc(db, 'customers', customer.id), {
+        consultingStore: 'Dom Pedro',
       });
       checkLojaDomPedro(customer); // Envia WhatsApp para loja
       toast('WhatsApp enviado para Loja Dom Pedro');
@@ -116,13 +116,13 @@ function Dashboard() {
   // Função quando LOJA confirma que TEM estoque
   const handleStoreHasStock = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'clientes', customer.id), {
-        lojaTemEstoque: true,
+      await updateDoc(doc(db, 'customers', customer.id), {
+        storeHasStock: true,
       });
       // Envia WhatsApp para o CLIENTE perguntando se aceita transferência
       notifyOtherStore(customer);
       toast.success(
-        `Cliente notificado sobre disponibilidade em ${customer.consultandoLoja}!`
+        `Cliente notificado sobre disponibilidade em ${customer.consultingStore}!`
       );
       refreshCustomers(); // Atualiza lista sem recarregar
     } catch (error) {
@@ -134,9 +134,9 @@ function Dashboard() {
   // Função quando LOJA confirma que NÃO TEM estoque
   const handleStoreNoStock = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'clientes', customer.id), {
-        consultandoLoja: null,
-        lojaTemEstoque: false,
+      await updateDoc(doc(db, 'customers', customer.id), {
+        consultingStore: null,
+        storeHasStock: false,
       });
       toast('Produto não disponível. Pode consultar outra loja.');
       refreshCustomers(); // Atualiza lista sem recarregar
@@ -149,13 +149,13 @@ function Dashboard() {
   // Função quando CLIENTE aceita a transferência
   const handleClientAccepted = async (customer: Customer) => {
     try {
-      await moveToAwaitingTransfer(customer, customer.consultandoLoja!);
+      await moveToAwaitingTransfer(customer, customer.consultingStore!);
       // Limpa campos auxiliares
-      await updateDoc(doc(db, 'clientes', customer.id), {
-        consultandoLoja: null,
-        lojaTemEstoque: false,
+      await updateDoc(doc(db, 'customers', customer.id), {
+        consultingStore: null,
+        storeHasStock: false,
       });
-      toast.success(`Transferência confirmada de ${customer.consultandoLoja}!`);
+      toast.success(`Transferência confirmada de ${customer.consultingStore}!`);
       refreshAll(); // Atualiza lista e métricas
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
@@ -185,14 +185,14 @@ function Dashboard() {
     if (!customerToArchive) return;
 
     try {
-      await updateDoc(doc(db, 'clientes', customerToArchive.id), {
-        arquivado: true,
+      await updateDoc(doc(db, 'customers', customerToArchive.id), {
+        archived: true,
         motivoArquivamento: reason,
         dataArquivamento: new Date().toISOString(),
         observacoes: notes,
       });
 
-      toast.success(`${customerToArchive.cliente} arquivado com sucesso!`);
+      toast.success(`${customerToArchive.name} archived com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
       refreshAll(); // Atualiza lista e métricas
@@ -210,7 +210,7 @@ function Dashboard() {
     try {
       await moveToAwaitingTransfer(customer, store);
       toast.success(
-        `${customer.cliente} aguardando transferência de ${store}!`
+        `${customer.name} aguardando transferência de ${store}!`
       );
       refreshAll(); // Atualiza lista e métricas
     } catch (error) {
@@ -224,7 +224,7 @@ function Dashboard() {
     try {
       await markAsContacted(customer);
       notifyProductArrived(customer);
-      toast.success(`${customer.cliente} pronto para retirada!`);
+      toast.success(`${customer.name} pronto para retirada!`);
       refreshAll(); // Atualiza lista e métricas
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
@@ -238,7 +238,7 @@ function Dashboard() {
       const isFromContactedCollection =
         customer._isFromContactedCollection || false;
       await moveToFinished(customer, isFromContactedCollection);
-      toast.success(`Venda de ${customer.cliente} finalizada!`);
+      toast.success(`Venda de ${customer.name} finalizada!`);
       refreshAll(); // Atualiza lista e métricas
     } catch (error) {
       console.error('Erro ao finalizar venda:', error);
@@ -404,7 +404,7 @@ function Dashboard() {
         isOpen={archiveModalOpen}
         onClose={() => setArchiveModalOpen(false)}
         onConfirm={handleArchiveCustomer}
-        customerName={customerToArchive?.cliente || ''}
+        customerName={customerToArchive?.name || ''}
       />
     </PageLayout>
   );

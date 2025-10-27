@@ -6,7 +6,7 @@ export async function updateCustomerStatus(
   customerId: string,
   newStatus: CustomerStatus,
   additionalData?: {
-    lojaOrigem?: string;
+    sourceStore?: string;
     isFromContactedCollection?: boolean;
   }
 ): Promise<void> {
@@ -17,17 +17,17 @@ export async function updateCustomerStatus(
   };
 
   switch (newStatus) {
-    case 'aguardando_transferencia':
-      updateData.dataTransferencia = now;
-      if (additionalData?.lojaOrigem) {
-        updateData.lojaOrigem = additionalData.lojaOrigem;
+    case 'awaiting_transfer':
+      updateData.transferredAt = now;
+      if (additionalData?.sourceStore) {
+        updateData.sourceStore = additionalData.sourceStore;
       }
       break;
-    case 'contactado':
-      updateData.dataContacto = now;
+    case 'ready_for_pickup':
+      updateData.contactedAt = now;
       break;
-    case 'finalizado':
-      updateData.dataFinalizacao = now;
+    case 'completed':
+      updateData.completedAt = now;
       break;
   }
 
@@ -37,7 +37,7 @@ export async function updateCustomerStatus(
 
     if (contactedSnap.exists()) {
       const customerData = contactedSnap.data() as Customer;
-      const customerRef = doc(db, 'clientes', customerId);
+      const customerRef = doc(db, 'customers', customerId);
       await setDoc(customerRef, {
         ...customerData,
         ...updateData,
@@ -45,17 +45,17 @@ export async function updateCustomerStatus(
       });
     }
   } else {
-    const customerRef = doc(db, 'clientes', customerId);
+    const customerRef = doc(db, 'customers', customerId);
     await updateDoc(customerRef, updateData);
   }
 }
 
 export async function moveToAwaitingTransfer(
   customer: Customer,
-  lojaOrigem: 'Campinas' | 'Dom Pedro'
+  sourceStore: 'Campinas' | 'Dom Pedro'
 ): Promise<void> {
-  await updateCustomerStatus(customer.id, 'aguardando_transferencia', {
-    lojaOrigem,
+  await updateCustomerStatus(customer.id, 'awaiting_transfer', {
+    sourceStore,
   });
 }
 
@@ -63,15 +63,15 @@ export async function moveToFinished(
   customer: Customer,
   isFromContactedCollection: boolean = false
 ): Promise<void> {
-  await updateCustomerStatus(customer.id, 'finalizado', {
+  await updateCustomerStatus(customer.id, 'completed', {
     isFromContactedCollection,
   });
 }
 
 export async function moveToAwaiting(customer: Customer): Promise<void> {
-  await updateCustomerStatus(customer.id, 'aguardando');
+  await updateCustomerStatus(customer.id, 'pending');
 }
 
 export async function markAsContacted(customer: Customer): Promise<void> {
-  await updateCustomerStatus(customer.id, 'contactado');
+  await updateCustomerStatus(customer.id, 'ready_for_pickup');
 }

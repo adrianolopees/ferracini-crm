@@ -6,15 +6,7 @@ import { db } from '@/services/firebase';
 import { formSchema, FormData } from '@/schemas/registerSchema';
 import { getFirebaseErrorMessage, maskPhone } from '@/utils';
 import toast from 'react-hot-toast';
-import {
-  Input,
-  Select,
-  Button,
-  Navigation,
-  Spinner,
-  PageHeader,
-  PageLayout,
-} from '@/components/ui';
+import { Input, Select, Button, Spinner, PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 
 function RegisterCustomer() {
@@ -31,13 +23,13 @@ function RegisterCustomer() {
     resolver: zodResolver(formSchema),
     mode: 'onSubmit',
     defaultValues: {
-      cliente: '',
-      celular: '',
-      modelo: '',
-      referencia: '',
-      numeracao: '',
-      cor: '',
-      vendedor: '',
+      name: '',
+      phone: '',
+      model: '',
+      reference: '',
+      size: '',
+      color: '',
+      salesperson: '',
     },
   });
 
@@ -47,11 +39,12 @@ function RegisterCustomer() {
 
     try {
       await toast.promise(
-        addDoc(collection(db, 'clientes'), {
+        addDoc(collection(db, 'customers'), {
           ...data,
-          referencia: data.referencia.toLowerCase(),
-          modelo: data.modelo.toLowerCase(),
-          dataCriacao: new Date().toISOString(),
+          reference: data.reference.toLowerCase(),
+          model: data.model.toLowerCase(),
+          createdAt: new Date().toISOString(),
+          archived: false,
         }),
         {
           loading: 'Salvando cliente...',
@@ -95,8 +88,8 @@ function RegisterCustomer() {
               <Input
                 label="Cliente"
                 placeholder="Nome e sobrenome"
-                {...register('cliente')}
-                error={errors.cliente?.message}
+                {...register('name')}
+                error={errors.name?.message}
                 disabled={isLoading}
                 required
               />
@@ -107,12 +100,12 @@ function RegisterCustomer() {
                 label="Celular"
                 type="tel"
                 placeholder="(00) 00000-0000"
-                {...register('celular')}
+                {...register('phone')}
                 onChange={(e) => {
                   const masked = maskPhone(e.target.value);
-                  setValue('celular', masked);
+                  setValue('phone', masked);
                 }}
-                error={errors.celular?.message}
+                error={errors.phone?.message}
                 disabled={isLoading}
                 required
               />
@@ -121,8 +114,8 @@ function RegisterCustomer() {
             <Input
               label="Modelo"
               placeholder="Nome da linha"
-              {...register('modelo')}
-              error={errors.modelo?.message}
+              {...register('model')}
+              error={errors.model?.message}
               disabled={isLoading}
               required
             />
@@ -130,8 +123,8 @@ function RegisterCustomer() {
             <Input
               label="Referência"
               placeholder="Referência completa"
-              {...register('referencia')}
-              error={errors.referencia?.message}
+              {...register('reference')}
+              error={errors.reference?.message}
               disabled={isLoading}
               required
             />
@@ -140,8 +133,8 @@ function RegisterCustomer() {
               label="Numeração"
               type="number"
               placeholder="37-47"
-              {...register('numeracao')}
-              error={errors.numeracao?.message}
+              {...register('size')}
+              error={errors.size?.message}
               disabled={isLoading}
               min="37"
               max="47"
@@ -151,8 +144,8 @@ function RegisterCustomer() {
             <Input
               label="Cor"
               placeholder="Cor do produto"
-              {...register('cor')}
-              error={errors.cor?.message}
+              {...register('color')}
+              error={errors.color?.message}
               disabled={isLoading}
               required
             />
@@ -165,8 +158,8 @@ function RegisterCustomer() {
                 { value: 'Will', label: 'Will' },
                 { value: 'Marcelo', label: 'Marcelo' },
               ]}
-              {...register('vendedor')}
-              error={errors.vendedor?.message}
+              {...register('salesperson')}
+              error={errors.salesperson?.message}
               disabled={isLoading}
               required
             />

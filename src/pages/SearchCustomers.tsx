@@ -38,13 +38,13 @@ function SearchCustomers() {
 
       // Busca por referência e modelo
       const refQuery = query(
-        collection(db, 'clientes'),
-        where('referencia', '==', valorBuscado)
+        collection(db, 'customers'),
+        where('reference', '==', valorBuscado)
       );
 
       const modeloQuery = query(
-        collection(db, 'clientes'),
-        where('modelo', '==', valorBuscado)
+        collection(db, 'customers'),
+        where('model', '==', valorBuscado)
       );
 
       const [refSnapshot, modeloSnapshot] = await Promise.all([
@@ -62,9 +62,9 @@ function SearchCustomers() {
         // - Status inicial (aguardando)
         // - Não consultando outra loja (não está em processo de transferência)
         if (
-          !customer.arquivado &&
-          (!customer.status || customer.status === 'aguardando') &&
-          !customer.consultandoLoja
+          !customer.archived &&
+          (!customer.status || customer.status === 'pending') &&
+          !customer.consultingStore
         ) {
           results.push(customer);
         }
@@ -75,9 +75,9 @@ function SearchCustomers() {
         const customer = { id: doc.id, ...doc.data() } as Customer;
         if (
           !results.some((c) => c.id === doc.id) &&
-          !customer.arquivado &&
-          (!customer.status || customer.status === 'aguardando') &&
-          !customer.consultandoLoja
+          !customer.archived &&
+          (!customer.status || customer.status === 'pending') &&
+          !customer.consultingStore
         ) {
           results.push(customer);
         }
@@ -94,7 +94,7 @@ function SearchCustomers() {
       // 1. Criar cópia do cliente para adicionar ao histórico
       const contactedCustomer = {
         ...customer, // Copia todos os dados originais
-        dataContacto: new Date().toISOString(), // Adiciona data de contato AGORA
+        contactedAt: new Date().toISOString(), // Adiciona data de contato AGORA
       };
 
       // 2. Adicionar à coleção 'contacted' (histórico)
@@ -104,7 +104,7 @@ function SearchCustomers() {
       notifyProductArrived(customer);
 
       // 5. Mostrar mensagem de sucesso
-      toast.success(`${customer.cliente} movido para o histórico!`);
+      toast.success(`${customer.name} movido para o histórico!`);
 
       // 6. Atualizar lista de resultados (remove da tela)
       setCustomers(customers.filter((c) => c.id !== customer.id));
@@ -126,14 +126,14 @@ function SearchCustomers() {
     if (!customerToArchive) return;
 
     try {
-      await updateDoc(doc(db, 'clientes', customerToArchive.id), {
-        arquivado: true,
-        dataArquivamento: new Date().toISOString(),
-        motivoArquivamento: reason,
-        observacoes: notes || '',
+      await updateDoc(doc(db, 'customers', customerToArchive.id), {
+        archived: true,
+        archivedAt: new Date().toISOString(),
+        archiveReason: reason,
+        notes: notes || '',
       });
 
-      toast.success(`${customerToArchive.cliente} arquivado com sucesso!`);
+      toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
 
@@ -196,7 +196,7 @@ function SearchCustomers() {
         isOpen={archiveModalOpen}
         onClose={() => setArchiveModalOpen(false)}
         onConfirm={handleArchiveCustomer}
-        customerName={customerToArchive?.cliente || ''}
+        customerName={customerToArchive?.name || ''}
       />
     </PageLayout>
   );

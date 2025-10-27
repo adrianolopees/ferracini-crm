@@ -16,7 +16,7 @@ function useTopProducts(limit: number = 10) {
       try {
         // Buscar de AMBAS as coleções (clientes aguardando + contactados)
         const [clientesSnapshot, contactedSnapshot] = await Promise.all([
-          getDocs(collection(db, 'clientes')),
+          getDocs(collection(db, 'customers')),
           getDocs(collection(db, 'contacted')),
         ]);
 
@@ -25,7 +25,7 @@ function useTopProducts(limit: number = 10) {
         // Contar modelos dos clientes aguardando
         clientesSnapshot.forEach((doc) => {
           const data = doc.data();
-          const modelo = data.modelo;
+          const modelo = data.model;
 
           if (modelo) {
             modeloCounts[modelo] = (modeloCounts[modelo] || 0) + 1;
@@ -35,7 +35,7 @@ function useTopProducts(limit: number = 10) {
         // Contar modelos dos clientes contactados (SOMA aos já contados)
         contactedSnapshot.forEach((doc) => {
           const data = doc.data();
-          const modelo = data.modelo;
+          const modelo = data.model;
 
           if (modelo) {
             modeloCounts[modelo] = (modeloCounts[modelo] || 0) + 1;

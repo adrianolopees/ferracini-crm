@@ -16,27 +16,27 @@ function ArchiveModal({
   customerName,
 }: ArchiveModalProps) {
   const [selectedReason, setSelectedReason] =
-    useState<ArchiveReason>('Desistiu');
+    useState<ArchiveReason>('gave_up');
   const [notes, setNotes] = useState('');
 
-  const reasons: ArchiveReason[] = [
-    'Desistiu',
-    'Não respondeu',
-    'Comprou concorrente',
-    'Produto não disponível',
-    'Outro',
+  const reasons: { value: ArchiveReason; label: string }[] = [
+    { value: 'gave_up', label: 'Desistiu' },
+    { value: 'no_response', label: 'Não respondeu' },
+    { value: 'bought_elsewhere', label: 'Comprou concorrente' },
+    { value: 'product_unavailable', label: 'Produto não disponível' },
+    { value: 'other', label: 'Outro' },
   ];
 
   const handleConfirm = () => {
     onConfirm(selectedReason, notes.trim() || undefined);
     // Reset form
-    setSelectedReason('Desistiu');
+    setSelectedReason('gave_up');
     setNotes('');
   };
 
   const handleCancel = () => {
     // Reset form
-    setSelectedReason('Desistiu');
+    setSelectedReason('gave_up');
     setNotes('');
     onClose();
   };
@@ -71,8 +71,8 @@ function ArchiveModal({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
           >
             {reasons.map((reason) => (
-              <option key={reason} value={reason}>
-                {reason}
+              <option key={reason.value} value={reason.value}>
+                {reason.label}
               </option>
             ))}
           </select>

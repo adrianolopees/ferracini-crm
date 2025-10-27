@@ -1,7 +1,7 @@
 import { getDaysWaiting } from '@/utils/formatDate';
 
-export function getCustomerStatus(dataCriacao: string) {
-  const daysWaiting = getDaysWaiting(dataCriacao);
+export function getCustomerStatus(createdAt: string) {
+  const daysWaiting = getDaysWaiting(createdAt);
 
   // Vermelho: 7 dias ou mais
   if (daysWaiting >= 7) {

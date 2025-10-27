@@ -32,7 +32,7 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
       try {
         // Buscar clientes ativos e contactados ao mesmo tempo
         const [clientesSnapshot, contactedSnapshot] = await Promise.all([
-          getDocs(query(collection(db, 'clientes'))),
+          getDocs(query(collection(db, 'customers'))),
           getDocs(query(collection(db, 'contacted'))),
         ]);
 
@@ -47,24 +47,24 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
           const data = doc.data();
 
           // PROTEÇÃO: Ignorar clientes arquivados
-          if (data.arquivado) return;
+          if (data.archived) return;
 
-          const status = data.status || 'aguardando'; // backward compatibility
-          const daysWaiting = getDaysWaiting(data.dataCriacao);
+          const status = data.status || 'pending'; // backward compatibility
+          const daysWaiting = getDaysWaiting(data.createdAt);
 
           // Contadores por status
-          if (status === 'aguardando') awaitingCount++;
-          if (status === 'aguardando_transferencia') awaitingTransferCount++;
-          if (status === 'contactado') contactedCount++;
-          if (status === 'finalizado') finishedCount++;
+          if (status === 'pending') awaitingCount++;
+          if (status === 'awaiting_transfer') awaitingTransferCount++;
+          if (status === 'ready_for_pickup') contactedCount++;
+          if (status === 'completed') finishedCount++;
 
           // Urgente se aguardando há 7+ dias
-          if (status === 'aguardando' && daysWaiting >= 7) {
+          if (status === 'pending' && daysWaiting >= 7) {
             urgentCount++;
           }
 
           // Tempo médio apenas para aguardando
-          if (status === 'aguardando') {
+          if (status === 'pending') {
             totalDays += daysWaiting;
           }
         });
@@ -76,7 +76,7 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
         let contactedLegacyCount = 0;
         contactedSnapshot.forEach((doc) => {
           const data = doc.data();
-          if (!data.arquivado) {
+          if (!data.archived) {
             contactedLegacyCount++;
           }
         });

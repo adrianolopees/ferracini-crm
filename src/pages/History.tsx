@@ -47,10 +47,10 @@ function History() {
       const term = searchTerm.toLowerCase();
       const filtered = customers.filter(
         (customer) =>
-          customer.cliente.toLowerCase().includes(term) ||
-          customer.modelo.toLowerCase().includes(term) ||
-          customer.referencia.toLowerCase().includes(term) ||
-          customer.celular.includes(term)
+          customer.name.toLowerCase().includes(term) ||
+          customer.model.toLowerCase().includes(term) ||
+          customer.reference.toLowerCase().includes(term) ||
+          customer.phone.includes(term)
       );
       setFilteredCustomers(filtered);
     }
@@ -74,31 +74,31 @@ function History() {
       // Buscar todas as coleções em paralelo
       const [contactedSnapshot, clientesSnapshot] = await Promise.all([
         getDocs(collection(db, 'contacted')),
-        getDocs(collection(db, 'clientes')),
+        getDocs(collection(db, 'customers')),
       ]);
 
       // Processar coleção 'contacted' (dados legados)
       contactedSnapshot.forEach((doc) => {
         const data = doc.data();
-        if (!data.arquivado) {
+        if (!data.archived) {
           contacted.push({ id: doc.id, ...data } as ContactedCustomer);
           contactedIds.add(doc.id);
         }
       });
 
-      // Processar coleção 'clientes'
+      // Processar coleção 'customers'
       clientesSnapshot.forEach((doc) => {
         const data = doc.data();
 
-        if (data.arquivado) {
+        if (data.archived) {
           // Arquivados (exceto finalizados)
-          if (data.status !== 'finalizado') {
+          if (data.status !== 'completed') {
             archived.push({ id: doc.id, ...data } as Customer);
           }
-        } else if (data.status === 'finalizado') {
+        } else if (data.status === 'completed') {
           // Vendas finalizadas
           finalized.push({ id: doc.id, ...data } as Customer);
-        } else if (data.status === 'contactado' && !contactedIds.has(doc.id)) {
+        } else if (data.status === 'ready_for_pickup' && !contactedIds.has(doc.id)) {
           // Contactados (excluindo duplicatas da coleção contacted)
           contacted.push({ id: doc.id, ...data } as ContactedCustomer);
           contactedIds.add(doc.id);
@@ -119,14 +119,14 @@ function History() {
 
   const handleRestore = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'clientes', customer.id), {
-        arquivado: false,
-        motivoArquivamento: null,
-        dataArquivamento: null,
-        observacoes: null,
+      await updateDoc(doc(db, 'customers', customer.id), {
+        archived: false,
+        archiveReason: null,
+        archivedAt: null,
+        notes: null,
       });
 
-      toast.success(`${customer.cliente} restaurado para clientes ativos!`);
+      toast.success(`${customer.name} restaurado para clientes ativos!`);
       fetchAllCustomers(); // Recarregar listas
     } catch (error) {
       console.error('Erro ao restaurar cliente:', error);

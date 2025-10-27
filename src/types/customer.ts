@@ -1,40 +1,40 @@
 export type CustomerStatus =
-  | 'aguardando'
-  | 'aguardando_transferencia'
-  | 'contactado'
-  | 'finalizado';
+  | 'pending'
+  | 'awaiting_transfer'
+  | 'ready_for_pickup'
+  | 'completed';
 
 export type ArchiveReason =
-  | 'Desistiu'
-  | 'Não respondeu'
-  | 'Comprou concorrente'
-  | 'Produto não disponível'
-  | 'Outro';
+  | 'gave_up'
+  | 'no_response'
+  | 'bought_elsewhere'
+  | 'product_unavailable'
+  | 'other';
 
 export interface Customer {
   id: string;
-  cliente: string;
-  celular: string;
-  modelo: string;
-  referencia: string;
-  numeracao: string;
-  cor: string;
-  vendedor?: string;
-  dataCriacao: string;
+  name: string;
+  phone: string;
+  model: string;
+  reference: string;
+  size: string;
+  color: string;
+  salesperson?: string;
+  createdAt: string;
   status?: CustomerStatus;
-  dataContacto?: string;
-  dataTransferencia?: string;
-  dataFinalizacao?: string;
-  lojaOrigem?: string;
+  contactedAt?: string;
+  transferredAt?: string;
+  completedAt?: string;
+  sourceStore?: string;
   _isFromContactedCollection?: boolean;
-  arquivado?: boolean;
-  motivoArquivamento?: ArchiveReason;
-  dataArquivamento?: string;
-  observacoes?: string;
-  consultandoLoja?: 'Campinas' | 'Dom Pedro';
-  lojaTemEstoque?: boolean;
+  archived?: boolean;
+  archiveReason?: ArchiveReason;
+  archivedAt?: string;
+  notes?: string;
+  consultingStore?: 'Campinas' | 'Dom Pedro';
+  storeHasStock?: boolean;
 }
 
 export interface ContactedCustomer extends Customer {
-  dataContacto: string;
+  contactedAt: string;
 }

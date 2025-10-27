@@ -42,9 +42,9 @@ function CustomerCard({
   onProductArrived,
   onPurchaseCompleted,
 }: CustomerCardProps) {
-  const status = getCustomerStatus(customer.dataCriacao);
-  const isFinalized = customer.status === 'finalizado';
-  const isArchived = customer.arquivado;
+  const status = getCustomerStatus(customer.createdAt);
+  const isFinalized = customer.status === 'completed';
+  const isArchived = customer.archived;
 
   // Determinar classes baseadas no variant
   const borderClass = isFinalized
@@ -99,7 +99,7 @@ function CustomerCard({
             <h3
               className={`font-semibold text-gray-900 ${variant === 'compact' ? 'text-base' : 'text-lg'}`}
             >
-              {customer.cliente}
+              {customer.name}
             </h3>
             {isFinalized ? (
               <i
@@ -112,21 +112,21 @@ function CustomerCard({
                 title={status.label}
               />
             )}
-            {customer.vendedor && (
+            {customer.salesperson && (
               <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                {customer.vendedor}
+                {customer.salesperson}
               </span>
             )}
           </div>
 
           {/* Data Info Contextual por Etapa */}
-          {isFinalized && customer.dataFinalizacao ? (
+          {isFinalized && customer.completedAt ? (
             // FINALIZADO
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <div className="flex items-center gap-1.5">
                 <i className="fa-solid fa-calendar-check text-emerald-600 text-xs"></i>
                 <span className="font-medium text-emerald-700">
-                  {formatDateTime(customer.dataFinalizacao)}
+                  {formatDateTime(customer.completedAt)}
                 </span>
               </div>
               <span className="text-gray-300">•</span>
@@ -134,69 +134,69 @@ function CustomerCard({
                 <i className="fa-solid fa-hourglass-end text-purple-600 text-xs"></i>
                 <span className="text-purple-700">
                   {formatDaysElapsed(
-                    customer.dataCriacao,
-                    customer.dataFinalizacao
+                    customer.createdAt,
+                    customer.completedAt
                   )}
                 </span>
               </div>
-              {customer.lojaOrigem && (
+              {customer.sourceStore && (
                 <>
                   <span className="text-gray-300">•</span>
                   <div className="flex items-center gap-1.5">
                     <i className="fa-solid fa-store text-blue-600 text-xs"></i>
-                    <span className="text-blue-700">{customer.lojaOrigem}</span>
+                    <span className="text-blue-700">{customer.sourceStore}</span>
                   </div>
                 </>
               )}
             </div>
-          ) : isArchived && customer.dataArquivamento ? (
+          ) : isArchived && customer.archivedAt ? (
             // ARQUIVADO
             <div className="text-sm space-y-1">
               <span className="text-orange-600 font-medium">
-                Arquivado {formatDistanceToNow(customer.dataArquivamento)}
+                Arquivado {formatDistanceToNow(customer.archivedAt)}
               </span>
-              {customer.motivoArquivamento && (
+              {customer.archiveReason && (
                 <div className="text-gray-600">
                   Motivo:{' '}
                   <span className="font-medium">
-                    {customer.motivoArquivamento}
+                    {customer.archiveReason}
                   </span>
                 </div>
               )}
             </div>
-          ) : customer.status === 'contactado' && customer.dataContacto ? (
+          ) : customer.status === 'ready_for_pickup' && customer.contactedAt ? (
             // PRONTO PARA RETIRADA
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <div className="flex items-center gap-1.5">
                 <i className="fa-solid fa-clock text-green-600 text-xs"></i>
                 <span className="font-medium text-green-700 ">
-                  Pronto há {formatDistanceToNow(customer.dataContacto)}
+                  Pronto há {formatDistanceToNow(customer.contactedAt)}
                 </span>
               </div>
               {/* Badge Loja Origem */}
-              {customer.lojaOrigem && (
+              {customer.sourceStore && (
                 <>
                   <span className="text-gray-400">•</span>
                   <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded">
                     <i className="fa-solid fa-store pr-1.5"></i>
-                    {customer.lojaOrigem}
+                    {customer.sourceStore}
                   </span>
                 </>
               )}
             </div>
-          ) : customer.status === 'aguardando_transferencia' ? (
+          ) : customer.status === 'awaiting_transfer' ? (
             // AGUARDANDO TRANSFERÊNCIA
             <div className="text-sm space-y-0.5">
               <div className="flex items-center gap-1.5">
                 <i className="fa-solid fa-truck text-blue-600 text-xs"></i>
                 <span className="font-medium text-blue-700">
-                  Transferência de {customer.lojaOrigem || '...'}
+                  Transferência de {customer.sourceStore || '...'}
                 </span>
               </div>
-              {customer.dataTransferencia && (
+              {customer.transferredAt && (
                 <span className="text-xs text-gray-600 block ml-5">
                   Em trânsito há{' '}
-                  {formatDistanceToNow(customer.dataTransferencia)}
+                  {formatDistanceToNow(customer.transferredAt)}
                 </span>
               )}
             </div>
@@ -205,7 +205,7 @@ function CustomerCard({
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className={status.textClass}>
                 <i className="fa-solid fa-clock text-gray-500 text-xs pr-1.5"></i>
-                Aguardando há {formatDistanceToNow(customer.dataCriacao)}
+                Aguardando há {formatDistanceToNow(customer.createdAt)}
               </span>
             </div>
           )}
@@ -214,16 +214,16 @@ function CustomerCard({
           {showActions && (
             <div className="flex items-center gap-2">
               <i className="fa-solid fa-phone text-gray-500 text-xs"></i>
-              <span className="text-sm text-gray-600">{customer.celular}</span>
+              <span className="text-sm text-gray-600">{customer.phone}</span>
             </div>
           )}
 
           {/* Botões Contextuais do Dashboard */}
           <div className="flex items-center gap-2 flex-wrap mt-2">
             {/* Status: AGUARDANDO - SUB-ESTADO 1: Inicial */}
-            {(!customer.status || customer.status === 'aguardando') &&
-              !customer.consultandoLoja &&
-              !customer.lojaTemEstoque && (
+            {(!customer.status || customer.status === 'pending') &&
+              !customer.consultingStore &&
+              !customer.storeHasStock && (
                 <>
                   {onCheckLojaCampinas && (
                     <button
@@ -250,12 +250,12 @@ function CustomerCard({
               )}
 
             {/* Status: AGUARDANDO - SUB-ESTADO 2: Aguardando resposta da LOJA */}
-            {(!customer.status || customer.status === 'aguardando') &&
-              customer.consultandoLoja &&
-              !customer.lojaTemEstoque && (
+            {(!customer.status || customer.status === 'pending') &&
+              customer.consultingStore &&
+              !customer.storeHasStock && (
                 <>
                   <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
-                    📞 Aguardando resposta - {customer.consultandoLoja}
+                    📞 Aguardando resposta - {customer.consultingStore}
                   </span>
 
                   {onStoreHasStock && (
@@ -283,12 +283,12 @@ function CustomerCard({
               )}
 
             {/* Status: AGUARDANDO - SUB-ESTADO 3: Aguardando resposta do CLIENTE */}
-            {(!customer.status || customer.status === 'aguardando') &&
-              customer.consultandoLoja &&
-              customer.lojaTemEstoque && (
+            {(!customer.status || customer.status === 'pending') &&
+              customer.consultingStore &&
+              customer.storeHasStock && (
                 <>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-medium">
-                    💬 Cliente notificado - {customer.consultandoLoja}
+                    💬 Cliente notificado - {customer.consultingStore}
                   </span>
 
                   {onClientAccepted && (
@@ -316,7 +316,7 @@ function CustomerCard({
               )}
 
             {/* Status: AGUARDANDO TRANSFERÊNCIA - Botão de produto chegou */}
-            {customer.status === 'aguardando_transferencia' &&
+            {customer.status === 'awaiting_transfer' &&
               onProductArrived && (
                 <button
                   onClick={() => onProductArrived(customer)}
@@ -329,7 +329,7 @@ function CustomerCard({
               )}
 
             {/* Status: PRONTO PARA RETIRADA - Botão de compra concluída */}
-            {customer.status === 'contactado' && onPurchaseCompleted && (
+            {customer.status === 'ready_for_pickup' && onPurchaseCompleted && (
               <button
                 onClick={() => onPurchaseCompleted(customer)}
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-colors cursor-pointer"
@@ -341,7 +341,7 @@ function CustomerCard({
             )}
 
             {/* Status: FINALIZADO - Mostrar apenas info */}
-            {customer.status === 'finalizado' && onPurchaseCompleted && (
+            {customer.status === 'completed' && onPurchaseCompleted && (
               <span className="text-xs text-emerald-700 bg-emerald-100 px-2 py-1 rounded">
                 ✓ Venda Concluída
               </span>
@@ -360,19 +360,19 @@ function CustomerCard({
           <div className="space-y-1.5 text-sm">
             <div>
               <p className="font-bold text-gray-900 text-base">
-                {customer.modelo}
+                {customer.model}
               </p>
             </div>
             <div>
-              <p className="text-gray-700 font-medium">{customer.referencia}</p>
+              <p className="text-gray-700 font-medium">{customer.reference}</p>
             </div>
             <div className="flex gap-3 text-xs">
               <span className="text-gray-600">
-                <span className="font-semibold">Nº</span> {customer.numeracao}
+                <span className="font-semibold">Nº</span> {customer.size}
               </span>
               <span className="text-gray-400">•</span>
               <span className="text-gray-600">
-                <span className="font-semibold">Cor</span> {customer.cor}
+                <span className="font-semibold">Cor</span> {customer.color}
               </span>
             </div>
           </div>

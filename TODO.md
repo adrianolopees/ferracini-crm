@@ -189,6 +189,36 @@
 
 ## 🔜 Próximas Melhorias
 
+### 🌍 IMPORTANTE: Padronização de Idioma (Recomendado)
+**Estimativa:** 4-6 horas | **Prioridade:** Alta | **Risco:** Médio
+
+**Problema Identificado:**
+- Código mistura português e inglês (não profissional)
+- Collections Firebase: `'clientes'` (PT) + `'contacted'` (EN)
+- Interface Customer: nome em inglês, fields em português
+- Status values em português: `'aguardando'`, `'finalizado'`
+
+**Solução Recomendada:**
+- ✅ Padronizar TODO código para **INGLÊS** (padrão da indústria)
+- ✅ Interface do usuário permanece em português
+- ✅ Alinhamento com 99% das empresas tech
+
+**Documentação Completa:**
+📄 Ver arquivo `MIGRATION-PT-TO-EN.md` para plano detalhado:
+- Mapeamento completo de campos PT → EN
+- Script de migração do Firebase
+- Ordem de execução passo a passo
+- Checklist de validação
+- Plano de rollback
+
+**Benefícios:**
+- Portfolio mais profissional
+- Facilita colaboração internacional
+- Código mais fácil de manter
+- Padrão da indústria tech
+
+---
+
 ### Performance & Paginação
 - [ ] Implementar paginação na página de busca
 - [ ] Busca com debounce para melhor performance

@@ -37,23 +37,23 @@ function useCustomersList({ filterType, isOpen, refreshTrigger }: UseCustomersLi
             allCustomers.push({
               id: doc.id,
               ...doc.data(),
-              status: 'contactado', // Garante que clientes legados tenham status
+              status: 'ready_for_pickup', // Garante que clientes legados tenham status
               _isFromContactedCollection: true,
             } as Customer);
           });
 
-          // Também buscar de 'clientes' com status 'contactado'
-          const customersQuery = query(collection(db, 'clientes'));
+          // Também buscar de 'customers' com status 'ready_for_pickup'
+          const customersQuery = query(collection(db, 'customers'));
           const customersSnapshot = await getDocs(customersQuery);
           customersSnapshot.forEach((doc) => {
             const data = doc.data();
-            if (data.status === 'contactado') {
+            if (data.status === 'ready_for_pickup') {
               allCustomers.push({ id: doc.id, ...data } as Customer);
             }
           });
         } else {
-          // Para outros filtros, buscar apenas de 'clientes'
-          const customersQuery = query(collection(db, 'clientes'));
+          // Para outros filtros, buscar apenas de 'customers'
+          const customersQuery = query(collection(db, 'customers'));
           const snapshot = await getDocs(customersQuery);
           snapshot.forEach((doc) => {
             allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
@@ -61,34 +61,34 @@ function useCustomersList({ filterType, isOpen, refreshTrigger }: UseCustomersLi
         }
 
         // Primeiro: filtrar clientes arquivados (não mostrar em nenhuma lista)
-        const activeCustomers = allCustomers.filter((c) => !c.arquivado);
+        const activeCustomers = allCustomers.filter((c) => !c.archived);
 
         // Filtrar baseado no tipo
         let filtered = activeCustomers;
 
         if (filterType === 'all') {
           filtered = activeCustomers.filter(
-            (c) => !c.status || c.status === 'aguardando'
+            (c) => !c.status || c.status === 'pending'
           );
         } else if (filterType === 'urgent') {
           filtered = activeCustomers.filter(
             (c) =>
-              (!c.status || c.status === 'aguardando') &&
-              getDaysWaiting(c.dataCriacao) >= 7
+              (!c.status || c.status === 'pending') &&
+              getDaysWaiting(c.createdAt) >= 7
           );
         } else if (filterType === 'awaiting_transfer') {
           filtered = activeCustomers.filter(
-            (c) => c.status === 'aguardando_transferencia'
+            (c) => c.status === 'awaiting_transfer'
           );
         } else if (filterType === 'finished') {
-          filtered = activeCustomers.filter((c) => c.status === 'finalizado');
+          filtered = activeCustomers.filter((c) => c.status === 'completed');
         }
         // filterType === 'contacted' já está filtrado acima
 
         // Ordenar por mais urgente
         filtered.sort(
           (a, b) =>
-            getDaysWaiting(b.dataCriacao) - getDaysWaiting(a.dataCriacao)
+            getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt)
         );
 
         setCustomers(filtered);
