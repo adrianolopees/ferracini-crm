@@ -69,25 +69,10 @@ function History() {
       const finalized: Customer[] = [];
       const contacted: ContactedCustomer[] = [];
       const archived: Customer[] = [];
-      const contactedIds = new Set<string>(); // Evitar duplicatas
 
-      // Buscar todas as coleções em paralelo
-      const [contactedSnapshot, clientesSnapshot] = await Promise.all([
-        getDocs(collection(db, 'contacted')),
-        getDocs(collection(db, 'customers')),
-      ]);
+      const snapshot = await getDocs(collection(db, 'customers'));
 
-      // Processar coleção 'contacted' (dados legados)
-      contactedSnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (!data.archived) {
-          contacted.push({ id: doc.id, ...data } as ContactedCustomer);
-          contactedIds.add(doc.id);
-        }
-      });
-
-      // Processar coleção 'customers'
-      clientesSnapshot.forEach((doc) => {
+      snapshot.forEach((doc) => {
         const data = doc.data();
 
         if (data.archived) {
@@ -98,10 +83,9 @@ function History() {
         } else if (data.status === 'completed') {
           // Vendas finalizadas
           finalized.push({ id: doc.id, ...data } as Customer);
-        } else if (data.status === 'ready_for_pickup' && !contactedIds.has(doc.id)) {
-          // Contactados (excluindo duplicatas da coleção contacted)
+        } else if (data.status === 'ready_for_pickup') {
+          // Contactados
           contacted.push({ id: doc.id, ...data } as ContactedCustomer);
-          contactedIds.add(doc.id);
         }
       });
 

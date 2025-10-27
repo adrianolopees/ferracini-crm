@@ -26,7 +26,6 @@ export interface Customer {
   transferredAt?: string;
   completedAt?: string;
   sourceStore?: string;
-  _isFromContactedCollection?: boolean;
   archived?: boolean;
   archiveReason?: ArchiveReason;
   archivedAt?: string;

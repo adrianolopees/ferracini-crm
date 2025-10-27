@@ -30,11 +30,7 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
   useEffect(() => {
     async function fetchMetrics() {
       try {
-        // Buscar clientes ativos e contactados ao mesmo tempo
-        const [clientesSnapshot, contactedSnapshot] = await Promise.all([
-          getDocs(query(collection(db, 'customers'))),
-          getDocs(query(collection(db, 'contacted'))),
-        ]);
+        const snapshot = await getDocs(query(collection(db, 'customers')));
 
         let urgentCount = 0;
         let totalDays = 0;
@@ -43,13 +39,13 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
         let contactedCount = 0;
         let finishedCount = 0;
 
-        clientesSnapshot.forEach((doc) => {
+        snapshot.forEach((doc) => {
           const data = doc.data();
 
           // PROTEÇÃO: Ignorar clientes arquivados
           if (data.archived) return;
 
-          const status = data.status || 'pending'; // backward compatibility
+          const status = data.status || 'pending';
           const daysWaiting = getDaysWaiting(data.createdAt);
 
           // Contadores por status
@@ -72,20 +68,9 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
         const averageWaitTime =
           awaitingCount > 0 ? Math.round(totalDays / awaitingCount) : 0;
 
-        // Incluir dados legados do 'contacted' na contagem de contactados (exceto arquivados)
-        let contactedLegacyCount = 0;
-        contactedSnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (!data.archived) {
-            contactedLegacyCount++;
-          }
-        });
-
-        const totalContactedWithLegacy = contactedCount + contactedLegacyCount;
-
         setMetrics({
           totalActive: awaitingCount,
-          totalContacted: totalContactedWithLegacy,
+          totalContacted: contactedCount,
           totalAwaitingTransfer: awaitingTransferCount,
           totalFinished: finishedCount,
           averageWaitTime: averageWaitTime,

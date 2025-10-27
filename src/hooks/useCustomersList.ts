@@ -29,36 +29,11 @@ function useCustomersList({ filterType, isOpen, refreshTrigger }: UseCustomersLi
       try {
         let allCustomers: Customer[] = [];
 
-        // Para 'contacted', buscar da coleção 'contacted' (dados legados)
-        if (filterType === 'contacted') {
-          const contactedQuery = query(collection(db, 'contacted'));
-          const snapshot = await getDocs(contactedQuery);
-          snapshot.forEach((doc) => {
-            allCustomers.push({
-              id: doc.id,
-              ...doc.data(),
-              status: 'ready_for_pickup', // Garante que clientes legados tenham status
-              _isFromContactedCollection: true,
-            } as Customer);
-          });
-
-          // Também buscar de 'customers' com status 'ready_for_pickup'
-          const customersQuery = query(collection(db, 'customers'));
-          const customersSnapshot = await getDocs(customersQuery);
-          customersSnapshot.forEach((doc) => {
-            const data = doc.data();
-            if (data.status === 'ready_for_pickup') {
-              allCustomers.push({ id: doc.id, ...data } as Customer);
-            }
-          });
-        } else {
-          // Para outros filtros, buscar apenas de 'customers'
-          const customersQuery = query(collection(db, 'customers'));
-          const snapshot = await getDocs(customersQuery);
-          snapshot.forEach((doc) => {
-            allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
-          });
-        }
+        const customersQuery = query(collection(db, 'customers'));
+        const snapshot = await getDocs(customersQuery);
+        snapshot.forEach((doc) => {
+          allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
+        });
 
         // Primeiro: filtrar clientes arquivados (não mostrar em nenhuma lista)
         const activeCustomers = allCustomers.filter((c) => !c.archived);
@@ -80,10 +55,11 @@ function useCustomersList({ filterType, isOpen, refreshTrigger }: UseCustomersLi
           filtered = activeCustomers.filter(
             (c) => c.status === 'awaiting_transfer'
           );
+        } else if (filterType === 'contacted') {
+          filtered = activeCustomers.filter((c) => c.status === 'ready_for_pickup');
         } else if (filterType === 'finished') {
           filtered = activeCustomers.filter((c) => c.status === 'completed');
         }
-        // filterType === 'contacted' já está filtrado acima
 
         // Ordenar por mais urgente
         filtered.sort(

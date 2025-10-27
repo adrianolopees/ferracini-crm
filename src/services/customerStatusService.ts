@@ -1,4 +1,4 @@
-import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { Customer, CustomerStatus } from '@/types/customer';
 
@@ -7,7 +7,6 @@ export async function updateCustomerStatus(
   newStatus: CustomerStatus,
   additionalData?: {
     sourceStore?: string;
-    isFromContactedCollection?: boolean;
   }
 ): Promise<void> {
   const now = new Date().toISOString();
@@ -31,23 +30,8 @@ export async function updateCustomerStatus(
       break;
   }
 
-  if (additionalData?.isFromContactedCollection) {
-    const contactedRef = doc(db, 'contacted', customerId);
-    const contactedSnap = await getDoc(contactedRef);
-
-    if (contactedSnap.exists()) {
-      const customerData = contactedSnap.data() as Customer;
-      const customerRef = doc(db, 'customers', customerId);
-      await setDoc(customerRef, {
-        ...customerData,
-        ...updateData,
-        id: customerId,
-      });
-    }
-  } else {
-    const customerRef = doc(db, 'customers', customerId);
-    await updateDoc(customerRef, updateData);
-  }
+  const customerRef = doc(db, 'customers', customerId);
+  await updateDoc(customerRef, updateData);
 }
 
 export async function moveToAwaitingTransfer(
@@ -59,13 +43,8 @@ export async function moveToAwaitingTransfer(
   });
 }
 
-export async function moveToFinished(
-  customer: Customer,
-  isFromContactedCollection: boolean = false
-): Promise<void> {
-  await updateCustomerStatus(customer.id, 'completed', {
-    isFromContactedCollection,
-  });
+export async function moveToFinished(customer: Customer): Promise<void> {
+  await updateCustomerStatus(customer.id, 'completed');
 }
 
 export async function moveToAwaiting(customer: Customer): Promise<void> {

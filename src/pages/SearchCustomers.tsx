@@ -5,7 +5,6 @@ import {
   where,
   getDocs,
   doc,
-  setDoc,
   updateDoc,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
@@ -91,26 +90,23 @@ function SearchCustomers() {
 
   const handleWhatsApp = async (customer: Customer) => {
     try {
-      // 1. Criar cópia do cliente para adicionar ao histórico
-      const contactedCustomer = {
-        ...customer, // Copia todos os dados originais
-        contactedAt: new Date().toISOString(), // Adiciona data de contato AGORA
-      };
+      // 1. Atualizar status do cliente para ready_for_pickup
+      await updateDoc(doc(db, 'customers', customer.id), {
+        status: 'ready_for_pickup',
+        contactedAt: new Date().toISOString(),
+      });
 
-      // 2. Adicionar à coleção 'contacted' (histórico)
-      await setDoc(doc(db, 'contacted', customer.id), contactedCustomer);
-
-      // 4. Abrir WhatsApp
+      // 2. Abrir WhatsApp
       notifyProductArrived(customer);
 
-      // 5. Mostrar mensagem de sucesso
-      toast.success(`${customer.name} movido para o histórico!`);
+      // 3. Mostrar mensagem de sucesso
+      toast.success(`${customer.name} movido para "Pronto para Retirada"!`);
 
-      // 6. Atualizar lista de resultados (remove da tela)
+      // 4. Atualizar lista de resultados (remove da tela)
       setCustomers(customers.filter((c) => c.id !== customer.id));
     } catch (error) {
       console.error('Erro ao processar contato:', error);
-      toast.error('Erro ao mover para histórico. Tente novamente.');
+      toast.error('Erro ao atualizar status. Tente novamente.');
     }
   };
 

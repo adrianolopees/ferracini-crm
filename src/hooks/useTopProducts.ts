@@ -14,26 +14,11 @@ function useTopProducts(limit: number = 10) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Buscar de AMBAS as coleções (clientes aguardando + contactados)
-        const [clientesSnapshot, contactedSnapshot] = await Promise.all([
-          getDocs(collection(db, 'customers')),
-          getDocs(collection(db, 'contacted')),
-        ]);
+        const snapshot = await getDocs(collection(db, 'customers'));
 
         const modeloCounts: Record<string, number> = {};
 
-        // Contar modelos dos clientes aguardando
-        clientesSnapshot.forEach((doc) => {
-          const data = doc.data();
-          const modelo = data.model;
-
-          if (modelo) {
-            modeloCounts[modelo] = (modeloCounts[modelo] || 0) + 1;
-          }
-        });
-
-        // Contar modelos dos clientes contactados (SOMA aos já contados)
-        contactedSnapshot.forEach((doc) => {
+        snapshot.forEach((doc) => {
           const data = doc.data();
           const modelo = data.model;
 
