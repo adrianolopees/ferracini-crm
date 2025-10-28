@@ -10,6 +10,7 @@ interface CustomerCardProps {
   customer: Customer;
   variant?: 'default' | 'compact' | 'finalized';
   onWhatsApp?: (customer: Customer) => void;
+  onArchive?: (customer: Customer) => void;
   onDelete?: (customer: Customer) => void;
   onRestore?: (customer: Customer) => void;
   showActions?: boolean;
@@ -29,9 +30,11 @@ function CustomerCard({
   customer,
   variant = 'default',
   onWhatsApp,
+  onArchive,
   onDelete,
   onRestore,
   showActions = true,
+
   // Dashboard-specific actions
   onCheckLojaCampinas,
   onCheckLojaDomPedro,
@@ -69,9 +72,18 @@ function CustomerCard({
               <i className="fa-solid fa-arrow-rotate-left text-lg" />
             </button>
           )}
-          {onDelete && !isFinalized && (
+          {onDelete && isArchived && (
             <button
               onClick={() => onDelete(customer)}
+              className="inline-flex items-center justify-center w-9 h-9 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer shadow-sm"
+              title="Excluir cliente permanentemente"
+            >
+              <i className="fa-solid fa-circle-xmark text-lg" />
+            </button>
+          )}
+          {onArchive && !isFinalized && (
+            <button
+              onClick={() => onArchive(customer)}
               className="inline-flex items-center justify-center w-9 h-9 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer shadow-sm"
               title="Arquivar cliente"
             >
@@ -133,10 +145,7 @@ function CustomerCard({
               <div className="flex items-center gap-1.5">
                 <i className="fa-solid fa-hourglass-end text-purple-600 text-xs"></i>
                 <span className="text-purple-700">
-                  {formatDaysElapsed(
-                    customer.createdAt,
-                    customer.completedAt
-                  )}
+                  {formatDaysElapsed(customer.createdAt, customer.completedAt)}
                 </span>
               </div>
               {customer.sourceStore && (
@@ -144,7 +153,9 @@ function CustomerCard({
                   <span className="text-gray-300">•</span>
                   <div className="flex items-center gap-1.5">
                     <i className="fa-solid fa-store text-blue-600 text-xs"></i>
-                    <span className="text-blue-700">{customer.sourceStore}</span>
+                    <span className="text-blue-700">
+                      {customer.sourceStore}
+                    </span>
                   </div>
                 </>
               )}
@@ -158,9 +169,7 @@ function CustomerCard({
               {customer.archiveReason && (
                 <div className="text-gray-600">
                   Motivo:{' '}
-                  <span className="font-medium">
-                    {customer.archiveReason}
-                  </span>
+                  <span className="font-medium">{customer.archiveReason}</span>
                 </div>
               )}
             </div>
@@ -195,8 +204,7 @@ function CustomerCard({
               </div>
               {customer.transferredAt && (
                 <span className="text-xs text-gray-600 block ml-5">
-                  Em trânsito há{' '}
-                  {formatDistanceToNow(customer.transferredAt)}
+                  Em trânsito há {formatDistanceToNow(customer.transferredAt)}
                 </span>
               )}
             </div>
@@ -316,17 +324,16 @@ function CustomerCard({
               )}
 
             {/* Status: AGUARDANDO TRANSFERÊNCIA - Botão de produto chegou */}
-            {customer.status === 'awaiting_transfer' &&
-              onProductArrived && (
-                <button
-                  onClick={() => onProductArrived(customer)}
-                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
-                  title="Produto chegou"
-                >
-                  <i className="fa-solid fa-box"></i>
-                  <span>Produto Chegou</span>
-                </button>
-              )}
+            {customer.status === 'awaiting_transfer' && onProductArrived && (
+              <button
+                onClick={() => onProductArrived(customer)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
+                title="Produto chegou"
+              >
+                <i className="fa-solid fa-box"></i>
+                <span>Produto Chegou</span>
+              </button>
+            )}
 
             {/* Status: PRONTO PARA RETIRADA - Botão de compra concluída */}
             {customer.status === 'ready_for_pickup' && onPurchaseCompleted && (

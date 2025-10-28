@@ -100,13 +100,13 @@ function ArchiveModal({
         <div className="flex gap-3 justify-end pt-4">
           <button
             onClick={handleCancel}
-            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+            className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium cursor-pointer"
           >
             Cancelar
           </button>
           <button
             onClick={handleConfirm}
-            className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-colors font-medium"
+            className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-colors font-medium cursor-pointer"
           >
             Arquivar
           </button>

@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc,
+  deleteDoc,
+} from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Customer, ContactedCustomer } from '@/types/customer';
-import { Input, PageLayout, Tabs } from '@/components/ui';
+import { Input, PageLayout, Tabs, ConfirmModal } from '@/components/ui';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { CustomerCard } from '@/components/features';
@@ -21,6 +27,10 @@ function History() {
     (Customer | ContactedCustomer)[]
   >([]);
   const [loading, setLoading] = useState(true);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
+    null
+  );
 
   // Buscar clientes ao carregar
   useEffect(() => {
@@ -118,6 +128,25 @@ function History() {
     }
   };
 
+  const handleDelete = async (customer: Customer) => {
+    setCustomerToDelete(customer);
+    setDeleteModalOpen(true);
+  };
+  const handleConfirmDelete = async () => {
+    if (!customerToDelete) return;
+
+    try {
+      await deleteDoc(doc(db, 'customers', customerToDelete.id));
+      toast.success(`${customerToDelete.name} excluído permanentemente!`);
+      setDeleteModalOpen(false);
+      setCustomerToDelete(null);
+      fetchAllCustomers(); // Recarregar listas
+    } catch (error) {
+      console.error('Erro ao excluir cliente:', error);
+      toast.error('Erro ao excluir cliente');
+    }
+  };
+
   const tabs = [
     {
       id: 'finalized',
@@ -207,6 +236,7 @@ function History() {
                         customer={customer}
                         variant="compact"
                         onRestore={isArchivedTab ? handleRestore : undefined}
+                        onDelete={isArchivedTab ? handleDelete : undefined}
                       />
                     </AnimatedListItem>
                   );
@@ -216,6 +246,12 @@ function History() {
           </Tabs>
         </div>
       </AnimatedContainer>
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        customerName={customerToDelete?.name || ''}
+      />
     </PageLayout>
   );
 }

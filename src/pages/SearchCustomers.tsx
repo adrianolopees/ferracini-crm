@@ -110,7 +110,7 @@ function SearchCustomers() {
     }
   };
 
-  const handleDeleteClick = (customer: Customer) => {
+  const handleArchiveClick = (customer: Customer) => {
     setCustomerToArchive(customer);
     setArchiveModalOpen(true);
   };
@@ -180,7 +180,7 @@ function SearchCustomers() {
                 <CustomerCard
                   customer={customer}
                   onWhatsApp={handleWhatsApp}
-                  onDelete={handleDeleteClick}
+                  onArchive={handleArchiveClick}
                 />
               </AnimatedListItem>
             ))}

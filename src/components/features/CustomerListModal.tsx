@@ -17,7 +17,7 @@ interface CustomerListModalProps {
   customers: Customer[];
   loading: boolean;
   onWhatsApp: (customer: Customer) => void;
-  onDelete: (customer: Customer) => void;
+  onArchive: (customer: Customer) => void;
   onCheckLojaCampinas?: (customer: Customer) => void;
   onCheckLojaDomPedro?: (customer: Customer) => void;
   onProductArrived?: (customer: Customer) => void;
@@ -40,7 +40,7 @@ function CustomerListModal({
   customers,
   loading,
   onWhatsApp,
-  onDelete,
+  onArchive,
   onCheckLojaCampinas,
   onCheckLojaDomPedro,
   onProductArrived,
@@ -74,7 +74,7 @@ function CustomerListModal({
                 customer={customer}
                 variant="compact"
                 onWhatsApp={onWhatsApp}
-                onDelete={onDelete}
+                onArchive={onArchive}
                 onCheckLojaCampinas={onCheckLojaCampinas}
                 onCheckLojaDomPedro={onCheckLojaDomPedro}
                 onStoreHasStock={onStoreHasStock}

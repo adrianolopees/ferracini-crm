@@ -171,7 +171,7 @@ function Dashboard() {
   };
 
   // Função para abrir modal de arquivamento
-  const handleDelete = (customer: Customer) => {
+  const handleArchive = (customer: Customer) => {
     setModalType(null); // Fecha o modal de lista primeiro
     setCustomerToArchive(customer);
     setArchiveModalOpen(true);
@@ -192,30 +192,13 @@ function Dashboard() {
         observacoes: notes,
       });
 
-      toast.success(`${customerToArchive.name} archived com sucesso!`);
+      toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
       refreshAll(); // Atualiza lista e métricas
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
       toast.error('Erro ao arquivar cliente');
-    }
-  };
-
-  // Função para aceitar transferência de outra loja
-  const handleAcceptTransfer = async (
-    customer: Customer,
-    store: 'Campinas' | 'Dom Pedro'
-  ) => {
-    try {
-      await moveToAwaitingTransfer(customer, store);
-      toast.success(
-        `${customer.name} aguardando transferência de ${store}!`
-      );
-      refreshAll(); // Atualiza lista e métricas
-    } catch (error) {
-      console.error('Erro ao atualizar status:', error);
-      toast.error('Erro ao atualizar status');
     }
   };
 
@@ -235,9 +218,7 @@ function Dashboard() {
   // Função para quando cliente compra
   const handlePurchaseCompleted = async (customer: Customer) => {
     try {
-      const isFromContactedCollection =
-        customer._isFromContactedCollection || false;
-      await moveToFinished(customer, isFromContactedCollection);
+      await moveToFinished(customer);
       toast.success(`Venda de ${customer.name} finalizada!`);
       refreshAll(); // Atualiza lista e métricas
     } catch (error) {
@@ -388,7 +369,7 @@ function Dashboard() {
         customers={customers}
         loading={customersLoading}
         onWhatsApp={handleWhatsApp}
-        onDelete={handleDelete}
+        onArchive={handleArchive}
         onCheckLojaCampinas={handleCheckLojaCampinas}
         onCheckLojaDomPedro={handleCheckLojaDomPedro}
         onProductArrived={handleProductArrived}
