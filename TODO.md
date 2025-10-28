@@ -44,6 +44,7 @@
 ## ✅ Fase 5 - Dashboard & Gestão de Clientes (CONCLUÍDO)
 
 ### Dashboard Principal
+
 - [x] Página Dashboard.tsx como home do sistema
 - [x] Título "Gestão de Clientes" com subtitle focado em ação
 - [x] **Seção "Ações Rápidas":**
@@ -58,6 +59,7 @@
 - [x] Hooks: useDashboardMetrics, useCustomersList
 
 ### Sistema de Status e Workflow
+
 - [x] Status: aguardando → aguardando_transferencia → contactado → finalizado
 - [x] **Sub-estados em "Aguardando":**
   - [x] Inicial: Botões "Verificar Campinas/Dom Pedro"
@@ -68,6 +70,7 @@
 - [x] Proteção: vendas finalizadas não podem ser arquivadas
 
 ### Sistema de Arquivamento
+
 - [x] Campo `arquivado: boolean` no Customer
 - [x] Campos de metadados: motivoArquivamento, dataArquivamento, observacoes
 - [x] ArchiveModal com dropdown de motivos
@@ -76,6 +79,7 @@
 - [x] Botão de arquivar oculto para status finalizado
 
 ### Histórico Unificado
+
 - [x] Página History.tsx com sistema de tabs
 - [x] **Tab "Vendas Finalizadas":**
   - [x] Lista vendas com status finalizado
@@ -96,6 +100,7 @@
 ## ✅ Fase 6 - Refinamentos de UX Mobile & Cards (CONCLUÍDO)
 
 ### Navigation Mobile Profissional
+
 - [x] Implementar Bottom Navigation no mobile (padrão Instagram/YouTube)
 - [x] Tabs fixas no bottom em mobile, top em desktop
 - [x] Ícones + labels sempre visíveis para melhor UX
@@ -103,6 +108,7 @@
 - [x] Ajuste de padding no PageLayout para evitar sobreposição de conteúdo
 
 ### Otimização de CustomerCards
+
 - [x] **Redução de 36% na altura dos cards** através de:
   - [x] Layout horizontal para informações contextuais (desktop)
   - [x] Padding reduzido (p-5 → p-4)
@@ -118,6 +124,7 @@
 - [x] Separadores visuais "•" entre informações inline (desktop)
 
 ### Refatoração de Código
+
 - [x] Centralizar funções de formatação em `@/utils/formatDate.ts`
 - [x] Adicionar `formatDateTime()` para data/hora completa
 - [x] Adicionar `formatDaysElapsed()` para cálculo de tempo decorrido
@@ -126,32 +133,38 @@
 ## ✅ Fase 7 - Refatoração CustomerCard & Melhorias UX (CONCLUÍDO)
 
 ### 🎯 Refatoração de CustomerCard no Dashboard
+
 **Concluído em:** 25/10/2025 | **Resultado:** -67% código duplicado, UX profissional
 
 #### Implementações Realizadas
 
 **1. Expandir CustomerCard.tsx** ✅
+
 - [x] Adicionadas 8 props opcionais para botões contextuais do Dashboard
 - [x] Props implementadas: `onCheckLojaCampinas`, `onCheckLojaDomPedro`, `onStoreHasStock`, `onStoreNoStock`, `onClientAccepted`, `onClientDeclined`, `onProductArrived`, `onPurchaseCompleted`
 - [x] Seção de "Botões Contextuais" condicional baseada no status
 - [x] Layout 2 colunas mantido com botões no canto superior direito
 
 **2. Refatorar CustomerListModal.tsx** ✅
+
 - [x] Removidas ~230 linhas de JSX duplicado (linhas 82-318)
 - [x] Substituído por componente `<CustomerCard />` reutilizável
 - [x] Arquivo reduzido de **341 → 113 linhas** (67% de redução!)
 - [x] Mantida apenas lógica de modal e listagem
 
 **3. Limpeza de Código Legado** ✅
+
 - [x] Removida prop `onAcceptTransfer` obsoleta (nunca foi usada)
 - [x] Identificada função `handleAcceptTransfer` desconectada
 
 **4. Otimização de Badges Informativos** ✅
+
 - [x] Removido badge da loja em status "aguardando" (redundante)
 - [x] Removido badge "De: [Loja]" em "aguardando_transferencia" (redundante)
 - [x] Informações contextuais aparecem apenas quando relevantes
 
 **5. SearchCustomers.tsx - Sistema de Arquivamento Profissional** ✅
+
 - [x] Substituído `deleteDoc` por `updateDoc` com arquivamento
 - [x] Removido `Modal` genérico e implementado `ArchiveModal` profissional
 - [x] Adicionado dropdown de motivos de arquivamento
@@ -159,18 +172,21 @@
 - [x] Sistema consistente com Dashboard
 
 **6. Ícone de Arquivar - Padrão da Indústria** ✅
+
 - [x] Trocado `fa-trash-can` (vermelho) por `fa-box-archive` (cinza)
 - [x] Cor neutra (padrão Gmail, Slack, Outlook, Discord)
 - [x] Título atualizado: "Arquivar cliente"
 - [x] Botões com cores discretas e profissionais
 
 **7. SearchCustomers.tsx - Busca Inteligente** ✅
+
 - [x] Busca apenas clientes aguardando produto NOVO (não transferências)
 - [x] Filtro: status "aguardando" + não consultando outra loja
 - [x] Exclui: arquivados, em transferência, contactados, finalizados
 - [x] Subtitle atualizado: "Produto novo chegou? Encontre quem está aguardando"
 
 #### Resultados Alcançados
+
 - ✅ **-67% de código duplicado** (230 linhas removidas)
 - ✅ **DRY:** Um componente único para todos os cards
 - ✅ **Consistência:** Visual idêntico em Dashboard/History/Search
@@ -180,6 +196,7 @@
 - ✅ **Segurança:** Nenhum dado deletado permanentemente
 
 #### Arquivos Modificados
+
 - `src/components/features/CustomerCard.tsx` (expandido: 242 → 383 linhas)
 - `src/components/features/CustomerListModal.tsx` (simplificado: 341 → 113 linhas)
 - `src/pages/SearchCustomers.tsx` (refatorado: arquivamento + busca inteligente)
@@ -190,21 +207,25 @@
 ## 🔜 Próximas Melhorias
 
 ### 🌍 IMPORTANTE: Padronização de Idioma (Recomendado)
+
 **Estimativa:** 4-6 horas | **Prioridade:** Alta | **Risco:** Médio
 
 **Problema Identificado:**
+
 - Código mistura português e inglês (não profissional)
 - Collections Firebase: `'clientes'` (PT) + `'contacted'` (EN)
 - Interface Customer: nome em inglês, fields em português
 - Status values em português: `'aguardando'`, `'finalizado'`
 
 **Solução Recomendada:**
+
 - ✅ Padronizar TODO código para **INGLÊS** (padrão da indústria)
 - ✅ Interface do usuário permanece em português
 - ✅ Alinhamento com 99% das empresas tech
 
 **Documentação Completa:**
 📄 Ver arquivo `MIGRATION-PT-TO-EN.md` para plano detalhado:
+
 - Mapeamento completo de campos PT → EN
 - Script de migração do Firebase
 - Ordem de execução passo a passo
@@ -212,6 +233,7 @@
 - Plano de rollback
 
 **Benefícios:**
+
 - Portfolio mais profissional
 - Facilita colaboração internacional
 - Código mais fácil de manter
@@ -220,18 +242,21 @@
 ---
 
 ### Performance & Paginação
+
 - [ ] Implementar paginação na página de busca
 - [ ] Busca com debounce para melhor performance
 - [ ] Filtros avançados (cor, numeração, período)
 - [ ] Ordenação customizada (urgente, alfabético, data)
 
 ### Analytics Avançado
+
 - [ ] Exportar relatórios em PDF/Excel
 - [ ] Gráfico de evolução de vendas por período
 - [ ] Comparação temporal (mês atual vs anterior)
 - [ ] Métricas por vendedor individual
 
 ### UX Refinements
+
 - [ ] Skeleton loaders
 - [ ] Empty states ilustrados
 - [ ] Confirmação visual ao salvar
@@ -239,11 +264,19 @@
 - [ ] Modo escuro (dark mode)
 
 ### Código & Qualidade
+
+- [x] Remover código morto e componentes não usados ✅
+- [x] Remover props e funções não utilizadas ✅
+- [x] Criar hook useCustomerActions (lógica de negócio separada) ✅
+- [ ] Refatorar Dashboard.tsx usando useCustomerActions 🔄
+- [ ] Criar hook useDashboardState (consolidar estados) 🔄
 - [ ] Extrair lógica de busca para hook customizado
 - [ ] Adicionar error boundary para capturar erros globais
 - [ ] Otimizar re-renders com React.memo
-- [ ] Adicionar indices no Firestore para queries mais rápidas
-- [ ] Lazy loading de componentes pesados
+- [ ] Adicionar PropTypes ou JSDoc para documentação
+- [ ] Code splitting por rota (lazy loading de páginas)
+- [ ] Adicionar índices compostos no Firestore
+- [ ] Implementar logger centralizado (analytics de erros)
 
 ## 💡 Ideias para o Futuro
 
@@ -259,6 +292,7 @@
 ## 📊 Status Atual do Projeto
 
 **Sistema 100% funcional** com:
+
 - ✅ Gestão completa do fluxo de clientes
 - ✅ Dashboard profissional com métricas em tempo real
 - ✅ Sistema de arquivamento preservando histórico

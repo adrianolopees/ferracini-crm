@@ -132,6 +132,7 @@ function History() {
     setCustomerToDelete(customer);
     setDeleteModalOpen(true);
   };
+
   const handleConfirmDelete = async () => {
     if (!customerToDelete) return;
 
@@ -194,7 +195,7 @@ function History() {
             </div>
 
             {/* Lista de clientes */}
-            <div className="space-y-4">
+            <div className="mt-6 space-y-4">
               {loading ? (
                 <div className="text-center py-12">
                   <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

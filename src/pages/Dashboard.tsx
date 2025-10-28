@@ -15,8 +15,8 @@ import toast from 'react-hot-toast';
 import { TopProductsChart } from '@/components/charts';
 import {
   notifyOtherStore,
-  checkLojaCampinas,
-  checkLojaDomPedro,
+  sendStoreCampinas,
+  sendStoreDomPedro,
   notifyProductArrived,
 } from '@/services/whatsappService';
 import {
@@ -89,7 +89,7 @@ function Dashboard() {
       await updateDoc(doc(db, 'customers', customer.id), {
         consultingStore: 'Campinas',
       });
-      checkLojaCampinas(customer);
+      sendStoreCampinas(customer);
       toast('WhatsApp enviado para Loja Campinas');
       refreshCustomers();
     } catch (error) {
@@ -104,7 +104,7 @@ function Dashboard() {
       await updateDoc(doc(db, 'customers', customer.id), {
         consultingStore: 'Dom Pedro',
       });
-      checkLojaDomPedro(customer); // Envia WhatsApp para loja
+      sendStoreDomPedro(customer); // Envia WhatsApp para loja
       toast('WhatsApp enviado para Loja Dom Pedro');
       refreshCustomers(); // Atualiza lista sem recarregar
     } catch (error) {

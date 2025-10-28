@@ -23,12 +23,12 @@ export function notifyOtherStore(customer: Customer) {
   openWhatsApp(customer.phone, message);
 }
 
-export function checkLojaDomPedro(customer: Customer) {
+export function sendStoreDomPedro(customer: Customer) {
   const message = `Olá, Vocês têm disponível o ${customer.model}, ref ${customer.reference} número ${customer.size}, ${customer.color}?`;
   openWhatsApp(domPedroNumber, message);
 }
 
-export function checkLojaCampinas(customer: Customer) {
+export function sendStoreCampinas(customer: Customer) {
   const message = `Olá, Vocês têm disponível o ${customer.model}, ref ${customer.reference} número ${customer.size}, ${customer.color}?`;
   openWhatsApp(campinasNumber, message);
 }
