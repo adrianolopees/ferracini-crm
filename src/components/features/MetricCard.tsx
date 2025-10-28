@@ -5,7 +5,6 @@ interface MetricCardProps {
   icon: string;
   colorScheme: 'purple' | 'blue' | 'green' | 'emerald' | 'teal' | 'cyan';
   loading?: boolean;
-  onClick?: () => void;
 }
 
 const COLOR_SCHEMES = {
@@ -66,14 +65,12 @@ function MetricCard({
   icon,
   colorScheme,
   loading = false,
-  onClick,
 }: MetricCardProps) {
   const colors = COLOR_SCHEMES[colorScheme];
 
   return (
     <div
-      className={`bg-gradient-to-br ${colors.gradient} rounded-lg p-4 border ${colors.border} ${onClick ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
-      onClick={onClick}
+      className={`bg-gradient-to-br ${colors.gradient} rounded-lg p-4 border ${colors.border}`}
     >
       <div className="flex items-center gap-2 mb-2">
         <i className={`${icon} ${colors.icon}`} />

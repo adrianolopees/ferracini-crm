@@ -34,7 +34,7 @@ function Navigation() {
                   : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-tachometer-alt text-xl sm:text-base"></i>
+              <i className="fa-solid fa-tachometer-alt text-xl sm:text-base pr-1"></i>
               <span className="text-[10px] sm:text-sm">Painel</span>
             </button>
 
@@ -46,7 +46,7 @@ function Navigation() {
                   : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-user-plus text-xl sm:text-base"></i>
+              <i className="fa-solid fa-user-plus text-xl sm:text-base pr-1"></i>
               <span className="text-[10px] sm:text-sm">Cadastrar</span>
             </button>
 
@@ -58,7 +58,7 @@ function Navigation() {
                   : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-magnifying-glass text-xl sm:text-base"></i>
+              <i className="fa-solid fa-magnifying-glass text-xl sm:text-base pr-1"></i>
               <span className="text-[10px] sm:text-sm">Buscar</span>
             </button>
 
@@ -70,7 +70,7 @@ function Navigation() {
                   : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
-              <i className="fa-solid fa-clock-rotate-left text-xl sm:text-base"></i>
+              <i className="fa-solid fa-clock-rotate-left text-xl sm:text-base pr-1"></i>
               <span className="text-[10px] sm:text-sm">Histórico</span>
             </button>
           </div>
