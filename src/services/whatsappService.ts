@@ -14,7 +14,7 @@ function openWhatsApp(phone: string, message: string) {
 }
 
 export function notifyProductArrived(customer: Customer) {
-  const message = `Oi ${customer.name}! Ferracini Maxi Shopping aqui! O ${customer.model} que você procurava chegou! Posso reservar pra você?`;
+  const message = `Oi ${customer.name}! Ferracini Maxi Shopping aqui! O ${customer.model} que você procurava chegou! Está separado para você no caixa!`;
   openWhatsApp(customer.phone, message);
 }
 
