@@ -1,16 +1,16 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { ArchiveModal, PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
-import { useDashboardMetrics, useCustomersList } from '@/hooks';
-import { useCustomerActions } from '@/hooks';
 import {
   CustomerListModal,
   ActionCard,
   MetricCard,
 } from '@/components/features';
-import { Customer, ArchiveReason } from '@/types/customer';
-import toast from 'react-hot-toast';
 import { TopProductsChart } from '@/components/charts';
+import { useDashboardMetrics, useCustomersList } from '@/hooks';
+import { useCustomerActions } from '@/hooks';
+import { Customer, ArchiveReason } from '@/types/customer';
 import { sendGenericMessage } from '@/services/whatsappService';
 
 function Dashboard() {
@@ -33,13 +33,6 @@ function Dashboard() {
     completeOrder,
   } = useCustomerActions();
 
-  // Determinar filterType baseado no modal ativo
-  const getFilterType = () => {
-    if (modalType === 'awaiting') return 'all';
-    if (modalType === 'ready_for_pickup') return 'ready_for_pickup';
-    if (modalType === 'awaiting_transfer') return 'awaiting_transfer';
-    return 'all';
-  };
   const { metrics, loading, refresh: refreshMetrics } = useDashboardMetrics();
   // Hook para buscar clientes filtrados
   const {
@@ -47,7 +40,7 @@ function Dashboard() {
     loading: customersLoading,
     refresh: refreshCustomers,
   } = useCustomersList({
-    filterType: getFilterType(),
+    modalType,
     isOpen: modalType !== null,
   });
 

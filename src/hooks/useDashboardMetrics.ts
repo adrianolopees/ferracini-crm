@@ -23,6 +23,9 @@ function useDashboardMetrics() {
   });
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const refresh = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     async function fetchMetrics() {
@@ -82,9 +85,6 @@ function useDashboardMetrics() {
     fetchMetrics();
   }, [refreshTrigger]);
 
-  const refresh = useCallback(() => {
-    setRefreshTrigger((prev) => prev + 1);
-  }, []);
   return { metrics, loading, refresh };
 }
 

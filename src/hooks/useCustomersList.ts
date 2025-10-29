@@ -4,22 +4,20 @@ import { db } from '@/services/firebase';
 import { Customer } from '@/types/customer';
 import { getDaysWaiting } from '@/utils';
 
-type FilterType =
-  | 'all'
-  | 'urgent'
-  | 'awaiting_transfer'
-  | 'ready_for_pickup'
-  | 'finished';
+type ModalType = 'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null;
 
 interface UseCustomersListProps {
-  filterType: FilterType;
-  isOpen: boolean; // só busca quando modal abre
+  modalType: ModalType;
+  isOpen: boolean;
 }
 
-function useCustomersList({ filterType, isOpen }: UseCustomersListProps) {
+function useCustomersList({ modalType, isOpen }: UseCustomersListProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const refresh = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -40,26 +38,21 @@ function useCustomersList({ filterType, isOpen }: UseCustomersListProps) {
         // Filtrar baseado no tipo
         let filtered = activeCustomers;
 
-        if (filterType === 'all') {
+        if (modalType === 'awaiting') {
+          // Modal "Aguardando" - mostra TODOS clientes pendentes
           filtered = activeCustomers.filter(
             (c) => !c.status || c.status === 'pending'
           );
-        } else if (filterType === 'urgent') {
-          filtered = activeCustomers.filter(
-            (c) =>
-              (!c.status || c.status === 'pending') &&
-              getDaysWaiting(c.createdAt) >= 7
-          );
-        } else if (filterType === 'awaiting_transfer') {
+        } else if (modalType === 'awaiting_transfer') {
+          // Modal "Aguardando Transferência"
           filtered = activeCustomers.filter(
             (c) => c.status === 'awaiting_transfer'
           );
-        } else if (filterType === 'ready_for_pickup') {
+        } else if (modalType === 'ready_for_pickup') {
+          // Modal "Pronto para Retirada"
           filtered = activeCustomers.filter(
             (c) => c.status === 'ready_for_pickup'
           );
-        } else if (filterType === 'finished') {
-          filtered = activeCustomers.filter((c) => c.status === 'completed');
         }
 
         // Ordenar por mais urgente
@@ -75,11 +68,7 @@ function useCustomersList({ filterType, isOpen }: UseCustomersListProps) {
       }
     }
     fetchCustomers();
-  }, [filterType, isOpen, refreshTrigger]);
-
-  const refresh = useCallback(() => {
-    setRefreshTrigger((prev) => prev + 1);
-  }, []);
+  }, [modalType, isOpen, refreshTrigger]);
 
   return { customers, loading, refresh };
 }
