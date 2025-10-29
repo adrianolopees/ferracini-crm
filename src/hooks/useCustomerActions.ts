@@ -3,6 +3,7 @@ import { db } from '@/services/firebase';
 import { Customer, ArchiveReason } from '@/types/customer';
 import {
   notifyOtherStore,
+  notifyProductArrived,
   sendStoreCampinas,
   sendStoreDomPedro,
 } from '@/services/whatsappService';
@@ -64,6 +65,7 @@ function useCustomerActions() {
 
   const productArrived = async (customer: Customer) => {
     await markAsContacted(customer);
+    notifyProductArrived(customer);
   };
 
   const completeOrder = async (customer: Customer) => {

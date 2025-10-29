@@ -5,7 +5,7 @@ import { getDaysWaiting } from '@/utils';
 
 interface DashboardMetrics {
   totalActive: number;
-  totalContacted: number;
+  totalReadyForPickup: number;
   totalAwaitingTransfer: number;
   totalFinished: number;
   averageWaitTime: number;
@@ -19,7 +19,7 @@ interface UseDashboardMetricsProps {
 function useDashboardMetrics(props?: UseDashboardMetricsProps) {
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalActive: 0,
-    totalContacted: 0,
+    totalReadyForPickup: 0,
     totalAwaitingTransfer: 0,
     totalFinished: 0,
     averageWaitTime: 0,
@@ -36,7 +36,7 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
         let totalDays = 0;
         let awaitingCount = 0;
         let awaitingTransferCount = 0;
-        let contactedCount = 0;
+        let readyForPickupCount = 0;
         let finishedCount = 0;
 
         snapshot.forEach((doc) => {
@@ -51,7 +51,7 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
           // Contadores por status
           if (status === 'pending') awaitingCount++;
           if (status === 'awaiting_transfer') awaitingTransferCount++;
-          if (status === 'ready_for_pickup') contactedCount++;
+          if (status === 'ready_for_pickup') readyForPickupCount++;
           if (status === 'completed') finishedCount++;
 
           // Urgente se aguardando há 7+ dias
@@ -70,7 +70,7 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
 
         setMetrics({
           totalActive: awaitingCount,
-          totalContacted: contactedCount,
+          totalReadyForPickup: readyForPickupCount,
           totalAwaitingTransfer: awaitingTransferCount,
           totalFinished: finishedCount,
           averageWaitTime: averageWaitTime,

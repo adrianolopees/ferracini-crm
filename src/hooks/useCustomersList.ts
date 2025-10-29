@@ -8,7 +8,7 @@ type FilterType =
   | 'all'
   | 'urgent'
   | 'awaiting_transfer'
-  | 'contacted'
+  | 'ready_for_pickup'
   | 'finished';
 
 interface UseCustomersListProps {
@@ -17,7 +17,11 @@ interface UseCustomersListProps {
   refreshTrigger?: number; // trigger para forçar atualização
 }
 
-function useCustomersList({ filterType, isOpen, refreshTrigger }: UseCustomersListProps) {
+function useCustomersList({
+  filterType,
+  isOpen,
+  refreshTrigger,
+}: UseCustomersListProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -55,16 +59,17 @@ function useCustomersList({ filterType, isOpen, refreshTrigger }: UseCustomersLi
           filtered = activeCustomers.filter(
             (c) => c.status === 'awaiting_transfer'
           );
-        } else if (filterType === 'contacted') {
-          filtered = activeCustomers.filter((c) => c.status === 'ready_for_pickup');
+        } else if (filterType === 'ready_for_pickup') {
+          filtered = activeCustomers.filter(
+            (c) => c.status === 'ready_for_pickup'
+          );
         } else if (filterType === 'finished') {
           filtered = activeCustomers.filter((c) => c.status === 'completed');
         }
 
         // Ordenar por mais urgente
         filtered.sort(
-          (a, b) =>
-            getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt)
+          (a, b) => getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt)
         );
 
         setCustomers(filtered);

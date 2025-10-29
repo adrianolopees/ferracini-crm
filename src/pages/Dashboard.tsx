@@ -1,51 +1,56 @@
 import { useState } from 'react';
 import { ArchiveModal, PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
-import { useDashboardMetrics } from '@/hooks';
-import { useCustomersList } from '@/hooks';
+import { useDashboardMetrics, useCustomersList } from '@/hooks';
+import { useCustomerActions } from '@/hooks';
 import {
   CustomerListModal,
   ActionCard,
   MetricCard,
 } from '@/components/features';
 import { Customer, ArchiveReason } from '@/types/customer';
-import { updateDoc, doc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
 import { TopProductsChart } from '@/components/charts';
-import {
-  notifyOtherStore,
-  sendStoreCampinas,
-  sendStoreDomPedro,
-  notifyProductArrived,
-} from '@/services/whatsappService';
-import {
-  moveToAwaitingTransfer,
-  markAsContacted,
-  moveToFinished,
-} from '@/services/customerStatusService';
+import { sendGenericMessage } from '@/services/whatsappService';
 
 function Dashboard() {
-  // Estado para forçar atualização das métricas do dashboard
   const [metricsRefreshTrigger, setMetricsRefreshTrigger] = useState(0);
-
-  const { metrics, loading } = useDashboardMetrics({
-    refreshTrigger: metricsRefreshTrigger,
-  });
-
-  // Estado para controlar qual modal está aberto
-  const [modalType, setModalType] = useState<
-    'awaiting' | 'awaiting_transfer' | 'contacted' | null
-  >(null);
-
-  // Estado para controlar modal de arquivamento
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(
     null
   );
-
-  // Estado para forçar atualização da lista de clientes
+  const [modalType, setModalType] = useState<
+    'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null
+  >(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const { metrics, loading } = useDashboardMetrics({
+    refreshTrigger: metricsRefreshTrigger,
+  });
+  const {
+    checkStoreCampinas,
+    checkStoreDomPedro,
+    confirmStoreStock,
+    acceptTransfer,
+    rejectStoreStock,
+    productArrived,
+    declineTransfer,
+    completeOrder,
+  } = useCustomerActions();
+
+  // Determinar filterType baseado no modal ativo
+  const getFilterType = () => {
+    if (modalType === 'awaiting') return 'all';
+    if (modalType === 'ready_for_pickup') return 'ready_for_pickup';
+    if (modalType === 'awaiting_transfer') return 'awaiting_transfer';
+    return 'all';
+  };
+  // Hook para buscar clientes filtrados
+  const { customers, loading: customersLoading } = useCustomersList({
+    filterType: getFilterType(),
+    isOpen: modalType !== null,
+    refreshTrigger,
+  });
 
   // Função para atualizar as métricas do dashboard
   const refreshMetrics = () => {
@@ -63,33 +68,14 @@ function Dashboard() {
     refreshMetrics();
   };
 
-  // Determinar filterType baseado no modal ativo
-  const getFilterType = () => {
-    if (modalType === 'awaiting') return 'all';
-    if (modalType === 'contacted') return 'contacted';
-    if (modalType === 'awaiting_transfer') return 'awaiting_transfer';
-    return 'all';
-  };
-
-  // Hook para buscar clientes filtrados
-  const { customers, loading: customersLoading } = useCustomersList({
-    filterType: getFilterType(),
-    isOpen: modalType !== null,
-    refreshTrigger,
-  });
-
-  // Função para avisar cliente que tem em outra loja
+  // Handlers para ações dos clientes
   const handleWhatsApp = (customer: Customer) => {
-    notifyOtherStore(customer);
+    sendGenericMessage(customer);
   };
 
-  // Função para verificar disponibilidade na Loja Campinas
-  const handleCheckLojaCampinas = async (customer: Customer) => {
+  const handleCheckStoreCampinas = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'customers', customer.id), {
-        consultingStore: 'Campinas',
-      });
-      sendStoreCampinas(customer);
+      await checkStoreCampinas(customer);
       toast('WhatsApp enviado para Loja Campinas');
       refreshCustomers();
     } catch (error) {
@@ -98,46 +84,30 @@ function Dashboard() {
     }
   };
 
-  // Função para verificar disponibilidade na Loja Dom Pedro
-  const handleCheckLojaDomPedro = async (customer: Customer) => {
+  const handleCheckStoreDomPedro = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'customers', customer.id), {
-        consultingStore: 'Dom Pedro',
-      });
-      sendStoreDomPedro(customer); // Envia WhatsApp para loja
+      await checkStoreDomPedro(customer);
       toast('WhatsApp enviado para Loja Dom Pedro');
-      refreshCustomers(); // Atualiza lista sem recarregar
+      refreshCustomers();
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao consultar loja');
     }
   };
 
-  // Função quando LOJA confirma que TEM estoque
-  const handleStoreHasStock = async (customer: Customer) => {
+  const handleConfirmStoreStock = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'customers', customer.id), {
-        storeHasStock: true,
-      });
-      // Envia WhatsApp para o CLIENTE perguntando se aceita transferência
-      notifyOtherStore(customer);
-      toast.success(
-        `Cliente notificado sobre disponibilidade em ${customer.consultingStore}!`
-      );
-      refreshCustomers(); // Atualiza lista sem recarregar
+      await confirmStoreStock(customer);
+      refreshCustomers();
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao notificar cliente');
     }
   };
 
-  // Função quando LOJA confirma que NÃO TEM estoque
-  const handleStoreNoStock = async (customer: Customer) => {
+  const handleRejectStoreStock = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'customers', customer.id), {
-        consultingStore: null,
-        storeHasStock: false,
-      });
+      await rejectStoreStock(customer);
       toast('Produto não disponível. Pode consultar outra loja.');
       refreshCustomers(); // Atualiza lista sem recarregar
     } catch (error) {
@@ -146,15 +116,9 @@ function Dashboard() {
     }
   };
 
-  // Função quando CLIENTE aceita a transferência
-  const handleClientAccepted = async (customer: Customer) => {
+  const handleAcceptTransfer = async (customer: Customer) => {
     try {
-      await moveToAwaitingTransfer(customer, customer.consultingStore!);
-      // Limpa campos auxiliares
-      await updateDoc(doc(db, 'customers', customer.id), {
-        consultingStore: null,
-        storeHasStock: false,
-      });
+      await acceptTransfer(customer);
       toast.success(`Transferência confirmada de ${customer.consultingStore}!`);
       refreshAll(); // Atualiza lista e métricas
     } catch (error) {
@@ -163,8 +127,7 @@ function Dashboard() {
     }
   };
 
-  // Função quando CLIENTE recusa a transferência
-  const handleClientDeclined = (customer: Customer) => {
+  const handleDeclineTransfer = (customer: Customer) => {
     setModalType(null); // Fecha o modal de lista
     setCustomerToArchive(customer);
     setArchiveModalOpen(true);
@@ -177,7 +140,6 @@ function Dashboard() {
     setArchiveModalOpen(true);
   };
 
-  // Função para arquivar cliente
   const handleArchiveCustomer = async (
     reason: ArchiveReason,
     notes?: string
@@ -185,40 +147,30 @@ function Dashboard() {
     if (!customerToArchive) return;
 
     try {
-      await updateDoc(doc(db, 'customers', customerToArchive.id), {
-        archived: true,
-        motivoArquivamento: reason,
-        dataArquivamento: new Date().toISOString(),
-        observacoes: notes,
-      });
-
+      await declineTransfer(customerToArchive, reason, notes || '');
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
-      refreshAll(); // Atualiza lista e métricas
+      refreshAll();
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
       toast.error('Erro ao arquivar cliente');
     }
   };
 
-  // Função para quando produto chega
   const handleProductArrived = async (customer: Customer) => {
     try {
-      await markAsContacted(customer);
-      notifyProductArrived(customer);
-      toast.success(`${customer.name} pronto para retirada!`);
-      refreshAll(); // Atualiza lista e métricas
+      await productArrived(customer);
+      refreshAll();
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
       toast.error('Erro ao atualizar status');
     }
   };
 
-  // Função para quando cliente compra
-  const handlePurchaseCompleted = async (customer: Customer) => {
+  const handleCompleteOrder = async (customer: Customer) => {
     try {
-      await moveToFinished(customer);
+      await completeOrder(customer);
       toast.success(`Venda de ${customer.name} finalizada!`);
       refreshAll(); // Atualiza lista e métricas
     } catch (error) {
@@ -232,7 +184,7 @@ function Dashboard() {
     if (modalType === 'awaiting') return 'Clientes Aguardando';
     if (modalType === 'awaiting_transfer')
       return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
-    if (modalType === 'contacted') return 'Pronto para Retirada';
+    if (modalType === 'ready_for_pickup') return 'Pronto para Retirada';
     return '';
   };
 
@@ -277,7 +229,7 @@ function Dashboard() {
         <AnimatedContainer type="slideDown" delay={0.3}>
           <ActionCard
             title="Pronto para Retirada"
-            value={metrics.totalContacted}
+            value={metrics.totalReadyForPickup}
             subtitle={
               metrics.totalFinished > 0
                 ? `${metrics.totalFinished} venda(s) finalizada(s)`
@@ -286,7 +238,7 @@ function Dashboard() {
             icon="fa-solid fa-box-open"
             colorScheme="green"
             loading={loading}
-            onClick={() => setModalType('contacted')}
+            onClick={() => setModalType('ready_for_pickup')}
           />
         </AnimatedContainer>
       </div>
@@ -315,7 +267,7 @@ function Dashboard() {
                 value={
                   metrics.totalActive +
                   metrics.totalAwaitingTransfer +
-                  metrics.totalContacted
+                  metrics.totalReadyForPickup
                 }
                 subtitle="clientes"
                 icon="fa-solid fa-users"
@@ -331,7 +283,7 @@ function Dashboard() {
                         (metrics.totalFinished /
                           (metrics.totalActive +
                             metrics.totalAwaitingTransfer +
-                            metrics.totalContacted +
+                            metrics.totalReadyForPickup +
                             metrics.totalFinished)) *
                           100
                       )
@@ -370,14 +322,14 @@ function Dashboard() {
         loading={customersLoading}
         onWhatsApp={handleWhatsApp}
         onArchive={handleArchive}
-        onCheckLojaCampinas={handleCheckLojaCampinas}
-        onCheckLojaDomPedro={handleCheckLojaDomPedro}
+        onCheckLojaCampinas={handleCheckStoreCampinas}
+        onCheckLojaDomPedro={handleCheckStoreDomPedro}
         onProductArrived={handleProductArrived}
-        onPurchaseCompleted={handlePurchaseCompleted}
-        onStoreHasStock={handleStoreHasStock}
-        onStoreNoStock={handleStoreNoStock}
-        onClientAccepted={handleClientAccepted}
-        onClientDeclined={handleClientDeclined}
+        onPurchaseCompleted={handleCompleteOrder}
+        onStoreHasStock={handleConfirmStoreStock}
+        onStoreNoStock={handleRejectStoreStock}
+        onClientAccepted={handleAcceptTransfer}
+        onClientDeclined={handleDeclineTransfer}
       />
 
       {/* Modal de Arquivamento */}
