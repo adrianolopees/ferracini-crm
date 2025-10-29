@@ -14,7 +14,6 @@ import { TopProductsChart } from '@/components/charts';
 import { sendGenericMessage } from '@/services/whatsappService';
 
 function Dashboard() {
-  const [metricsRefreshTrigger, setMetricsRefreshTrigger] = useState(0);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(
     null
@@ -22,11 +21,7 @@ function Dashboard() {
   const [modalType, setModalType] = useState<
     'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null
   >(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  const { metrics, loading } = useDashboardMetrics({
-    refreshTrigger: metricsRefreshTrigger,
-  });
   const {
     checkStoreCampinas,
     checkStoreDomPedro,
@@ -45,27 +40,20 @@ function Dashboard() {
     if (modalType === 'awaiting_transfer') return 'awaiting_transfer';
     return 'all';
   };
+  const { metrics, loading, refresh: refreshMetrics } = useDashboardMetrics();
   // Hook para buscar clientes filtrados
-  const { customers, loading: customersLoading } = useCustomersList({
+  const {
+    customers,
+    loading: customersLoading,
+    refresh: refreshCustomers,
+  } = useCustomersList({
     filterType: getFilterType(),
     isOpen: modalType !== null,
-    refreshTrigger,
   });
 
-  // Função para atualizar as métricas do dashboard
-  const refreshMetrics = () => {
-    setMetricsRefreshTrigger((prev) => prev + 1);
-  };
-
-  // Função para atualizar a lista sem recarregar a página
-  const refreshCustomers = () => {
-    setRefreshTrigger((prev) => prev + 1);
-  };
-
-  // Função para atualizar tudo (lista + métricas)
   const refreshAll = () => {
-    refreshCustomers();
     refreshMetrics();
+    refreshCustomers();
   };
 
   // Handlers para ações dos clientes

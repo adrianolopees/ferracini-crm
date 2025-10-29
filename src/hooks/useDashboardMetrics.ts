@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { getDaysWaiting } from '@/utils';
@@ -12,11 +12,7 @@ interface DashboardMetrics {
   urgentCustomers: number;
 }
 
-interface UseDashboardMetricsProps {
-  refreshTrigger?: number;
-}
-
-function useDashboardMetrics(props?: UseDashboardMetricsProps) {
+function useDashboardMetrics() {
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalActive: 0,
     totalReadyForPickup: 0,
@@ -26,6 +22,7 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
     urgentCustomers: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     async function fetchMetrics() {
@@ -83,8 +80,12 @@ function useDashboardMetrics(props?: UseDashboardMetricsProps) {
       }
     }
     fetchMetrics();
-  }, [props?.refreshTrigger]);
-  return { metrics, loading };
+  }, [refreshTrigger]);
+
+  const refresh = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
+  return { metrics, loading, refresh };
 }
 
 export default useDashboardMetrics;

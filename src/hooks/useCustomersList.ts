@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Customer } from '@/types/customer';
@@ -14,20 +14,15 @@ type FilterType =
 interface UseCustomersListProps {
   filterType: FilterType;
   isOpen: boolean; // só busca quando modal abre
-  refreshTrigger?: number; // trigger para forçar atualização
 }
 
-function useCustomersList({
-  filterType,
-  isOpen,
-  refreshTrigger,
-}: UseCustomersListProps) {
+function useCustomersList({ filterType, isOpen }: UseCustomersListProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
-    if (!isOpen) return; // não busca se modal está fechado
-
+    if (!isOpen) return;
     async function fetchCustomers() {
       setLoading(true);
       try {
@@ -79,11 +74,14 @@ function useCustomersList({
         setLoading(false);
       }
     }
-
     fetchCustomers();
   }, [filterType, isOpen, refreshTrigger]);
 
-  return { customers, loading };
+  const refresh = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
+
+  return { customers, loading, refresh };
 }
 
 export default useCustomersList;
