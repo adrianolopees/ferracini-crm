@@ -7,30 +7,29 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { db } from '@/services/firebase';
-import { Customer, ContactedCustomer } from '@/types/customer';
-import { Input, PageLayout, Tabs, ConfirmModal } from '@/components/ui';
 import toast from 'react-hot-toast';
+import { Customer } from '@/types/customer';
+import { Input, PageLayout, Tabs, ConfirmModal } from '@/components/ui';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { CustomerCard } from '@/components/features';
+import { useCustomerActions } from '@/hooks';
 
-type TabType = 'finalized' | 'contacted' | 'archived';
+type TabType = 'finalized' | 'transfers' | 'archived';
 
 function History() {
   const [activeTab, setActiveTab] = useState<TabType>('finalized');
   const [searchTerm, setSearchTerm] = useState('');
   const [finalizedCustomers, setFinalizedCustomers] = useState<Customer[]>([]);
-  const [contactedCustomers, setContactedCustomers] = useState<
-    ContactedCustomer[]
-  >([]);
+  const [transferCustomers, setTransferCustomers] = useState<Customer[]>([]);
   const [archivedCustomers, setArchivedCustomers] = useState<Customer[]>([]);
-  const [filteredCustomers, setFilteredCustomers] = useState<
-    (Customer | ContactedCustomer)[]
-  >([]);
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
     null
   );
+
+  const { restoreFromArchive } = useCustomerActions();
 
   // Buscar clientes ao carregar
   useEffect(() => {
@@ -47,8 +46,8 @@ function History() {
     const customers =
       activeTab === 'finalized'
         ? finalizedCustomers
-        : activeTab === 'contacted'
-          ? contactedCustomers
+        : activeTab === 'transfers'
+          ? transferCustomers
           : archivedCustomers;
 
     if (searchTerm.trim() === '') {
@@ -68,7 +67,7 @@ function History() {
     searchTerm,
     activeTab,
     finalizedCustomers,
-    contactedCustomers,
+    transferCustomers,
     archivedCustomers,
   ]);
 
@@ -77,7 +76,7 @@ function History() {
       setLoading(true);
 
       const finalized: Customer[] = [];
-      const contacted: ContactedCustomer[] = [];
+      const transfers: Customer[] = [];
       const archived: Customer[] = [];
 
       const snapshot = await getDocs(collection(db, 'customers'));
@@ -92,15 +91,18 @@ function History() {
           }
         } else if (data.status === 'completed') {
           // Vendas finalizadas
-          finalized.push({ id: doc.id, ...data } as Customer);
-        } else if (data.status === 'ready_for_pickup') {
-          // Contactados
-          contacted.push({ id: doc.id, ...data } as ContactedCustomer);
+          if (data.sourceStore) {
+            // Transferências (finalizados com loja de origem)
+            transfers.push({ id: doc.id, ...data } as Customer);
+          } else {
+            // Finalizados normais (sem transferência)
+            finalized.push({ id: doc.id, ...data } as Customer);
+          }
         }
       });
 
       setFinalizedCustomers(finalized);
-      setContactedCustomers(contacted);
+      setTransferCustomers(transfers);
       setArchivedCustomers(archived);
       setFilteredCustomers(finalized); // Por padrão mostra finalizados
     } catch (error) {
@@ -113,15 +115,9 @@ function History() {
 
   const handleRestore = async (customer: Customer) => {
     try {
-      await updateDoc(doc(db, 'customers', customer.id), {
-        archived: false,
-        archiveReason: null,
-        archivedAt: null,
-        notes: null,
-      });
-
+      await restoreFromArchive(customer);
       toast.success(`${customer.name} restaurado para clientes ativos!`);
-      fetchAllCustomers(); // Recarregar listas
+      fetchAllCustomers();
     } catch (error) {
       console.error('Erro ao restaurar cliente:', error);
       toast.error('Erro ao restaurar cliente');
@@ -151,15 +147,15 @@ function History() {
   const tabs = [
     {
       id: 'finalized',
-      label: 'Vendas Finalizadas',
+      label: 'Finalizados',
       count: finalizedCustomers.length,
       icon: 'fa-solid fa-circle-check',
     },
     {
-      id: 'contacted',
-      label: 'Contactados',
-      count: contactedCustomers.length,
-      icon: 'fa-solid fa-box-open',
+      id: 'transfers',
+      label: 'Transferências',
+      count: transferCustomers.length,
+      icon: 'fa-solid fa-arrows-turn-right',
     },
     {
       id: 'archived',
@@ -173,7 +169,7 @@ function History() {
     <PageLayout
       title="Histórico de"
       highlight="Clientes"
-      subtitle="Vendas finalizadas, contactados e arquivados"
+      subtitle="Vendas finalizadas, transferências recebidas e clientes arquivados"
       maxWidth="2xl"
     >
       {/* Tabs e Conteúdo */}
@@ -194,6 +190,32 @@ function History() {
               />
             </div>
 
+            {/* Resumo de Transferências */}
+            {activeTab === 'transfers' && transferCustomers.length > 0 && (
+              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                  <i className="fa-solid fa-chart-pie"></i>
+                  Resumo de Transferências
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white rounded-lg p-3 border border-blue-100">
+                    <div className="text-xs text-gray-600 mb-1">Campinas</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {transferCustomers.filter(c => c.sourceStore === 'Campinas').length}
+                    </div>
+                    <div className="text-xs text-gray-500">vendas concluídas</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-purple-100">
+                    <div className="text-xs text-gray-600 mb-1">Dom Pedro</div>
+                    <div className="text-2xl font-bold text-purple-600">
+                      {transferCustomers.filter(c => c.sourceStore === 'Dom Pedro').length}
+                    </div>
+                    <div className="text-xs text-gray-500">vendas concluídas</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Lista de clientes */}
             <div className="mt-6 space-y-4">
               {loading ? (
@@ -208,8 +230,8 @@ function History() {
                       className={`text-gray-400 text-2xl ${
                         activeTab === 'finalized'
                           ? 'fa-solid fa-circle-check'
-                          : activeTab === 'contacted'
-                            ? 'fa-solid fa-box-open'
+                          : activeTab === 'transfers'
+                            ? 'fa-solid fa-arrows-turn-right'
                             : 'fa-solid fa-archive'
                       }`}
                     ></i>
@@ -219,8 +241,8 @@ function History() {
                       ? 'Nenhum resultado encontrado'
                       : activeTab === 'finalized'
                         ? 'Nenhuma venda finalizada ainda'
-                        : activeTab === 'contacted'
-                          ? 'Nenhum cliente contactado ainda'
+                        : activeTab === 'transfers'
+                          ? 'Nenhuma transferência recebida ainda'
                           : 'Nenhum cliente arquivado'}
                   </p>
                   <p className="text-gray-500 text-sm mt-1">
@@ -230,12 +252,13 @@ function History() {
               ) : (
                 filteredCustomers.map((customer, index) => {
                   const isArchivedTab = activeTab === 'archived';
+                  const isTransferTab = activeTab === 'transfers';
 
                   return (
                     <AnimatedListItem key={customer.id} index={index}>
                       <CustomerCard
                         customer={customer}
-                        variant="compact"
+                        variant={isTransferTab ? 'transfer' : 'compact'}
                         onRestore={isArchivedTab ? handleRestore : undefined}
                         onDelete={isArchivedTab ? handleDelete : undefined}
                       />

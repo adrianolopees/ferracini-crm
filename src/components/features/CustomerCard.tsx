@@ -9,7 +9,7 @@ import { Button } from '@/components/ui';
 
 interface CustomerCardProps {
   customer: Customer;
-  variant?: 'default' | 'compact' | 'finalized';
+  variant?: 'default' | 'compact' | 'finalized' | 'transfer';
   onSendMessage?: (customer: Customer) => void;
   onArchive?: (customer: Customer) => void;
   onDelete?: (customer: Customer) => void;
@@ -56,6 +56,114 @@ function CustomerCard({
     : isArchived
       ? 'border-l-orange-500 bg-orange-50'
       : status.borderClass + ' bg-gray-50';
+
+  // Variant TRANSFER - Layout focado em relatório
+  if (variant === 'transfer') {
+    return (
+      <div className="border-l-4 border-l-blue-500 bg-blue-50/30 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+        {/* Header: Nome + Badge */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-semibold text-gray-900 text-base">{customer.name}</h3>
+            {customer.salesperson && (
+              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                {customer.salesperson}
+              </span>
+            )}
+          </div>
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded">
+            <i className="fa-solid fa-arrows-turn-right"></i>
+            Transferência
+          </span>
+        </div>
+
+        {/* Grid: Produto | Timeline */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+          {/* COLUNA ESQUERDA: Produto */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <i className="fa-solid fa-box text-blue-500 text-sm"></i>
+              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Produto
+              </span>
+            </div>
+            <div className="space-y-1 text-sm">
+              <p className="font-bold text-gray-900">{customer.model}</p>
+              <p className="text-gray-700">{customer.reference}</p>
+              <div className="flex gap-3 text-xs text-gray-600">
+                <span><span className="font-semibold">Nº</span> {customer.size}</span>
+                <span className="text-gray-400">•</span>
+                <span><span className="font-semibold">Cor</span> {customer.color}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* COLUNA DIREITA: Timeline */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <i className="fa-solid fa-clock-rotate-left text-blue-500 text-sm"></i>
+              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Linha do Tempo
+              </span>
+            </div>
+            <div className="space-y-2 text-sm">
+              {/* Solicitado */}
+              <div className="flex items-start gap-2">
+                <i className="fa-solid fa-circle text-gray-400 text-[6px] mt-1.5"></i>
+                <div>
+                  <span className="text-gray-600">Solicitado:</span>
+                  <span className="font-medium text-gray-900 ml-1">{formatDateTime(customer.createdAt)}</span>
+                </div>
+              </div>
+
+              {/* Chegou na loja */}
+              {customer.contactedAt && (
+                <div className="flex items-start gap-2">
+                  <i className="fa-solid fa-circle text-blue-500 text-[6px] mt-1.5"></i>
+                  <div>
+                    <span className="text-gray-600">Chegou:</span>
+                    <span className="font-medium text-gray-900 ml-1">{formatDateTime(customer.contactedAt)}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Vendido */}
+              {customer.completedAt && (
+                <div className="flex items-start gap-2">
+                  <i className="fa-solid fa-circle text-emerald-500 text-[6px] mt-1.5"></i>
+                  <div>
+                    <span className="text-gray-600">Vendido:</span>
+                    <span className="font-medium text-gray-900 ml-1">{formatDateTime(customer.completedAt)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer: Origem + Tempo Total */}
+        <div className="mt-4 pt-3 border-t border-blue-200 flex items-center justify-between flex-wrap gap-2">
+          {/* Loja Origem */}
+          <div className="inline-flex items-center gap-2 text-sm">
+            <i className="fa-solid fa-store text-blue-600"></i>
+            <span className="text-gray-600">Origem:</span>
+            <span className="font-semibold text-blue-700">{customer.sourceStore || 'N/A'}</span>
+          </div>
+
+          {/* Tempo Total */}
+          {customer.completedAt && (
+            <div className="inline-flex items-center gap-2 text-sm">
+              <i className="fa-solid fa-hourglass-end text-purple-600"></i>
+              <span className="text-gray-600">Tempo total:</span>
+              <span className="font-semibold text-purple-700">
+                {formatDaysElapsed(customer.createdAt, customer.completedAt)}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
