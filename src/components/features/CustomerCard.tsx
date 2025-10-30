@@ -5,6 +5,7 @@ import {
   formatDaysElapsed,
 } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
+import { Button } from '@/components/ui';
 
 interface CustomerCardProps {
   customer: Customer;
@@ -13,9 +14,9 @@ interface CustomerCardProps {
   onArchive?: (customer: Customer) => void;
   onDelete?: (customer: Customer) => void;
   onRestore?: (customer: Customer) => void;
+  onResetToInitial?: (customer: Customer) => void;
   showActions?: boolean;
 
-  // Dashboard-specific actions
   checkStoreCampinas?: (customer: Customer) => void;
   checkStoreDomPedro?: (customer: Customer) => void;
   productArrived?: (customer: Customer) => void;
@@ -33,9 +34,9 @@ function CustomerCard({
   onArchive,
   onDelete,
   onRestore,
+  onResetToInitial,
   showActions = true,
 
-  // Dashboard-specific actions
   checkStoreCampinas,
   checkStoreDomPedro,
   productArrived,
@@ -63,6 +64,21 @@ function CustomerCard({
       {/* Action Buttons - Canto superior direito */}
       {showActions && (
         <div className="absolute top-3 right-3 flex gap-2">
+          {onResetToInitial &&
+            !isFinalized &&
+            !isArchived &&
+            (customer.consultingStore ||
+              customer.status === 'awaiting_transfer' ||
+              customer.status === 'ready_for_pickup') && (
+              <button
+                onClick={() => onResetToInitial(customer)}
+                className="inline-flex items-center justify-center w-9 h-9 text-orange-600 hover:bg-orange-50 rounded-lg
+  transition-colors cursor-pointer shadow-sm"
+                title="Resetar para estado inicial"
+              >
+                <i className="fa-solid fa-rotate-left text-lg" />
+              </button>
+            )}
           {onRestore && isArchived && (
             <button
               onClick={() => onRestore(customer)}
@@ -234,25 +250,29 @@ function CustomerCard({
               !customer.storeHasStock && (
                 <>
                   {checkStoreCampinas && (
-                    <button
+                    <Button
                       onClick={() => checkStoreCampinas(customer)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors cursor-pointer"
-                      title="Consultar disponibilidade na Loja Campinas"
+                      variant="blue"
+                      size="xs"
+                      withRing={false}
+                      title="Consultar disponibilidade no Campinas Shopping"
                     >
-                      <i className="fa-solid fa-store"></i>
-                      <span>Verificar Campinas</span>
-                    </button>
+                      <i className="fa-solid fa-store pr-1.5"></i>
+                      <span>Campinas</span>
+                    </Button>
                   )}
 
                   {checkStoreDomPedro && (
-                    <button
+                    <Button
                       onClick={() => checkStoreDomPedro(customer)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500 text-white text-xs rounded-lg hover:bg-purple-600 transition-colors cursor-pointer"
-                      title="Consultar disponibilidade na Loja Dom Pedro"
+                      variant="purple"
+                      size="xs"
+                      withRing={false}
+                      title="Consultar disponibilidade no Dom Pedro"
                     >
-                      <i className="fa-solid fa-store"></i>
-                      <span>Verificar Dom Pedro</span>
-                    </button>
+                      <i className="fa-solid fa-store pr-1.5"></i>
+                      <span>Dom Pedro</span>
+                    </Button>
                   )}
                 </>
               )}
@@ -267,25 +287,29 @@ function CustomerCard({
                   </span>
 
                   {confirmStoreStock && (
-                    <button
+                    <Button
                       onClick={() => confirmStoreStock(customer)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
-                      title="Loja confirmou que tem o produto"
+                      variant="green"
+                      size="xs"
+                      withRing={false}
+                      title="Loja tem o produto"
                     >
-                      <i className="fa-solid fa-check"></i>
-                      <span>Tem Estoque</span>
-                    </button>
+                      <i className="fa-solid fa-check pr-1.5"></i>
+                      <span>Disponível</span>
+                    </Button>
                   )}
 
                   {rejectStoreStock && (
-                    <button
+                    <Button
                       onClick={() => rejectStoreStock(customer)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
+                      variant="red"
+                      size="xs"
+                      withRing={false}
                       title="Loja não tem o produto"
                     >
-                      <i className="fa-solid fa-times"></i>
-                      <span>Não Tem</span>
-                    </button>
+                      <i className="fa-solid fa-times pr-1.5"></i>
+                      <span>Indisponível</span>
+                    </Button>
                   )}
                 </>
               )}
@@ -300,25 +324,29 @@ function CustomerCard({
                   </span>
 
                   {acceptTransfer && (
-                    <button
+                    <Button
                       onClick={() => acceptTransfer(customer)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-colors cursor-pointer"
-                      title="Cliente aceitou aguardar transferência"
+                      variant="emerald"
+                      size="xs"
+                      withRing={false}
+                      title="Cliente aceitou a transferência"
                     >
-                      <i className="fa-solid fa-check"></i>
+                      <i className="fa-solid fa-check pr-1.5"></i>
                       <span>Cliente Aceitou</span>
-                    </button>
+                    </Button>
                   )}
 
                   {declineTransfer && (
-                    <button
+                    <Button
                       onClick={() => declineTransfer(customer)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
+                      variant="red"
+                      size="xs"
+                      withRing={false}
                       title="Cliente recusou a transferência"
                     >
-                      <i className="fa-solid fa-times"></i>
+                      <i className="fa-solid fa-times pr-1.5"></i>
                       <span>Cliente Recusou</span>
-                    </button>
+                    </Button>
                   )}
                 </>
               )}

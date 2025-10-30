@@ -31,6 +31,7 @@ function Dashboard() {
     productArrived,
     declineTransfer,
     completeOrder,
+    resetToInitial,
   } = useCustomerActions();
 
   const { metrics, loading, refresh: refreshMetrics } = useDashboardMetrics();
@@ -105,12 +106,6 @@ function Dashboard() {
     setArchiveModalOpen(true);
   };
 
-  const handleArchive = (customer: Customer) => {
-    setModalType(null); // Fecha o modal de lista primeiro
-    setCustomerToArchive(customer);
-    setArchiveModalOpen(true);
-  };
-
   const handleArchiveCustomer = async (
     reason: ArchiveReason,
     notes?: string
@@ -150,6 +145,22 @@ function Dashboard() {
     }
   };
 
+  const handleArchive = (customer: Customer) => {
+    setModalType(null); // Fecha o modal de lista primeiro
+    setCustomerToArchive(customer);
+    setArchiveModalOpen(true);
+  };
+
+  const handleResetToInitial = async (customer: Customer) => {
+    try {
+      await resetToInitial(customer);
+      toast.success(`Cliente ${customer.name} voltou ao status inicial.`);
+      refreshCustomers();
+    } catch (error) {
+      console.error('Erro ao resetar cliente:', error);
+      toast.error('Erro ao resetar cliente');
+    }
+  };
   const getModalTitle = () => {
     if (modalType === 'awaiting')
       return `Clientes Aguardando (${metrics.totalActive})`;
@@ -294,6 +305,7 @@ function Dashboard() {
         loading={customersLoading}
         onSendMessage={sendGenericMessage}
         onArchive={handleArchive}
+        onResetToInitial={handleResetToInitial}
         checkStoreCampinas={handleCheckStoreCampinas}
         checkStoreDomPedro={handleCheckStoreDomPedro}
         productArrived={handleProductArrived}

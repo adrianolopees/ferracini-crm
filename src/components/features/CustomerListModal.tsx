@@ -11,6 +11,7 @@ interface CustomerListModalProps {
   loading: boolean;
   onSendMessage: (customer: Customer) => void;
   onArchive: (customer: Customer) => void;
+  onResetToInitial?: (customer: Customer) => void;
   checkStoreCampinas?: (customer: Customer) => void;
   checkStoreDomPedro?: (customer: Customer) => void;
   productArrived?: (customer: Customer) => void;
@@ -29,6 +30,7 @@ function CustomerListModal({
   loading,
   onArchive,
   onSendMessage,
+  onResetToInitial,
   checkStoreCampinas,
   checkStoreDomPedro,
   productArrived,
@@ -63,6 +65,7 @@ function CustomerListModal({
                   variant="compact"
                   onSendMessage={onSendMessage}
                   onArchive={onArchive}
+                  onResetToInitial={onResetToInitial}
                   checkStoreCampinas={checkStoreCampinas}
                   checkStoreDomPedro={checkStoreDomPedro}
                   confirmStoreStock={confirmStoreStock}

@@ -72,6 +72,26 @@ function useCustomerActions() {
     await moveToFinished(customer);
   };
 
+  const restoreFromArchive = async (customer: Customer) => {
+    await updateDoc(doc(db, 'customers', customer.id), {
+      archived: false,
+      archiveReason: null,
+      archivedAt: null,
+      notes: null,
+    });
+  };
+
+  const resetToInitial = async (customer: Customer) => {
+    await updateDoc(doc(db, 'customers', customer.id), {
+      consultingStore: null,
+      storeHasStock: false,
+      status: 'pending',
+      sourceStore: null,
+      transferredAt: null,
+      contactedAt: null,
+    });
+  };
+
   return {
     checkStoreCampinas,
     checkStoreDomPedro,
@@ -81,6 +101,8 @@ function useCustomerActions() {
     declineTransfer,
     productArrived,
     completeOrder,
+    restoreFromArchive,
+    resetToInitial,
   };
 }
 
