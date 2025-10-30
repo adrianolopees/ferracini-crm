@@ -34,24 +34,15 @@ function Dashboard() {
   } = useCustomerActions();
 
   const { metrics, loading, refresh: refreshMetrics } = useDashboardMetrics();
-  // Hook para buscar clientes filtrados
   const {
     customers,
     loading: customersLoading,
     refresh: refreshCustomers,
-  } = useCustomersList({
-    modalType,
-    isOpen: modalType !== null,
-  });
+  } = useCustomersList({ modalType, isOpen: modalType !== null });
 
   const refreshAll = () => {
     refreshMetrics();
     refreshCustomers();
-  };
-
-  // Handlers para ações dos clientes
-  const handleWhatsApp = (customer: Customer) => {
-    sendGenericMessage(customer);
   };
 
   const handleCheckStoreCampinas = async (customer: Customer) => {
@@ -114,7 +105,6 @@ function Dashboard() {
     setArchiveModalOpen(true);
   };
 
-  // Função para abrir modal de arquivamento
   const handleArchive = (customer: Customer) => {
     setModalType(null); // Fecha o modal de lista primeiro
     setCustomerToArchive(customer);
@@ -160,12 +150,13 @@ function Dashboard() {
     }
   };
 
-  // Função para obter título do modal
   const getModalTitle = () => {
-    if (modalType === 'awaiting') return 'Clientes Aguardando';
+    if (modalType === 'awaiting')
+      return `Clientes Aguardando (${metrics.totalActive})`;
     if (modalType === 'awaiting_transfer')
       return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
-    if (modalType === 'ready_for_pickup') return 'Pronto para Retirada';
+    if (modalType === 'ready_for_pickup')
+      return `Pronto para Retirada (${metrics.totalReadyForPickup})`;
     return '';
   };
 
@@ -301,16 +292,16 @@ function Dashboard() {
         title={getModalTitle()}
         customers={customers}
         loading={customersLoading}
-        onWhatsApp={handleWhatsApp}
+        onSendMessage={sendGenericMessage}
         onArchive={handleArchive}
-        onCheckLojaCampinas={handleCheckStoreCampinas}
-        onCheckLojaDomPedro={handleCheckStoreDomPedro}
-        onProductArrived={handleProductArrived}
-        onPurchaseCompleted={handleCompleteOrder}
-        onStoreHasStock={handleConfirmStoreStock}
-        onStoreNoStock={handleRejectStoreStock}
-        onClientAccepted={handleAcceptTransfer}
-        onClientDeclined={handleDeclineTransfer}
+        checkStoreCampinas={handleCheckStoreCampinas}
+        checkStoreDomPedro={handleCheckStoreDomPedro}
+        productArrived={handleProductArrived}
+        completeOrder={handleCompleteOrder}
+        confirmStoreStock={handleConfirmStoreStock}
+        rejectStoreStock={handleRejectStoreStock}
+        acceptTransfer={handleAcceptTransfer}
+        declineTransfer={handleDeclineTransfer}
       />
 
       {/* Modal de Arquivamento */}

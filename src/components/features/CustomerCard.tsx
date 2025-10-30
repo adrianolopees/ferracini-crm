@@ -9,41 +9,41 @@ import { getCustomerStatus } from '@/utils/customerStatus';
 interface CustomerCardProps {
   customer: Customer;
   variant?: 'default' | 'compact' | 'finalized';
-  onWhatsApp?: (customer: Customer) => void;
+  onSendMessage?: (customer: Customer) => void;
   onArchive?: (customer: Customer) => void;
   onDelete?: (customer: Customer) => void;
   onRestore?: (customer: Customer) => void;
   showActions?: boolean;
 
   // Dashboard-specific actions
-  onCheckLojaCampinas?: (customer: Customer) => void;
-  onCheckLojaDomPedro?: (customer: Customer) => void;
-  onStoreHasStock?: (customer: Customer) => void;
-  onStoreNoStock?: (customer: Customer) => void;
-  onClientAccepted?: (customer: Customer) => void;
-  onClientDeclined?: (customer: Customer) => void;
-  onProductArrived?: (customer: Customer) => void;
-  onPurchaseCompleted?: (customer: Customer) => void;
+  checkStoreCampinas?: (customer: Customer) => void;
+  checkStoreDomPedro?: (customer: Customer) => void;
+  productArrived?: (customer: Customer) => void;
+  completeOrder?: (customer: Customer) => void;
+  confirmStoreStock?: (customer: Customer) => void;
+  rejectStoreStock?: (customer: Customer) => void;
+  acceptTransfer?: (customer: Customer) => void;
+  declineTransfer?: (customer: Customer) => void;
 }
 
 function CustomerCard({
   customer,
   variant = 'default',
-  onWhatsApp,
+  onSendMessage,
   onArchive,
   onDelete,
   onRestore,
   showActions = true,
 
   // Dashboard-specific actions
-  onCheckLojaCampinas,
-  onCheckLojaDomPedro,
-  onStoreHasStock,
-  onStoreNoStock,
-  onClientAccepted,
-  onClientDeclined,
-  onProductArrived,
-  onPurchaseCompleted,
+  checkStoreCampinas,
+  checkStoreDomPedro,
+  productArrived,
+  completeOrder,
+  confirmStoreStock,
+  rejectStoreStock,
+  acceptTransfer,
+  declineTransfer,
 }: CustomerCardProps) {
   const status = getCustomerStatus(customer.createdAt);
   const isFinalized = customer.status === 'completed';
@@ -90,9 +90,9 @@ function CustomerCard({
               <i className="fa-solid fa-box-archive text-lg" />
             </button>
           )}
-          {onWhatsApp && !isFinalized && (
+          {onSendMessage && !isFinalized && (
             <button
-              onClick={() => onWhatsApp(customer)}
+              onClick={() => onSendMessage(customer)}
               className="inline-flex items-center justify-center w-9 h-9 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer shadow-sm"
               title="Enviar WhatsApp"
             >
@@ -233,9 +233,9 @@ function CustomerCard({
               !customer.consultingStore &&
               !customer.storeHasStock && (
                 <>
-                  {onCheckLojaCampinas && (
+                  {checkStoreCampinas && (
                     <button
-                      onClick={() => onCheckLojaCampinas(customer)}
+                      onClick={() => checkStoreCampinas(customer)}
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600 transition-colors cursor-pointer"
                       title="Consultar disponibilidade na Loja Campinas"
                     >
@@ -244,9 +244,9 @@ function CustomerCard({
                     </button>
                   )}
 
-                  {onCheckLojaDomPedro && (
+                  {checkStoreDomPedro && (
                     <button
-                      onClick={() => onCheckLojaDomPedro(customer)}
+                      onClick={() => checkStoreDomPedro(customer)}
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500 text-white text-xs rounded-lg hover:bg-purple-600 transition-colors cursor-pointer"
                       title="Consultar disponibilidade na Loja Dom Pedro"
                     >
@@ -266,9 +266,9 @@ function CustomerCard({
                     📞 Aguardando resposta - {customer.consultingStore}
                   </span>
 
-                  {onStoreHasStock && (
+                  {confirmStoreStock && (
                     <button
-                      onClick={() => onStoreHasStock(customer)}
+                      onClick={() => confirmStoreStock(customer)}
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
                       title="Loja confirmou que tem o produto"
                     >
@@ -277,9 +277,9 @@ function CustomerCard({
                     </button>
                   )}
 
-                  {onStoreNoStock && (
+                  {rejectStoreStock && (
                     <button
-                      onClick={() => onStoreNoStock(customer)}
+                      onClick={() => rejectStoreStock(customer)}
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
                       title="Loja não tem o produto"
                     >
@@ -299,9 +299,9 @@ function CustomerCard({
                     💬 Cliente notificado - {customer.consultingStore}
                   </span>
 
-                  {onClientAccepted && (
+                  {acceptTransfer && (
                     <button
-                      onClick={() => onClientAccepted(customer)}
+                      onClick={() => acceptTransfer(customer)}
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-colors cursor-pointer"
                       title="Cliente aceitou aguardar transferência"
                     >
@@ -310,9 +310,9 @@ function CustomerCard({
                     </button>
                   )}
 
-                  {onClientDeclined && (
+                  {declineTransfer && (
                     <button
-                      onClick={() => onClientDeclined(customer)}
+                      onClick={() => declineTransfer(customer)}
                       className="inline-flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white text-xs rounded-lg hover:bg-red-600 transition-colors cursor-pointer"
                       title="Cliente recusou a transferência"
                     >
@@ -324,9 +324,9 @@ function CustomerCard({
               )}
 
             {/* Status: AGUARDANDO TRANSFERÊNCIA - Botão de produto chegou */}
-            {customer.status === 'awaiting_transfer' && onProductArrived && (
+            {customer.status === 'awaiting_transfer' && productArrived && (
               <button
-                onClick={() => onProductArrived(customer)}
+                onClick={() => productArrived(customer)}
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-xs rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
                 title="Produto chegou"
               >
@@ -336,9 +336,9 @@ function CustomerCard({
             )}
 
             {/* Status: PRONTO PARA RETIRADA - Botão de compra concluída */}
-            {customer.status === 'ready_for_pickup' && onPurchaseCompleted && (
+            {customer.status === 'ready_for_pickup' && completeOrder && (
               <button
-                onClick={() => onPurchaseCompleted(customer)}
+                onClick={() => completeOrder(customer)}
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 text-white text-xs rounded-lg hover:bg-emerald-600 transition-colors cursor-pointer"
                 title="Cliente comprou"
               >
@@ -348,7 +348,7 @@ function CustomerCard({
             )}
 
             {/* Status: FINALIZADO - Mostrar apenas info */}
-            {customer.status === 'completed' && onPurchaseCompleted && (
+            {customer.status === 'completed' && completeOrder && (
               <span className="text-xs text-emerald-700 bg-emerald-100 px-2 py-1 rounded">
                 ✓ Venda Concluída
               </span>
