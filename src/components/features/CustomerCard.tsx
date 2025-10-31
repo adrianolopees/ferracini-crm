@@ -1,4 +1,4 @@
-import { Customer } from '@/types/customer';
+import { Customer, ArchiveReason } from '@/types/customer';
 import {
   formatDistanceToNow,
   formatDateTime,
@@ -7,9 +7,33 @@ import {
 import { getCustomerStatus } from '@/utils/customerStatus';
 import { Button } from '@/components/ui';
 
+// Mapear motivos de arquivamento para labels em português
+const getArchiveReasonLabel = (reason?: ArchiveReason): string => {
+  const labels: Record<ArchiveReason, string> = {
+    gave_up: 'Desistiu',
+    no_response: 'Não Respondeu',
+    bought_elsewhere: 'Comprou Fora',
+    product_unavailable: 'Indisponível',
+    other: 'Outro',
+  };
+  return reason ? labels[reason] : 'Arquivado';
+};
+
+// Mapear motivos para cores
+const getArchiveReasonColor = (reason?: ArchiveReason) => {
+  const colors: Record<ArchiveReason, { icon: string; bg: string; text: string; border: string }> = {
+    gave_up: { icon: 'fa-circle-xmark', bg: 'bg-red-50', text: 'text-red-700', border: 'border-l-red-500' },
+    no_response: { icon: 'fa-comment-slash', bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-l-yellow-500' },
+    bought_elsewhere: { icon: 'fa-store-slash', bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-l-purple-500' },
+    product_unavailable: { icon: 'fa-box-open', bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-l-orange-500' },
+    other: { icon: 'fa-archive', bg: 'bg-gray-50', text: 'text-gray-700', border: 'border-l-gray-500' },
+  };
+  return reason ? colors[reason] : colors.other;
+};
+
 interface CustomerCardProps {
   customer: Customer;
-  variant?: 'default' | 'compact' | 'finalized' | 'transfer';
+  variant?: 'default' | 'compact' | 'finalized' | 'transfer' | 'archived';
   onSendMessage?: (customer: Customer) => void;
   onArchive?: (customer: Customer) => void;
   onDelete?: (customer: Customer) => void;
@@ -57,103 +81,270 @@ function CustomerCard({
       ? 'border-l-orange-500 bg-orange-50'
       : status.borderClass + ' bg-gray-50';
 
-  // Variant TRANSFER - Layout focado em relatório
-  if (variant === 'transfer') {
+  // Variant ARCHIVED - Layout compacto com motivo em destaque
+  if (variant === 'archived') {
+    const reasonColors = getArchiveReasonColor(customer.archiveReason);
+    const reasonLabel = getArchiveReasonLabel(customer.archiveReason);
+    const daysWaiting = customer.archivedAt
+      ? formatDaysElapsed(customer.createdAt, customer.archivedAt)
+      : null;
+
     return (
-      <div className="border-l-4 border-l-blue-500 bg-blue-50/30 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-        {/* Header: Nome + Badge */}
-        <div className="flex items-center justify-between mb-3">
+      <div className={`border-l-4 ${reasonColors.border} ${reasonColors.bg} rounded-lg p-3 hover:shadow-md transition-shadow duration-200`}>
+        {/* Header: Nome + Vendedor + Badge Motivo */}
+        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-semibold text-gray-900 text-base">{customer.name}</h3>
+            <h3 className="font-semibold text-gray-900 text-sm">
+              {customer.name}
+            </h3>
             {customer.salesperson && (
-              <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                {customer.salesperson}
+              <span className="text-xs font-medium text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
+                @{customer.salesperson}
               </span>
             )}
           </div>
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-700 bg-blue-100 px-2 py-1 rounded">
-            <i className="fa-solid fa-arrows-turn-right"></i>
-            Transferência
+          <span className={`inline-flex items-center gap-1 text-xs font-semibold ${reasonColors.bg} ${reasonColors.text} px-2 py-0.5 rounded-full border ${reasonColors.border}`}>
+            <i className={`fa-solid ${reasonColors.icon} text-[10px]`}></i>
+            {reasonLabel}
+          </span>
+        </div>
+
+        {/* Produto em linha compacta */}
+        <div className="mb-2 text-xs text-gray-700">
+          <i className="fa-solid fa-box text-gray-400 text-[10px] mr-1"></i>
+          <span className="font-semibold">{customer.model}</span>
+          <span className="text-gray-400 mx-1">•</span>
+          <span>{customer.reference}</span>
+          <span className="text-gray-400 mx-1">•</span>
+          <span>Nº {customer.size}</span>
+          <span className="text-gray-400 mx-1">•</span>
+          <span>{customer.color}</span>
+        </div>
+
+        {/* Timeline de arquivamento */}
+        <div className="space-y-1 text-xs mb-2">
+          {customer.archivedAt && (
+            <div className="flex items-center gap-1.5">
+              <i className="fa-solid fa-calendar-xmark text-gray-400 text-[10px]"></i>
+              <span className="text-gray-600">Arquivado há</span>
+              <span className="font-medium text-gray-900">
+                {formatDistanceToNow(customer.archivedAt)}
+              </span>
+            </div>
+          )}
+          {daysWaiting && (
+            <div className="flex items-center gap-1.5">
+              <i className="fa-solid fa-clock text-gray-400 text-[10px]"></i>
+              <span className="text-gray-600">Ficou</span>
+              <span className="font-medium text-gray-900">{daysWaiting}</span>
+              <span className="text-gray-600">aguardando</span>
+            </div>
+          )}
+        </div>
+
+        {/* Nota/Observação */}
+        {customer.notes && (
+          <div className="text-xs bg-white/50 rounded px-2 py-1.5 border border-gray-200 mb-2">
+            <i className="fa-solid fa-comment-dots text-gray-400 text-[10px] mr-1"></i>
+            <span className="text-gray-600 italic">"{customer.notes}"</span>
+          </div>
+        )}
+
+        {/* Botões de Ação */}
+        {(onRestore || onDelete) && (
+          <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
+            {onRestore && (
+              <button
+                onClick={() => onRestore(customer)}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded transition-colors"
+                title="Restaurar para Pronto para Retirada"
+              >
+                <i className="fa-solid fa-arrow-rotate-left text-[10px]"></i>
+                <span>Restaurar</span>
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => onDelete(customer)}
+                className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded transition-colors"
+                title="Excluir permanentemente"
+              >
+                <i className="fa-solid fa-trash text-[10px]"></i>
+                <span>Excluir</span>
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Variant TRANSFER - Layout focado em relatório
+  if (variant === 'transfer') {
+    // Determinar cor da loja
+    const storeColor =
+      customer.sourceStore === 'Campinas'
+        ? {
+            border: 'border-l-blue-500',
+            bg: 'bg-blue-50/30',
+            icon: 'text-blue-500',
+            badge: 'bg-blue-100 text-blue-700',
+            storeBadge: 'bg-blue-500 text-white',
+            timeline: 'border-blue-200',
+          }
+        : {
+            border: 'border-l-purple-500',
+            bg: 'bg-purple-50/30',
+            icon: 'text-purple-500',
+            badge: 'bg-purple-100 text-purple-700',
+            storeBadge: 'bg-purple-500 text-white',
+            timeline: 'border-purple-200',
+          };
+
+    // Calcular tempo de transferência (entre solicitado e chegou)
+    const transferDays =
+      customer.contactedAt && customer.transferredAt
+        ? formatDaysElapsed(customer.transferredAt, customer.contactedAt)
+        : null;
+
+    return (
+      <div
+        className={`border-l-4 ${storeColor.border} ${storeColor.bg} rounded-lg p-3 hover:shadow-md transition-shadow duration-200`}
+      >
+        {/* Header: Nome + Badge Tempo + Badge Loja */}
+        <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="font-semibold text-gray-900 text-sm">
+              {customer.name}
+            </h3>
+            {transferDays && (
+              <span className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium">
+                <i className="fa-solid fa-truck-fast text-[10px]"></i>
+                {transferDays}
+              </span>
+            )}
+          </div>
+          <span
+            className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full`}
+          >
+            <i className="fa-solid fa-store text-[10px]"></i>
+            {customer.sourceStore || 'N/A'}
           </span>
         </div>
 
         {/* Grid: Produto | Timeline */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
           {/* COLUNA ESQUERDA: Produto */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <i className="fa-solid fa-box text-blue-500 text-sm"></i>
-              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 mb-2">
+              <i className={`fa-solid fa-box ${storeColor.icon} text-xs`}></i>
+              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide ">
                 Produto
               </span>
             </div>
-            <div className="space-y-1 text-sm">
-              <p className="font-bold text-gray-900">{customer.model}</p>
-              <p className="text-gray-700">{customer.reference}</p>
-              <div className="flex gap-3 text-xs text-gray-600">
-                <span><span className="font-semibold">Nº</span> {customer.size}</span>
+            <div className="space-y-1 text-xs">
+              {/* Modelo */}
+              <div className="flex items-center gap-1.5">
+                <i
+                  className={`fa-solid fa-tag ${storeColor.icon} text-[10px]`}
+                ></i>
+                <span className="text-gray-500">Modelo:</span>
+                <span className="font-medium text-gray-900">
+                  {customer.model}
+                </span>
+              </div>
+
+              {/* Referência */}
+              <div className="flex items-center gap-1.5">
+                <i className="fa-solid fa-barcode text-gray-400 text-[10px]"></i>
+                <span className="text-gray-500">Ref:</span>
+                <span className="font-medium text-gray-900">
+                  {customer.reference}
+                </span>
+              </div>
+
+              {/* Número e Cor */}
+              <div className="flex items-center gap-1.5">
+                <i className="fa-solid fa-ruler text-gray-400 text-[10px]"></i>
+                <span className="text-gray-500">Nº:</span>
+                <span className="font-medium text-gray-900">
+                  {customer.size}
+                </span>
                 <span className="text-gray-400">•</span>
-                <span><span className="font-semibold">Cor</span> {customer.color}</span>
+                <span className="text-gray-500">Cor:</span>
+                <span className="font-medium text-gray-900">
+                  {customer.color}
+                </span>
               </div>
             </div>
           </div>
 
           {/* COLUNA DIREITA: Timeline */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <i className="fa-solid fa-clock-rotate-left text-blue-500 text-sm"></i>
+          <div className="space-y-1">
+            <div className="flex items-center gap-1.5 mb-2">
+              <i
+                className={`fa-solid fa-timeline ${storeColor.icon} text-xs`}
+              ></i>
               <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                Linha do Tempo
+                Timeline
               </span>
             </div>
-            <div className="space-y-2 text-sm">
+            <div className="space-y-1 text-xs">
               {/* Solicitado */}
-              <div className="flex items-start gap-2">
-                <i className="fa-solid fa-circle text-gray-400 text-[6px] mt-1.5"></i>
-                <div>
-                  <span className="text-gray-600">Solicitado:</span>
-                  <span className="font-medium text-gray-900 ml-1">{formatDateTime(customer.createdAt)}</span>
-                </div>
+              <div className="flex items-center gap-1.5">
+                <i className="fa-solid fa-clipboard-list text-gray-400 text-[10px]"></i>
+                <span className="text-gray-500">Solicitado:</span>
+                <span className="font-medium text-gray-900">
+                  {formatDateTime(customer.createdAt)}
+                </span>
               </div>
 
               {/* Chegou na loja */}
               {customer.contactedAt && (
-                <div className="flex items-start gap-2">
-                  <i className="fa-solid fa-circle text-blue-500 text-[6px] mt-1.5"></i>
-                  <div>
-                    <span className="text-gray-600">Chegou:</span>
-                    <span className="font-medium text-gray-900 ml-1">{formatDateTime(customer.contactedAt)}</span>
-                  </div>
+                <div className="flex items-center gap-1.5">
+                  <i
+                    className={`fa-solid fa-location-dot ${storeColor.icon} text-[10px]`}
+                  ></i>
+                  <span className="text-gray-500">Chegou:</span>
+                  <span className="font-medium text-gray-900">
+                    {formatDateTime(customer.contactedAt)}
+                  </span>
                 </div>
               )}
 
               {/* Vendido */}
               {customer.completedAt && (
-                <div className="flex items-start gap-2">
-                  <i className="fa-solid fa-circle text-emerald-500 text-[6px] mt-1.5"></i>
-                  <div>
-                    <span className="text-gray-600">Vendido:</span>
-                    <span className="font-medium text-gray-900 ml-1">{formatDateTime(customer.completedAt)}</span>
-                  </div>
+                <div className="flex items-center gap-1.5">
+                  <i className="fa-solid fa-circle-check text-emerald-500 text-[10px]"></i>
+                  <span className="text-gray-500">Vendido:</span>
+                  <span className="font-medium text-gray-900">
+                    {formatDateTime(customer.completedAt)}
+                  </span>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Footer: Origem + Tempo Total */}
-        <div className="mt-4 pt-3 border-t border-blue-200 flex items-center justify-between flex-wrap gap-2">
-          {/* Loja Origem */}
-          <div className="inline-flex items-center gap-2 text-sm">
-            <i className="fa-solid fa-store text-blue-600"></i>
-            <span className="text-gray-600">Origem:</span>
-            <span className="font-semibold text-blue-700">{customer.sourceStore || 'N/A'}</span>
-          </div>
+        {/* Footer: Vendedor + Tempo Total */}
+        <div
+          className={`mt-2 pt-2 border-t ${storeColor.timeline} flex items-center justify-between flex-wrap gap-2`}
+        >
+          {/* Vendedor */}
+          {customer.salesperson && (
+            <div className="inline-flex items-center gap-1.5 text-xs">
+              <i className="fa-solid fa-user text-gray-400 text-[10px]"></i>
+              <span className="text-gray-600">Vendedor:</span>
+              <span className="font-medium text-blue-600 bg-blue-50">
+                {customer.salesperson}
+              </span>
+            </div>
+          )}
 
           {/* Tempo Total */}
           {customer.completedAt && (
-            <div className="inline-flex items-center gap-2 text-sm">
-              <i className="fa-solid fa-hourglass-end text-purple-600"></i>
+            <div className="inline-flex items-center gap-1.5 text-xs">
+              <i className="fa-solid fa-hourglass-end text-purple-600 text-[10px]"></i>
               <span className="text-gray-600">Tempo total:</span>
               <span className="font-semibold text-purple-700">
                 {formatDaysElapsed(customer.createdAt, customer.completedAt)}
@@ -172,6 +363,7 @@ function CustomerCard({
       {/* Action Buttons - Canto superior direito */}
       {showActions && (
         <div className="absolute top-3 right-3 flex gap-2">
+          {/* Botão resetar para estado inicial */}
           {onResetToInitial &&
             !isFinalized &&
             !isArchived &&
@@ -187,6 +379,7 @@ function CustomerCard({
                 <i className="fa-solid fa-rotate-left text-lg" />
               </button>
             )}
+          {/* Botão restaurar para clientes arquivados */}
           {onRestore && isArchived && (
             <button
               onClick={() => onRestore(customer)}
@@ -196,6 +389,7 @@ function CustomerCard({
               <i className="fa-solid fa-arrow-rotate-left text-lg" />
             </button>
           )}
+          {/* Botão excluir para clientes arquivados */}
           {onDelete && isArchived && (
             <button
               onClick={() => onDelete(customer)}
@@ -205,6 +399,7 @@ function CustomerCard({
               <i className="fa-solid fa-circle-xmark text-lg" />
             </button>
           )}
+          {/* Botão arquivar para clientes ativos */}
           {onArchive && !isFinalized && (
             <button
               onClick={() => onArchive(customer)}
@@ -214,6 +409,7 @@ function CustomerCard({
               <i className="fa-solid fa-box-archive text-lg" />
             </button>
           )}
+          {/* Botão msg generica em todos os cards */}
           {onSendMessage && !isFinalized && (
             <button
               onClick={() => onSendMessage(customer)}

@@ -192,25 +192,45 @@ function History() {
 
             {/* Resumo de Transferências */}
             {activeTab === 'transfers' && transferCustomers.length > 0 && (
-              <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-blue-900 mb-3 flex items-center gap-2">
-                  <i className="fa-solid fa-chart-pie"></i>
-                  Resumo de Transferências
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white rounded-lg p-3 border border-blue-100">
-                    <div className="text-xs text-gray-600 mb-1">Campinas</div>
-                    <div className="text-2xl font-bold text-blue-600">
+              <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-2">
+                  <i className="fa-solid fa-chart-pie text-blue-600 text-sm"></i>
+                  <h3 className="text-sm font-semibold text-gray-800">
+                    Resumo de Transferências
+                  </h3>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Campinas */}
+                  <div className="bg-white rounded-lg p-2.5 border border-blue-200 shadow-sm">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <i className="fa-solid fa-store text-blue-500 text-xs"></i>
+                      <span className="text-xs font-medium text-gray-600">Campinas</span>
+                    </div>
+                    <div className="text-xl font-bold text-blue-600">
                       {transferCustomers.filter(c => c.sourceStore === 'Campinas').length}
                     </div>
-                    <div className="text-xs text-gray-500">vendas concluídas</div>
                   </div>
-                  <div className="bg-white rounded-lg p-3 border border-purple-100">
-                    <div className="text-xs text-gray-600 mb-1">Dom Pedro</div>
-                    <div className="text-2xl font-bold text-purple-600">
+
+                  {/* Dom Pedro */}
+                  <div className="bg-white rounded-lg p-2.5 border border-purple-200 shadow-sm">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <i className="fa-solid fa-store text-purple-500 text-xs"></i>
+                      <span className="text-xs font-medium text-gray-600">Dom Pedro</span>
+                    </div>
+                    <div className="text-xl font-bold text-purple-600">
                       {transferCustomers.filter(c => c.sourceStore === 'Dom Pedro').length}
                     </div>
-                    <div className="text-xs text-gray-500">vendas concluídas</div>
+                  </div>
+
+                  {/* Total */}
+                  <div className="bg-white rounded-lg p-2.5 border border-emerald-200 shadow-sm">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <i className="fa-solid fa-chart-line text-emerald-500 text-xs"></i>
+                      <span className="text-xs font-medium text-gray-600">Total</span>
+                    </div>
+                    <div className="text-xl font-bold text-emerald-600">
+                      {transferCustomers.length}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -258,7 +278,7 @@ function History() {
                     <AnimatedListItem key={customer.id} index={index}>
                       <CustomerCard
                         customer={customer}
-                        variant={isTransferTab ? 'transfer' : 'compact'}
+                        variant={isTransferTab ? 'transfer' : isArchivedTab ? 'archived' : 'compact'}
                         onRestore={isArchivedTab ? handleRestore : undefined}
                         onDelete={isArchivedTab ? handleDelete : undefined}
                       />

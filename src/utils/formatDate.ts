@@ -27,13 +27,17 @@ export const getDaysWaiting = (isoString: string): number => {
 };
 
 export const formatDateTime = (isoString: string): string => {
-  return new Date(isoString).toLocaleString('pt-BR', {
+  const date = new Date(isoString);
+  const dateStr = date.toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
+  });
+  const timeStr = date.toLocaleTimeString('pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
   });
+  return `${dateStr} às ${timeStr}`;
 };
 
 export const formatDaysElapsed = (startDate: string, endDate: string): string => {

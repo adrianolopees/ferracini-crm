@@ -78,6 +78,8 @@ function useCustomerActions() {
       archiveReason: null,
       archivedAt: null,
       notes: null,
+      status: 'ready_for_pickup',
+      contactedAt: new Date().toISOString(),
     });
   };
 
