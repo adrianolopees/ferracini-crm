@@ -10,5 +10,11 @@ body,
 }
 
 body {
+  font-family:
+    'Poppins',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
   overflow-y: auto;
 }

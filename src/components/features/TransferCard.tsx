@@ -1,0 +1,186 @@
+/**
+ * TransferCard Component
+ *
+ * Card usado na página de Histórico > Transferências
+ * Layout focado em relatório de transferências entre lojas
+ *
+ * Exibe:
+ * - Loja de origem
+ * - Timeline completa (solicitado, chegou, vendido)
+ * - Tempo de transferência
+ * - Tempo total do processo
+ * - Informações do produto
+ *
+ * @module components/features/TransferCard
+ */
+
+import { Customer } from '@/types/customer';
+import { formatDateTime, formatDaysElapsed } from '@/utils';
+
+/* ============================================================================
+ * CONSTANTS
+ * ========================================================================= */
+
+/**
+ * Store-specific color schemes
+ */
+const STORE_COLORS = {
+  Campinas: {
+    border: 'border-l-blue-500',
+    bg: 'bg-blue-50/30',
+    icon: 'text-blue-500',
+    storeBadge: 'bg-blue-500 text-white',
+    timeline: 'border-blue-200',
+  },
+  'Dom Pedro': {
+    border: 'border-l-purple-500',
+    bg: 'bg-purple-50/30',
+    icon: 'text-purple-500',
+    storeBadge: 'bg-purple-500 text-white',
+    timeline: 'border-purple-200',
+  },
+} as const;
+
+/* ============================================================================
+ * HELPER FUNCTIONS
+ * ========================================================================= */
+
+/**
+ * Get color configuration for store
+ */
+const getStoreColor = (storeName?: string) => {
+  if (storeName === 'Campinas') return STORE_COLORS.Campinas;
+  if (storeName === 'Dom Pedro') return STORE_COLORS['Dom Pedro'];
+  return STORE_COLORS.Campinas; // Default
+};
+
+/* ============================================================================
+ * TYPES
+ * ========================================================================= */
+
+interface TransferCardProps {
+  customer: Customer;
+}
+
+/* ============================================================================
+ * COMPONENT
+ * ========================================================================= */
+
+function TransferCard({ customer }: TransferCardProps) {
+  const storeColor = getStoreColor(customer.sourceStore);
+
+  // Calculate transfer duration (from requested to arrived)
+  const transferDays =
+    customer.contactedAt && customer.transferredAt
+      ? formatDaysElapsed(customer.transferredAt, customer.contactedAt)
+      : null;
+
+  return (
+    <div
+      className={`border-l-4 ${storeColor.border} ${storeColor.bg} rounded-lg p-4 hover:shadow-md transition-shadow
+  duration-200`}
+    >
+      {/* Header: Name + Transfer Time Badge + Store Badge */}
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <h3 className="font-bold text-gray-900 text-base">{customer.name}</h3>
+          {transferDays && (
+            <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded font-medium">
+              <i className="fa-solid fa-truck-fast text-[10px]"></i>{' '}
+              {transferDays}
+            </span>
+          )}
+        </div>
+        <span
+          className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full`}
+        >
+          <i className="fa-solid fa-location-dot  text-[10px]"></i>
+          {customer.sourceStore || 'N/A'}
+        </span>
+      </div>
+
+      {/* Two Column Layout: Product Details | Timeline */}
+      <div className="space-y-3 gap-3 md:gap-4">
+        {/* LEFT COLUMN: Product Details */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+          <span className="font-semibold text-gray-900">{customer.model}</span>
+          <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
+          <span className="flex items-center gap-1">
+            <i
+              className={`fa-solid fa-barcode ${storeColor.icon} text-[10px]`}
+            ></i>
+            {customer.reference}
+          </span>
+
+          <span className="text-gray-400">•</span>
+
+          <span className="flex items-center gap-1">
+            <i
+              className={`fa-solid fa-ruler ${storeColor.icon} text-[10px]`}
+            ></i>
+            Nº {customer.size}
+          </span>
+
+          <span className="text-gray-400">•</span>
+
+          <span className="flex items-center gap-1">
+            <i
+              className={`fa-solid fa-palette ${storeColor.icon} text-[10px]`}
+            ></i>
+            {customer.color}
+          </span>
+        </div>
+        {/* RIGHT COLUMN: Timeline */}
+        <div className="flex items-center gap-2 text-xs text-gray-600 flex-wrap">
+          <span className="flex items-center gap-1">
+            <i className={`fa-solid fa-clipboard-list ${storeColor.icon}`}></i>
+            {formatDateTime(customer.createdAt)}
+          </span>
+
+          {customer.contactedAt && (
+            <>
+              <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
+              <span className="flex items-center gap-1">
+                <i
+                  className={`fa-solid fa-location-dot ${storeColor.icon}`}
+                ></i>
+                {formatDateTime(customer.contactedAt)}
+              </span>
+            </>
+          )}
+
+          {customer.completedAt && (
+            <>
+              <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
+              <span className="flex items-center gap-1">
+                <i
+                  className={`fa-solid fa-circle-check ${storeColor.icon}`}
+                ></i>
+                {formatDateTime(customer.completedAt)}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Footer: Salesperson + Total Time */}
+      <div
+        className={`mt-2 pt-2 border-t ${storeColor.timeline} flex items-center justify-between flex-wrap gap-2`}
+      >
+        {/* Salesperson */}
+        {customer.salesperson && (
+          <div className="inline-flex items-center gap-1.5 text-xs">
+            <i
+              className={`fa-solid fa-user ${storeColor.icon} text-[10px]`}
+            ></i>
+            <span className="font-medium text-gray-700">
+              {customer.salesperson}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default TransferCard;

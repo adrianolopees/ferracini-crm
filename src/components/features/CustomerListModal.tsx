@@ -1,7 +1,7 @@
 import { DialogModal } from '@/components/ui';
 import { Customer } from '@/types/customer';
 import { AnimatedListItem } from '@/components/animations';
-import CustomerCard from './CustomerCard';
+import WorkflowCard from './WorkflowCard';
 
 interface CustomerListModalProps {
   isOpen: boolean;
@@ -60,9 +60,8 @@ function CustomerListModal({
           <div className="space-y-4">
             {customers.map((customer, index) => (
               <AnimatedListItem key={customer.id} index={index}>
-                <CustomerCard
+                <WorkflowCard
                   customer={customer}
-                  variant="compact"
                   onSendMessage={onSendMessage}
                   onArchive={onArchive}
                   onResetToInitial={onResetToInitial}

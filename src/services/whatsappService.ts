@@ -19,7 +19,7 @@ export function notifyProductArrived(customer: Customer) {
 }
 
 export function notifyOtherStore(customer: Customer) {
-  const message = `Oi ${customer.name}! Ferracini Maxi Shopping aqui! Não temos o ${customer.model} agora, mas temos em outra loja! Podemos trazer pra você e avisar quando chegar. Quer que a gente faça isso?`;
+  const message = `Oi ${customer.name}! Ferracini Maxi Shopping aqui! Temos o modelo que você gostou em outra loja! Podemos trazer pra você e avisar quando chegar. Pode ser?`;
   openWhatsApp(customer.phone, message);
 }
 

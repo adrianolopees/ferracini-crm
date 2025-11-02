@@ -13,7 +13,7 @@ import { Input, PageLayout, ArchiveModal } from '@/components/ui';
 import toast from 'react-hot-toast';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { notifyProductArrived } from '@/services/whatsappService';
-import { CustomerCard } from '@/components/features';
+import { WorkflowCard } from '@/components/features';
 
 function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -177,9 +177,9 @@ function SearchCustomers() {
 
             {customers.map((customer, index) => (
               <AnimatedListItem key={customer.id} index={index}>
-                <CustomerCard
+                <WorkflowCard
                   customer={customer}
-                  onWhatsApp={handleWhatsApp}
+                  onSendMessage={handleWhatsApp}
                   onArchive={handleArchiveClick}
                 />
               </AnimatedListItem>

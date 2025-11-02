@@ -1,17 +1,15 @@
 import { useState, useEffect } from 'react';
-import {
-  collection,
-  getDocs,
-  updateDoc,
-  doc,
-  deleteDoc,
-} from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
 import { Customer } from '@/types/customer';
 import { Input, PageLayout, Tabs, ConfirmModal } from '@/components/ui';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
-import { CustomerCard } from '@/components/features';
+import {
+  TransferCard,
+  ArchivedCard,
+  FinalizedCard,
+} from '@/components/features';
 import { useCustomerActions } from '@/hooks';
 
 type TabType = 'finalized' | 'transfers' | 'archived';
@@ -199,15 +197,22 @@ function History() {
                     Resumo de Transferências
                   </h3>
                 </div>
+
                 <div className="grid grid-cols-3 gap-3">
                   {/* Campinas */}
                   <div className="bg-white rounded-lg p-2.5 border border-blue-200 shadow-sm">
                     <div className="flex items-center gap-1.5 mb-1">
                       <i className="fa-solid fa-store text-blue-500 text-xs"></i>
-                      <span className="text-xs font-medium text-gray-600">Campinas</span>
+                      <span className="text-xs font-medium text-gray-600">
+                        Campinas
+                      </span>
                     </div>
                     <div className="text-xl font-bold text-blue-600">
-                      {transferCustomers.filter(c => c.sourceStore === 'Campinas').length}
+                      {
+                        transferCustomers.filter(
+                          (c) => c.sourceStore === 'Campinas'
+                        ).length
+                      }
                     </div>
                   </div>
 
@@ -215,10 +220,16 @@ function History() {
                   <div className="bg-white rounded-lg p-2.5 border border-purple-200 shadow-sm">
                     <div className="flex items-center gap-1.5 mb-1">
                       <i className="fa-solid fa-store text-purple-500 text-xs"></i>
-                      <span className="text-xs font-medium text-gray-600">Dom Pedro</span>
+                      <span className="text-xs font-medium text-gray-600">
+                        Dom Pedro
+                      </span>
                     </div>
                     <div className="text-xl font-bold text-purple-600">
-                      {transferCustomers.filter(c => c.sourceStore === 'Dom Pedro').length}
+                      {
+                        transferCustomers.filter(
+                          (c) => c.sourceStore === 'Dom Pedro'
+                        ).length
+                      }
                     </div>
                   </div>
 
@@ -226,7 +237,9 @@ function History() {
                   <div className="bg-white rounded-lg p-2.5 border border-emerald-200 shadow-sm">
                     <div className="flex items-center gap-1.5 mb-1">
                       <i className="fa-solid fa-chart-line text-emerald-500 text-xs"></i>
-                      <span className="text-xs font-medium text-gray-600">Total</span>
+                      <span className="text-xs font-medium text-gray-600">
+                        Total
+                      </span>
                     </div>
                     <div className="text-xl font-bold text-emerald-600">
                       {transferCustomers.length}
@@ -276,12 +289,17 @@ function History() {
 
                   return (
                     <AnimatedListItem key={customer.id} index={index}>
-                      <CustomerCard
-                        customer={customer}
-                        variant={isTransferTab ? 'transfer' : isArchivedTab ? 'archived' : 'compact'}
-                        onRestore={isArchivedTab ? handleRestore : undefined}
-                        onDelete={isArchivedTab ? handleDelete : undefined}
-                      />
+                      {isTransferTab ? (
+                        <TransferCard customer={customer} />
+                      ) : isArchivedTab ? (
+                        <ArchivedCard
+                          customer={customer}
+                          onRestore={handleRestore}
+                          onDelete={handleDelete}
+                        />
+                      ) : (
+                        <FinalizedCard customer={customer} />
+                      )}
                     </AnimatedListItem>
                   );
                 })
