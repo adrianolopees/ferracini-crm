@@ -83,9 +83,13 @@ function TransferCard({ customer }: TransferCardProps) {
       {/* Header: Name + Transfer Time Badge + Store Badge */}
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-bold text-gray-900 text-base">{customer.name}</h3>
+          <h3 className="font-semibold text-gray-900 text-base">
+            {customer.name}
+          </h3>
           {transferDays && (
-            <span className="bg-blue-50 text-blue-700 text-xs px-2 py-0.5 rounded font-medium">
+            <span
+              className={`${storeColor.icon} text-xs px-2 py-0.5 rounded font-medium`}
+            >
               <i className="fa-solid fa-truck-fast text-[10px]"></i>{' '}
               {transferDays}
             </span>
@@ -99,11 +103,13 @@ function TransferCard({ customer }: TransferCardProps) {
         </span>
       </div>
 
-      {/* Two Column Layout: Product Details | Timeline */}
+      {/* Product Details | Timeline */}
       <div className="space-y-3 gap-3 md:gap-4">
-        {/* LEFT COLUMN: Product Details */}
+        {/* Product Details */}
         <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
-          <span className="font-semibold text-gray-900">{customer.model}</span>
+          <span className="font-stretch-50% text-gray-900">
+            {customer.model}
+          </span>
           <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
           <span className="flex items-center gap-1">
             <i
@@ -130,7 +136,7 @@ function TransferCard({ customer }: TransferCardProps) {
             {customer.color}
           </span>
         </div>
-        {/* RIGHT COLUMN: Timeline */}
+        {/* Timeline */}
         <div className="flex items-center gap-2 text-xs text-gray-600 flex-wrap">
           <span className="flex items-center gap-1">
             <i className={`fa-solid fa-clipboard-list ${storeColor.icon}`}></i>
@@ -163,11 +169,10 @@ function TransferCard({ customer }: TransferCardProps) {
         </div>
       </div>
 
-      {/* Footer: Salesperson + Total Time */}
+      {/* Footer: Salesperson */}
       <div
         className={`mt-2 pt-2 border-t ${storeColor.timeline} flex items-center justify-between flex-wrap gap-2`}
       >
-        {/* Salesperson */}
         {customer.salesperson && (
           <div className="inline-flex items-center gap-1.5 text-xs">
             <i
