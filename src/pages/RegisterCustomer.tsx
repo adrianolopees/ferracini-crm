@@ -166,14 +166,19 @@ function RegisterCustomer() {
           </div>
 
           <div className="pt-4">
-            <Button type="submit" disabled={isLoading}>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              fullWidth={true}
+              className="flex justify-center items-center"
+            >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
                   <Spinner size="sm" />
                   Salvando...
                 </span>
               ) : (
-                <span className="flex items-center justify-center gap-2">
+                <span className="flex items-center justify-center gap-2 ">
                   <i className="fa-solid fa-bookmark"></i>{' '}
                   {/* Adicione ícone */}
                   Registrar

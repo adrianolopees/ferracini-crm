@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ReactNode } from 'react';
 
 interface AnimatedListItemProps {
@@ -11,11 +11,13 @@ function AnimatedListItem({ children, index = 0 }: AnimatedListItemProps) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
       transition={{
-        duration: 0.4,
-        delay: index * 0.1,
+        duration: 0.3,
+        delay: index * 0.05,
         ease: 'easeOut',
       }}
+      layout
     >
       {children}
     </motion.div>

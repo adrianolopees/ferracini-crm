@@ -4,7 +4,11 @@ import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
 import { Customer } from '@/types/customer';
 import { Input, PageLayout, Tabs, ConfirmModal } from '@/components/ui';
-import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
+import {
+  AnimatedContainer,
+  AnimatedListItem,
+} from '@/components/animations';
+import { AnimatePresence } from 'framer-motion';
 import {
   TransferCard,
   ArchivedCard,
@@ -410,26 +414,31 @@ function History() {
                   </p>
                 </div>
               ) : (
-                filteredCustomers.map((customer, index) => {
-                  const isArchivedTab = activeTab === 'archived';
-                  const isTransferTab = activeTab === 'transfers';
+                <AnimatePresence mode="popLayout">
+                  {filteredCustomers.map((customer, index) => {
+                    const isArchivedTab = activeTab === 'archived';
+                    const isTransferTab = activeTab === 'transfers';
 
-                  return (
-                    <AnimatedListItem key={customer.id} index={index}>
-                      {isTransferTab ? (
-                        <TransferCard customer={customer} />
-                      ) : isArchivedTab ? (
-                        <ArchivedCard
-                          customer={customer}
-                          onRestore={handleRestore}
-                          onDelete={handleDelete}
-                        />
-                      ) : (
-                        <FinalizedCard customer={customer} />
-                      )}
-                    </AnimatedListItem>
-                  );
-                })
+                    return (
+                      <AnimatedListItem
+                        key={`${activeTab}-${customer.id}`}
+                        index={index}
+                      >
+                        {isTransferTab ? (
+                          <TransferCard customer={customer} />
+                        ) : isArchivedTab ? (
+                          <ArchivedCard
+                            customer={customer}
+                            onRestore={handleRestore}
+                            onDelete={handleDelete}
+                          />
+                        ) : (
+                          <FinalizedCard customer={customer} />
+                        )}
+                      </AnimatedListItem>
+                    );
+                  })}
+                </AnimatePresence>
               )}
             </div>
           </Tabs>

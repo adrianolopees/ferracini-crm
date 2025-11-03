@@ -173,9 +173,9 @@ function Dashboard() {
 
   return (
     <PageLayout
-      title="Gestão de"
-      highlight="Clientes"
-      subtitle="Gerencie o fluxo de clientes em tempo real"
+      title="Painel de"
+      highlight="Controle"
+      subtitle="Sistema para gerenciar solicitações de clientes, transferências entre lojas e reposições de estoque"
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-5xl mx-auto">
         {/* Card 1: Clientes Aguardando */}
