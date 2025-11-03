@@ -32,45 +32,6 @@ const ARCHIVE_REASON_LABELS: Record<ArchiveReason, string> = {
   other: 'Outro',
 };
 
-/**
- * Archive reason visual styles
- */
-const ARCHIVE_REASON_COLORS: Record<
-  ArchiveReason,
-  { icon: string; bg: string; text: string; border: string }
-> = {
-  gave_up: {
-    icon: 'fa-circle-xmark',
-    bg: 'bg-red-50',
-    text: 'text-red-700',
-    border: 'border-l-red-500',
-  },
-  no_response: {
-    icon: 'fa-comment-slash',
-    bg: 'bg-yellow-50',
-    text: 'text-yellow-700',
-    border: 'border-l-yellow-500',
-  },
-  bought_elsewhere: {
-    icon: 'fa-store-slash',
-    bg: 'bg-purple-50',
-    text: 'text-purple-700',
-    border: 'border-l-purple-500',
-  },
-  product_unavailable: {
-    icon: 'fa-box-open',
-    bg: 'bg-orange-50',
-    text: 'text-orange-700',
-    border: 'border-l-orange-500',
-  },
-  other: {
-    icon: 'fa-archive',
-    bg: 'bg-gray-50',
-    text: 'text-gray-700',
-    border: 'border-l-gray-500',
-  },
-};
-
 /* ============================================================================
  * HELPER FUNCTIONS
  * ========================================================================= */
@@ -80,13 +41,6 @@ const ARCHIVE_REASON_COLORS: Record<
  */
 const getArchiveReasonLabel = (reason?: ArchiveReason): string => {
   return reason ? ARCHIVE_REASON_LABELS[reason] : 'Arquivado';
-};
-
-/**
- * Get color configuration for archive reason
- */
-const getArchiveReasonColor = (reason?: ArchiveReason) => {
-  return reason ? ARCHIVE_REASON_COLORS[reason] : ARCHIVE_REASON_COLORS.other;
 };
 
 /* ============================================================================
@@ -103,12 +57,7 @@ interface ArchivedCardProps {
  * COMPONENT
  * ========================================================================= */
 
-function ArchivedCard({
-  customer,
-  onRestore,
-  onDelete,
-}: ArchivedCardProps) {
-  const reasonColors = getArchiveReasonColor(customer.archiveReason);
+function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
   const reasonLabel = getArchiveReasonLabel(customer.archiveReason);
 
   // Calculate days waiting before archive
@@ -117,59 +66,60 @@ function ArchivedCard({
     : null;
 
   return (
-    <div
-      className={`border-l-4 ${reasonColors.border} ${reasonColors.bg} rounded-lg p-3 hover:shadow-md transition-shadow duration-200`}
-    >
-      {/* Header: Name + Salesperson + Reason Badge */}
-      <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+    <div className="border-l-4 border-l-gray-400 bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
+      {/* Header: Name + Days Waiting Badge */}
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-semibold text-gray-900 text-sm">
+          <h3 className="font-semibold text-gray-900 text-base">
             {customer.name}
           </h3>
-          {customer.salesperson && (
-            <span className="text-xs font-medium text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded">
-              @{customer.salesperson}
+
+          {/* Badge Days Waiting */}
+          {daysWaiting && (
+            <span className="text-gray-500 text-xs px-2 py-0.5 rounded-full font-medium bg-gray-200">
+              <i className="fa-solid fa-clock text-gray-600 text-[10px] pr-1"></i>
+              {daysWaiting}
             </span>
           )}
         </div>
-        <span
-          className={`inline-flex items-center gap-1 text-xs font-semibold ${reasonColors.bg} ${reasonColors.text} px-2 py-0.5 rounded-full border ${reasonColors.border}`}
-        >
-          <i className={`fa-solid ${reasonColors.icon} text-[10px]`}></i>
-          {reasonLabel}
+
+        {/* Archive Reason Badge */}
+        <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full bg-gray-200">
+          <i className="fa-solid fa-box-archive text-[10px] text-gray-600"></i>
+          <span className="text-gray-700">{reasonLabel}</span>
         </span>
       </div>
 
-      {/* Product Info - Compact Single Line */}
-      <div className="mb-2 text-xs text-gray-700">
-        <i className="fa-solid fa-box text-gray-400 text-[10px] mr-1"></i>
-        <span className="font-semibold">{customer.model}</span>
-        <span className="text-gray-400 mx-1">•</span>
-        <span>{customer.reference}</span>
-        <span className="text-gray-400 mx-1">•</span>
-        <span>Nº {customer.size}</span>
-        <span className="text-gray-400 mx-1">•</span>
-        <span>{customer.color}</span>
+      {/* Product Info - Same format as other cards */}
+      <div className="flex items-center gap-3 text-sm text-gray-600 flex-wrap mb-2">
+        <span className="font-stretch-50% text-gray-900">{customer.model}</span>
+        <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
+        <span className="flex items-center gap-1">
+          <i className="fa-solid fa-barcode text-[10px]"></i>
+          {customer.reference}
+        </span>
+        <span className="text-gray-400">•</span>
+        <span className="flex items-center gap-1">
+          <i className="fa-solid fa-ruler text-[10px]"></i>
+          Nº {customer.size}
+        </span>
+        <span className="text-gray-400">•</span>
+        <span className="flex items-center gap-1">
+          <i className="fa-solid fa-palette text-[10px]"></i>
+          {customer.color}
+        </span>
       </div>
 
       {/* Archive Timeline */}
-      <div className="space-y-1 text-xs mb-2">
+      <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap mb-2">
         {customer.archivedAt && (
-          <div className="flex items-center gap-1.5">
-            <i className="fa-solid fa-calendar-xmark text-gray-400 text-[10px]"></i>
-            <span className="text-gray-600">Arquivado há</span>
-            <span className="font-medium text-gray-900">
+          <>
+            <i className="fa-solid fa-calendar-xmark text-gray-600 text-[10px]"></i>
+            <span className="text-gray-500">Arquivado:</span>
+            <span className="text-gray-700">
               {formatDistanceToNow(customer.archivedAt)}
             </span>
-          </div>
-        )}
-        {daysWaiting && (
-          <div className="flex items-center gap-1.5">
-            <i className="fa-solid fa-clock text-gray-400 text-[10px]"></i>
-            <span className="text-gray-600">Ficou</span>
-            <span className="font-medium text-gray-900">{daysWaiting}</span>
-            <span className="text-gray-600">aguardando</span>
-          </div>
+          </>
         )}
       </div>
 
@@ -181,31 +131,44 @@ function ArchivedCard({
         </div>
       )}
 
-      {/* Action Buttons */}
-      {(onRestore || onDelete) && (
-        <div className="flex items-center gap-2 pt-2 border-t border-gray-200">
-          {onRestore && (
-            <button
-              onClick={() => onRestore(customer)}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-xs font-medium rounded transition-colors"
-              title="Restaurar para Pronto para Retirada"
-            >
-              <i className="fa-solid fa-arrow-rotate-left text-[10px]"></i>
-              <span>Restaurar</span>
-            </button>
-          )}
-          {onDelete && (
-            <button
-              onClick={() => onDelete(customer)}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded transition-colors"
-              title="Excluir permanentemente"
-            >
-              <i className="fa-solid fa-trash text-[10px]"></i>
-              <span>Excluir</span>
-            </button>
-          )}
-        </div>
-      )}
+      {/* Footer: Salesperson + Action Buttons */}
+      <div className="border-t mt-2 pt-2 border-gray-200 flex items-center justify-between gap-2 flex-wrap">
+        {/* Salesperson */}
+        {customer.salesperson && (
+          <div className="inline-flex items-center gap-1.5 text-xs">
+            <i className="fa-solid fa-user text-[10px] text-gray-600"></i>
+            <span className="font-medium text-gray-700">
+              {customer.salesperson}
+            </span>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        {(onRestore || onDelete) && (
+          <div className="flex items-center gap-2">
+            {onRestore && (
+              <button
+                onClick={() => onRestore(customer)}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium rounded-full transition-colors border border-blue-200 cursor-pointer"
+                title="Restaurar para Pronto para Retirada"
+              >
+                <i className="fa-solid fa-arrow-rotate-left text-[10px]"></i>
+                <span>Restaurar</span>
+              </button>
+            )}
+            {onDelete && (
+              <button
+                onClick={() => onDelete(customer)}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 text-xs font-medium rounded-full transition-colors border border-red-200 cursor-pointer"
+                title="Excluir permanentemente"
+              >
+                <i className="fa-solid fa-trash text-[10px]"></i>
+                <span>Excluir</span>
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

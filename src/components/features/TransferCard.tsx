@@ -95,15 +95,9 @@ function TransferCard({ customer }: TransferCardProps) {
             </span>
           )}
         </div>
+
         {/* Source Store */}
         <div className="flex items-center gap-2">
-          {/* Badge "Não vendido" (SÓ se arquivado) */}
-          {customer.archived && (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold bg-orange-500 text-white px-2 py-0.5 rounded-full">
-              <i className="fa-solid fa-box-archive text-[10px]"></i>
-              Não vendido
-            </span>
-          )}
           {/* Badge da Loja (SEMPRE mostra) */}
           <span
             className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full`}
@@ -192,6 +186,13 @@ function TransferCard({ customer }: TransferCardProps) {
               {customer.salesperson}
             </span>
           </div>
+        )}
+        {/* Badge "Não vendido" (SÓ se arquivado) */}
+        {customer.archived && (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold bg-orange-100 text-gray-500 px-2 py-0.5 rounded-full">
+            <i className="fa-solid fa-box-archive text-[10px]"></i>
+            Não vendido
+          </span>
         )}
       </div>
     </div>

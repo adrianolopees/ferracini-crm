@@ -33,7 +33,3 @@ export interface Customer {
   consultingStore?: 'Campinas' | 'Dom Pedro';
   storeHasStock?: boolean;
 }
-
-export interface ContactedCustomer extends Customer {
-  contactedAt: string;
-}
