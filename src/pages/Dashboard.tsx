@@ -198,9 +198,9 @@ function Dashboard() {
         {/* Card 2: Aguardando Transferência */}
         <AnimatedContainer type="slideDown" delay={0.2}>
           <ActionCard
-            title="Aguardando Transferência"
+            title="Em Transferência"
             value={metrics.totalAwaitingTransfer}
-            subtitle="Produtos em transferência"
+            subtitle="Aguardando transferência"
             icon="fa-solid fa-truck"
             colorScheme="yellow"
             loading={loading}

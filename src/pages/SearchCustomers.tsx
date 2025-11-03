@@ -94,6 +94,7 @@ function SearchCustomers() {
       await updateDoc(doc(db, 'customers', customer.id), {
         status: 'ready_for_pickup',
         contactedAt: new Date().toISOString(),
+        sourceStore: 'Jundiaí',
       });
 
       // 2. Abrir WhatsApp

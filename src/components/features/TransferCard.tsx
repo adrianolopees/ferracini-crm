@@ -90,15 +90,16 @@ function TransferCard({ customer }: TransferCardProps) {
             <span
               className={`${storeColor.icon} text-xs px-2 py-0.5 rounded font-medium`}
             >
-              <i className="fa-solid fa-truck-fast text-[10px]"></i>{' '}
+              <i className="fa-solid fa-truck-fast text-[10px] pr-1"></i>
               {transferDays}
             </span>
           )}
         </div>
+        {/* Source Store */}
         <span
           className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full`}
         >
-          <i className="fa-solid fa-location-dot  text-[10px]"></i>
+          <i className="fa-solid fa-location-dot text-[10px]"></i>
           {customer.sourceStore || 'N/A'}
         </span>
       </div>
@@ -154,7 +155,6 @@ function TransferCard({ customer }: TransferCardProps) {
               </span>
             </>
           )}
-
           {customer.completedAt && (
             <>
               <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>

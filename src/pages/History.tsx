@@ -80,22 +80,20 @@ function History() {
       const snapshot = await getDocs(collection(db, 'customers'));
 
       snapshot.forEach((doc) => {
-        const data = doc.data();
+        const customerData = doc.data();
 
-        if (data.archived) {
-          // Arquivados (exceto finalizados)
-          if (data.status !== 'completed') {
-            archived.push({ id: doc.id, ...data } as Customer);
+        if (customerData.archived) {
+          if (customerData.status !== 'completed') {
+            archived.push({ id: doc.id, ...customerData } as Customer);
           }
-        } else if (data.status === 'completed') {
-          // Vendas finalizadas
-          if (data.sourceStore) {
-            // Transferências (finalizados com loja de origem)
-            transfers.push({ id: doc.id, ...data } as Customer);
-          } else {
-            // Finalizados normais (sem transferência)
-            finalized.push({ id: doc.id, ...data } as Customer);
-          }
+        } else if (customerData.status === 'completed') {
+          finalized.push({ id: doc.id, ...customerData } as Customer);
+        }
+        if (
+          customerData.sourceStore === 'Campinas' ||
+          customerData.sourceStore === 'Dom Pedro'
+        ) {
+          transfers.push({ id: doc.id, ...customerData } as Customer);
         }
       });
 

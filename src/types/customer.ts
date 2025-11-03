@@ -25,7 +25,7 @@ export interface Customer {
   contactedAt?: string;
   transferredAt?: string;
   completedAt?: string;
-  sourceStore?: string;
+  sourceStore?: 'Campinas' | 'Dom Pedro' | 'Jundiaí';
   archived?: boolean;
   archiveReason?: ArchiveReason;
   archivedAt?: string;
