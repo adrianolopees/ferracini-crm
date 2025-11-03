@@ -216,7 +216,7 @@ function History() {
                   {/* Não Finalizados */}
                   <button
                     onClick={() => setTransferFilter('not_finalized')}
-                    className={`rounded-lg p-2.5 border shadow-sm transition-all ${
+                    className={`rounded-lg p-2.5 border shadow-sm transition-all cursor-pointer ${
                       transferFilter === 'not_finalized'
                         ? 'bg-orange-500 border-orange-600 shadow-md scale-105'
                         : 'bg-white border-orange-200 hover:border-orange-400'
@@ -254,7 +254,7 @@ function History() {
                   {/* Campinas */}
                   <button
                     onClick={() => setTransferFilter('Campinas')}
-                    className={`rounded-lg p-2.5 border shadow-sm transition-all ${
+                    className={`rounded-lg p-2.5 border shadow-sm transition-all cursor-pointer ${
                       transferFilter === 'Campinas'
                         ? 'bg-blue-500 border-blue-600 shadow-md scale-105'
                         : 'bg-white border-blue-200 hover:border-blue-400'
@@ -296,7 +296,7 @@ function History() {
                   {/* Dom Pedro */}
                   <button
                     onClick={() => setTransferFilter('Dom Pedro')}
-                    className={`rounded-lg p-2.5 border shadow-sm transition-all ${
+                    className={`rounded-lg p-2.5 border shadow-sm transition-all cursor-pointer ${
                       transferFilter === 'Dom Pedro'
                         ? 'bg-purple-500 border-purple-600 shadow-md scale-105'
                         : 'bg-white border-purple-200 hover:border-purple-400'
@@ -338,7 +338,7 @@ function History() {
                   {/* Total */}
                   <button
                     onClick={() => setTransferFilter('all')}
-                    className={`rounded-lg p-2.5 border shadow-sm transition-all ${
+                    className={`rounded-lg p-2.5 border shadow-sm transition-all cursor-pointer ${
                       transferFilter === 'all'
                         ? 'bg-emerald-500 border-emerald-600 shadow-md scale-105'
                         : 'bg-white border-emerald-200 hover:border-emerald-400'
