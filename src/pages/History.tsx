@@ -21,6 +21,9 @@ function History() {
   const [transferCustomers, setTransferCustomers] = useState<Customer[]>([]);
   const [archivedCustomers, setArchivedCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
+  const [transferFilter, setTransferFilter] = useState<
+    'all' | 'Campinas' | 'Dom Pedro' | 'not_finalized'
+  >('all');
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
@@ -37,16 +40,28 @@ function History() {
   // Limpar busca ao trocar de tab
   useEffect(() => {
     setSearchTerm('');
+    setTransferFilter('all');
   }, [activeTab]);
 
   // Filtrar quando mudar busca ou listas
   useEffect(() => {
-    const customers =
+    let customers =
       activeTab === 'finalized'
         ? finalizedCustomers
         : activeTab === 'transfers'
           ? transferCustomers
           : archivedCustomers;
+
+    customers =
+      activeTab === 'transfers' && transferFilter !== 'all'
+        ? transferFilter === 'Campinas'
+          ? customers.filter((c) => c.sourceStore === 'Campinas')
+          : transferFilter === 'Dom Pedro'
+            ? customers.filter((c) => c.sourceStore === 'Dom Pedro')
+            : transferFilter === 'not_finalized'
+              ? customers.filter((c) => c.archived)
+              : customers
+        : customers;
 
     if (searchTerm.trim() === '') {
       setFilteredCustomers(customers);
@@ -67,6 +82,7 @@ function History() {
     finalizedCustomers,
     transferCustomers,
     archivedCustomers,
+    transferFilter,
   ]);
 
   const fetchAllCustomers = async () => {
@@ -186,63 +202,176 @@ function History() {
               />
             </div>
 
-            {/* Resumo de Transferências */}
+            {/* Resumo de Transferências com Filtros */}
             {activeTab === 'transfers' && transferCustomers.length > 0 && (
               <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <i className="fa-solid fa-chart-pie text-blue-600 text-sm"></i>
+                  <i className="fa-solid fa-filter text-blue-600 text-sm"></i>
                   <h3 className="text-sm font-semibold text-gray-800">
-                    Resumo de Transferências
+                    Filtros de Transferências
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3">
-                  {/* Campinas */}
-                  <div className="bg-white rounded-lg p-2.5 border border-blue-200 shadow-sm">
+                <div className="grid grid-cols-4 gap-3">
+                  {/* Não Finalizados */}
+                  <button
+                    onClick={() => setTransferFilter('not_finalized')}
+                    className={`rounded-lg p-2.5 border shadow-sm transition-all ${
+                      transferFilter === 'not_finalized'
+                        ? 'bg-orange-500 border-orange-600 shadow-md scale-105'
+                        : 'bg-white border-orange-200 hover:border-orange-400'
+                    }`}
+                  >
                     <div className="flex items-center gap-1.5 mb-1">
-                      <i className="fa-solid fa-store text-blue-500 text-xs"></i>
-                      <span className="text-xs font-medium text-gray-600">
+                      <i
+                        className={`fa-solid fa-box-archive text-xs ${
+                          transferFilter === 'not_finalized'
+                            ? 'text-white'
+                            : 'text-orange-500'
+                        }`}
+                      ></i>
+                      <span
+                        className={`text-xs font-medium ${
+                          transferFilter === 'not_finalized'
+                            ? 'text-white'
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        Não Finalizados
+                      </span>
+                    </div>
+                    <div
+                      className={`text-xl font-bold ${
+                        transferFilter === 'not_finalized'
+                          ? 'text-white'
+                          : 'text-orange-600'
+                      }`}
+                    >
+                      {transferCustomers.filter((c) => c.archived).length}
+                    </div>
+                  </button>
+
+                  {/* Campinas */}
+                  <button
+                    onClick={() => setTransferFilter('Campinas')}
+                    className={`rounded-lg p-2.5 border shadow-sm transition-all ${
+                      transferFilter === 'Campinas'
+                        ? 'bg-blue-500 border-blue-600 shadow-md scale-105'
+                        : 'bg-white border-blue-200 hover:border-blue-400'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <i
+                        className={`fa-solid fa-store text-xs ${
+                          transferFilter === 'Campinas'
+                            ? 'text-white'
+                            : 'text-blue-500'
+                        }`}
+                      ></i>
+                      <span
+                        className={`text-xs font-medium ${
+                          transferFilter === 'Campinas'
+                            ? 'text-white'
+                            : 'text-gray-600'
+                        }`}
+                      >
                         Campinas
                       </span>
                     </div>
-                    <div className="text-xl font-bold text-blue-600">
+                    <div
+                      className={`text-xl font-bold ${
+                        transferFilter === 'Campinas'
+                          ? 'text-white'
+                          : 'text-blue-600'
+                      }`}
+                    >
                       {
                         transferCustomers.filter(
                           (c) => c.sourceStore === 'Campinas'
                         ).length
                       }
                     </div>
-                  </div>
+                  </button>
 
                   {/* Dom Pedro */}
-                  <div className="bg-white rounded-lg p-2.5 border border-purple-200 shadow-sm">
+                  <button
+                    onClick={() => setTransferFilter('Dom Pedro')}
+                    className={`rounded-lg p-2.5 border shadow-sm transition-all ${
+                      transferFilter === 'Dom Pedro'
+                        ? 'bg-purple-500 border-purple-600 shadow-md scale-105'
+                        : 'bg-white border-purple-200 hover:border-purple-400'
+                    }`}
+                  >
                     <div className="flex items-center gap-1.5 mb-1">
-                      <i className="fa-solid fa-store text-purple-500 text-xs"></i>
-                      <span className="text-xs font-medium text-gray-600">
+                      <i
+                        className={`fa-solid fa-store text-xs ${
+                          transferFilter === 'Dom Pedro'
+                            ? 'text-white'
+                            : 'text-purple-500'
+                        }`}
+                      ></i>
+                      <span
+                        className={`text-xs font-medium ${
+                          transferFilter === 'Dom Pedro'
+                            ? 'text-white'
+                            : 'text-gray-600'
+                        }`}
+                      >
                         Dom Pedro
                       </span>
                     </div>
-                    <div className="text-xl font-bold text-purple-600">
+                    <div
+                      className={`text-xl font-bold ${
+                        transferFilter === 'Dom Pedro'
+                          ? 'text-white'
+                          : 'text-purple-600'
+                      }`}
+                    >
                       {
                         transferCustomers.filter(
                           (c) => c.sourceStore === 'Dom Pedro'
                         ).length
                       }
                     </div>
-                  </div>
+                  </button>
 
                   {/* Total */}
-                  <div className="bg-white rounded-lg p-2.5 border border-emerald-200 shadow-sm">
+                  <button
+                    onClick={() => setTransferFilter('all')}
+                    className={`rounded-lg p-2.5 border shadow-sm transition-all ${
+                      transferFilter === 'all'
+                        ? 'bg-emerald-500 border-emerald-600 shadow-md scale-105'
+                        : 'bg-white border-emerald-200 hover:border-emerald-400'
+                    }`}
+                  >
                     <div className="flex items-center gap-1.5 mb-1">
-                      <i className="fa-solid fa-chart-line text-emerald-500 text-xs"></i>
-                      <span className="text-xs font-medium text-gray-600">
+                      <i
+                        className={`fa-solid fa-chart-line text-xs ${
+                          transferFilter === 'all'
+                            ? 'text-white'
+                            : 'text-emerald-500'
+                        }`}
+                      ></i>
+                      <span
+                        className={`text-xs font-medium ${
+                          transferFilter === 'all'
+                            ? 'text-white'
+                            : 'text-gray-600'
+                        }`}
+                      >
                         Total
                       </span>
                     </div>
-                    <div className="text-xl font-bold text-emerald-600">
+                    <div
+                      className={`text-xl font-bold ${
+                        transferFilter === 'all'
+                          ? 'text-white'
+                          : 'text-emerald-600'
+                      }`}
+                    >
                       {transferCustomers.length}
                     </div>
-                  </div>
+                  </button>
                 </div>
               </div>
             )}

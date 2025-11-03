@@ -96,12 +96,21 @@ function TransferCard({ customer }: TransferCardProps) {
           )}
         </div>
         {/* Source Store */}
-        <span
-          className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full`}
-        >
-          <i className="fa-solid fa-location-dot text-[10px]"></i>
-          {customer.sourceStore || 'N/A'}
-        </span>
+        {customer.archived ? (
+          // Cliente arquivado - badge laranja
+          <span className="inline-flex items-center gap-1 text-xs font-semibold bg-orange-500 text-white px-2 py-0.5 rounded-full">
+            <i className="fa-solid fa-box-archive text-[10px]"></i>
+            Não vendido
+          </span>
+        ) : (
+          // Cliente vendido - badge da loja
+          <span
+            className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full`}
+          >
+            <i className="fa-solid fa-location-dot text-[10px]"></i>
+            {customer.sourceStore || 'N/A'}
+          </span>
+        )}
       </div>
 
       {/* Product Details | Timeline */}
