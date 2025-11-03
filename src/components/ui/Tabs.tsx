@@ -18,11 +18,8 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
   return (
     <div className="w-full overflow-hidden">
       {/* Tab Headers */}
-      <div className="border-b border-gray-200 mb-6 ">
-        <nav
-          className="flex w-full max-w-full overflow-hidden border-collapse "
-          aria-label="Tabs"
-        >
+      <div className="border-b border-gray-200 mb-4 sm:mb-6">
+        <nav className="flex w-full -mb-px" aria-label="Tabs">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -33,7 +30,7 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
                   onTabChange(tab.id);
                 }}
                 className={`
-                  flex-1 px-1 sm:px-3 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors flex items-center justify-center gap-1.5 sm:gap-2 box-border cursor-pointer
+                  flex-1 px-2 sm:px-4 py-3 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 cursor-pointer
                   ${
                     isActive
                       ? 'border-blue-500 text-blue-600'
@@ -41,35 +38,29 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
                   }
                 `}
               >
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  {tab.icon && (
-                    <i className={`${tab.icon} text-xs sm:text-base`}></i>
-                  )}
-                  <span className="hidden min-[500px]:inline">{tab.label}</span>
-                  <span className="min-[500px]:hidden">
-                    {tab.label.includes('Finalizadas')
-                      ? 'Vendas'
-                      : tab.label.includes('Contactados')
-                        ? 'Contato'
-                        : tab.label.includes('Arquivados')
-                          ? 'Arquivo'
-                          : tab.label}
-                  </span>
-                  {tab.count !== undefined && (
-                    <span
-                      className={`
-                      px-1.5 sm:px-2 py-0.5 rounded-full text-xs font-semibold
+                {/* Ícone - maior em mobile */}
+                {tab.icon && (
+                  <i className={`${tab.icon} text-xl sm:text-base`}></i>
+                )}
+
+                {/* Label - apenas desktop */}
+                <span className="hidden sm:inline">{tab.label}</span>
+
+                {/* Badge de contagem */}
+                {tab.count !== undefined && (
+                  <span
+                    className={`
+                      px-2 py-0.5 rounded-full text-xs font-semibold
                       ${
                         isActive
                           ? 'bg-blue-100 text-blue-600'
                           : 'bg-gray-100 text-gray-600'
                       }
                     `}
-                    >
-                      {tab.count}
-                    </span>
-                  )}
-                </div>
+                  >
+                    {tab.count}
+                  </span>
+                )}
               </button>
             );
           })}

@@ -77,18 +77,17 @@ function TransferCard({ customer }: TransferCardProps) {
 
   return (
     <div
-      className={`border-l-4 ${storeColor.border} ${storeColor.bg} rounded-lg p-4 hover:shadow-md transition-shadow
-  duration-200`}
+      className={`border-l-4 ${storeColor.border} ${storeColor.bg} rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200`}
     >
       {/* Header: Name + Transfer Time Badge + Store Badge */}
-      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-semibold text-gray-900 text-base">
+      <div className="flex items-start justify-between mb-3 gap-2">
+        <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
             {customer.name}
           </h3>
           {transferDays && (
             <span
-              className={`${storeColor.icon} text-xs px-2 py-0.5 rounded font-medium`}
+              className={`${storeColor.icon} text-xs px-2 py-1 rounded font-medium whitespace-nowrap`}
             >
               <i className="fa-solid fa-truck-fast text-[10px] pr-1"></i>
               {transferDays}
@@ -96,44 +95,37 @@ function TransferCard({ customer }: TransferCardProps) {
           )}
         </div>
 
-        {/* Source Store */}
-        <div className="flex items-center gap-2">
-          {/* Badge da Loja (SEMPRE mostra) */}
-          <span
-            className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full`}
-          >
-            <i className="fa-solid fa-location-dot text-[10px]"></i>
-            {customer.sourceStore || 'N/A'}
-          </span>
-        </div>
+        {/* Source Store - sempre no topo direito */}
+        <span
+          className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0`}
+        >
+          <i className="fa-solid fa-location-dot text-[10px]"></i>
+          {customer.sourceStore || 'N/A'}
+        </span>
       </div>
 
       {/* Product Details | Timeline */}
-      <div className="space-y-3 gap-3 md:gap-4">
+      <div className="space-y-2 sm:space-y-3">
         {/* Product Details */}
-        <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+        <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
           <span className="font-stretch-50% text-gray-900">
             {customer.model}
           </span>
-          <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
+          <span className="text-gray-400">•</span>
           <span className="flex items-center gap-1">
             <i
               className={`fa-solid fa-barcode ${storeColor.icon} text-[10px]`}
             ></i>
             {customer.reference}
           </span>
-
           <span className="text-gray-400">•</span>
-
           <span className="flex items-center gap-1">
             <i
               className={`fa-solid fa-ruler ${storeColor.icon} text-[10px]`}
             ></i>
             Nº {customer.size}
           </span>
-
           <span className="text-gray-400">•</span>
-
           <span className="flex items-center gap-1">
             <i
               className={`fa-solid fa-palette ${storeColor.icon} text-[10px]`}
@@ -141,41 +133,35 @@ function TransferCard({ customer }: TransferCardProps) {
             {customer.color}
           </span>
         </div>
-        {/* Timeline */}
-        <div className="flex items-center gap-2 text-xs text-gray-600 flex-wrap">
-          <span className="flex items-center gap-1">
+        {/* Timeline - Responsivo: vertical em mobile, horizontal em desktop */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs sm:text-sm text-gray-600">
+          <span className="flex items-center gap-1 whitespace-nowrap">
             <i className={`fa-solid fa-clipboard-list ${storeColor.icon}`}></i>
             {formatDateTime(customer.createdAt)}
           </span>
 
           {customer.contactedAt && (
-            <>
-              <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
-              <span className="flex items-center gap-1">
-                <i
-                  className={`fa-solid fa-location-dot ${storeColor.icon}`}
-                ></i>
-                {formatDateTime(customer.contactedAt)}
-              </span>
-            </>
+            <span className="flex items-center gap-1 whitespace-nowrap">
+              <i
+                className={`fa-solid fa-location-dot ${storeColor.icon}`}
+              ></i>
+              {formatDateTime(customer.contactedAt)}
+            </span>
           )}
           {customer.completedAt && (
-            <>
-              <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
-              <span className="flex items-center gap-1">
-                <i
-                  className={`fa-solid fa-circle-check ${storeColor.icon}`}
-                ></i>
-                {formatDateTime(customer.completedAt)}
-              </span>
-            </>
+            <span className="flex items-center gap-1 whitespace-nowrap">
+              <i
+                className={`fa-solid fa-circle-check ${storeColor.icon}`}
+              ></i>
+              {formatDateTime(customer.completedAt)}
+            </span>
           )}
         </div>
       </div>
 
       {/* Footer: Salesperson */}
       <div
-        className={`mt-2 pt-2 border-t ${storeColor.timeline} flex items-center justify-between flex-wrap gap-2`}
+        className={`mt-2 pt-2 border-t ${storeColor.timeline} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2`}
       >
         {customer.salesperson && (
           <div className="inline-flex items-center gap-1.5 text-xs">
@@ -189,7 +175,7 @@ function TransferCard({ customer }: TransferCardProps) {
         )}
         {/* Badge "Não vendido" (SÓ se arquivado) */}
         {customer.archived && (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold bg-orange-100 text-gray-500 px-2 py-0.5 rounded-full">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold bg-orange-100 text-gray-500 px-2 py-0.5 rounded-full whitespace-nowrap">
             <i className="fa-solid fa-box-archive text-[10px]"></i>
             Não vendido
           </span>

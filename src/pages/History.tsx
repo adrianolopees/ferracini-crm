@@ -186,14 +186,14 @@ function History() {
     >
       {/* Tabs e Conteúdo */}
       <AnimatedContainer type="slideUp" delay={0.2}>
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 mb-6">
           <Tabs
             tabs={tabs}
             activeTab={activeTab}
             onTabChange={(tabId) => setActiveTab(tabId as TabType)}
           >
             {/* Busca */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <Input
                 type="search"
                 placeholder="Digite nome, modelo, referência..."
@@ -204,25 +204,25 @@ function History() {
 
             {/* Resumo de Transferências com Filtros */}
             {activeTab === 'transfers' && transferCustomers.length > 0 && (
-              <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+                <div className="flex items-center gap-2 mb-3">
                   <i className="fa-solid fa-filter text-blue-600 text-sm"></i>
                   <h3 className="text-sm font-semibold text-gray-800">
                     Filtros de Transferências
                   </h3>
                 </div>
 
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                   {/* Não Finalizados */}
                   <button
                     onClick={() => setTransferFilter('not_finalized')}
-                    className={`rounded-lg p-2.5 border shadow-sm transition-all cursor-pointer ${
+                    className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
                       transferFilter === 'not_finalized'
                         ? 'bg-orange-500 border-orange-600 shadow-md scale-105'
                         : 'bg-white border-orange-200 hover:border-orange-400'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 mb-1">
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
                         className={`fa-solid fa-box-archive text-xs ${
                           transferFilter === 'not_finalized'
@@ -231,7 +231,7 @@ function History() {
                         }`}
                       ></i>
                       <span
-                        className={`text-xs font-medium ${
+                        className={`text-xs font-medium truncate ${
                           transferFilter === 'not_finalized'
                             ? 'text-white'
                             : 'text-gray-600'
@@ -241,7 +241,7 @@ function History() {
                       </span>
                     </div>
                     <div
-                      className={`text-xl font-bold ${
+                      className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
                         transferFilter === 'not_finalized'
                           ? 'text-white'
                           : 'text-orange-600'
@@ -254,13 +254,13 @@ function History() {
                   {/* Campinas */}
                   <button
                     onClick={() => setTransferFilter('Campinas')}
-                    className={`rounded-lg p-2.5 border shadow-sm transition-all cursor-pointer ${
+                    className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
                       transferFilter === 'Campinas'
                         ? 'bg-blue-500 border-blue-600 shadow-md scale-105'
                         : 'bg-white border-blue-200 hover:border-blue-400'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 mb-1">
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
                         className={`fa-solid fa-store text-xs ${
                           transferFilter === 'Campinas'
@@ -269,7 +269,7 @@ function History() {
                         }`}
                       ></i>
                       <span
-                        className={`text-xs font-medium ${
+                        className={`text-xs font-medium truncate ${
                           transferFilter === 'Campinas'
                             ? 'text-white'
                             : 'text-gray-600'
@@ -279,7 +279,7 @@ function History() {
                       </span>
                     </div>
                     <div
-                      className={`text-xl font-bold ${
+                      className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
                         transferFilter === 'Campinas'
                           ? 'text-white'
                           : 'text-blue-600'
@@ -296,13 +296,13 @@ function History() {
                   {/* Dom Pedro */}
                   <button
                     onClick={() => setTransferFilter('Dom Pedro')}
-                    className={`rounded-lg p-2.5 border shadow-sm transition-all cursor-pointer ${
+                    className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
                       transferFilter === 'Dom Pedro'
                         ? 'bg-purple-500 border-purple-600 shadow-md scale-105'
                         : 'bg-white border-purple-200 hover:border-purple-400'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 mb-1">
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
                         className={`fa-solid fa-store text-xs ${
                           transferFilter === 'Dom Pedro'
@@ -311,7 +311,7 @@ function History() {
                         }`}
                       ></i>
                       <span
-                        className={`text-xs font-medium ${
+                        className={`text-xs font-medium truncate ${
                           transferFilter === 'Dom Pedro'
                             ? 'text-white'
                             : 'text-gray-600'
@@ -321,7 +321,7 @@ function History() {
                       </span>
                     </div>
                     <div
-                      className={`text-xl font-bold ${
+                      className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
                         transferFilter === 'Dom Pedro'
                           ? 'text-white'
                           : 'text-purple-600'
@@ -338,13 +338,13 @@ function History() {
                   {/* Total */}
                   <button
                     onClick={() => setTransferFilter('all')}
-                    className={`rounded-lg p-2.5 border shadow-sm transition-all cursor-pointer ${
+                    className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
                       transferFilter === 'all'
                         ? 'bg-emerald-500 border-emerald-600 shadow-md scale-105'
                         : 'bg-white border-emerald-200 hover:border-emerald-400'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 mb-1">
+                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
                         className={`fa-solid fa-chart-line text-xs ${
                           transferFilter === 'all'
@@ -353,7 +353,7 @@ function History() {
                         }`}
                       ></i>
                       <span
-                        className={`text-xs font-medium ${
+                        className={`text-xs font-medium truncate ${
                           transferFilter === 'all'
                             ? 'text-white'
                             : 'text-gray-600'
@@ -363,7 +363,7 @@ function History() {
                       </span>
                     </div>
                     <div
-                      className={`text-xl font-bold ${
+                      className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
                         transferFilter === 'all'
                           ? 'text-white'
                           : 'text-emerald-600'
