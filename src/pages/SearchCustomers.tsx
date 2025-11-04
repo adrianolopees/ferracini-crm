@@ -7,13 +7,14 @@ import {
   doc,
   updateDoc,
 } from 'firebase/firestore';
-import { db } from '@/services/firebase';
-import { Customer, ArchiveReason } from '@/types/customer';
-import { Input, PageLayout, ArchiveModal } from '@/components/ui';
 import toast from 'react-hot-toast';
-import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
+import { db } from '@/services/firebase';
 import { notifyProductArrived } from '@/services/whatsappService';
-import { WorkflowCard } from '@/components/features';
+import { Customer, ArchiveReason } from '@/types/customer';
+import { Input, PageLayout } from '@/components/ui';
+import { WorkflowCard } from '@/components/dashboard';
+import { ArchiveModal } from '@/components/modals';
+import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 
 function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');

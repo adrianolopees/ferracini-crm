@@ -1,13 +1,10 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { ArchiveModal, PageLayout } from '@/components/ui';
+import { PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
-import {
-  CustomerListModal,
-  ActionCard,
-  MetricCard,
-} from '@/components/features';
+import { ActionCard, MetricCard } from '@/components/dashboard';
 import { TopProductsChart } from '@/components/charts';
+import { ArchiveModal, CustomerListModal } from '@/components/modals';
 import { useDashboardMetrics, useCustomersList } from '@/hooks';
 import { useCustomerActions } from '@/hooks';
 import { Customer, ArchiveReason } from '@/types/customer';

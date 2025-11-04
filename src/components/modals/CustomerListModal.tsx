@@ -1,7 +1,7 @@
-import { DialogModal } from '@/components/ui';
+import { DialogModal } from '@/components/modals';
 import { Customer } from '@/types/customer';
 import { AnimatedListItem } from '@/components/animations';
-import WorkflowCard from './WorkflowCard';
+import { WorkflowCard } from '@/components/dashboard';
 
 interface CustomerListModalProps {
   isOpen: boolean;

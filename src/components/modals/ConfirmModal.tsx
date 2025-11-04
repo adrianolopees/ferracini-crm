@@ -1,4 +1,4 @@
-import { DialogModal } from '@/components/ui';
+import { DialogModal } from '@/components/modals';
 
 interface ConfirmModalProps {
   isOpen: boolean;

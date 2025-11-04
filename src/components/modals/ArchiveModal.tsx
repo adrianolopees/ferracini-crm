@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DialogModal } from '@/components/ui';
+import { DialogModal } from '@/components/modals';
 import { ArchiveReason } from '@/types/customer';
 
 interface ArchiveModalProps {

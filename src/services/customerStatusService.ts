@@ -6,7 +6,7 @@ export async function updateCustomerStatus(
   customerId: string,
   newStatus: CustomerStatus,
   additionalData?: {
-    sourceStore?: string;
+    sourceStore?: 'Campinas' | 'Dom Pedro' | 'Jundiaí';
   }
 ): Promise<void> {
   const now = new Date().toISOString();
@@ -36,7 +36,7 @@ export async function updateCustomerStatus(
 
 export async function moveToAwaitingTransfer(
   customer: Customer,
-  sourceStore: 'Campinas' | 'Dom Pedro'
+  sourceStore: 'Campinas' | 'Dom Pedro' | 'Jundiaí'
 ): Promise<void> {
   await updateCustomerStatus(customer.id, 'awaiting_transfer', {
     sourceStore,

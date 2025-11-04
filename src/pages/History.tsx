@@ -3,17 +3,15 @@ import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
 import { Customer } from '@/types/customer';
-import { Input, PageLayout, Tabs, ConfirmModal } from '@/components/ui';
-import {
-  AnimatedContainer,
-  AnimatedListItem,
-} from '@/components/animations';
-import { AnimatePresence } from 'framer-motion';
+import { Input, PageLayout, Tabs } from '@/components/ui';
+import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
+import { ConfirmModal } from '@/components/modals';
 import {
   TransferCard,
   ArchivedCard,
   FinalizedCard,
-} from '@/components/features';
+} from '@/components/history';
+import { AnimatePresence } from 'framer-motion';
 import { useCustomerActions } from '@/hooks';
 
 type TabType = 'finalized' | 'transfers' | 'archived';
