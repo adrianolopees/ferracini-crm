@@ -10,13 +10,12 @@
  * 3. PENDING (disponível) -> aguardar resposta do cliente
  * 4. AWAITING_TRANSFER -> produto em trânsito
  * 5. READY_FOR_PICKUP -> produto disponível para retirada
- * 6. COMPLETED -> venda finalizada
  *
  * @module components/features/WorkflowCard
  */
 
 import { Customer } from '@/types/customer';
-import { getTimeAgo, formatDateTime, getDaysBetween } from '@/utils';
+import { getTimeAgo } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
 import { Button } from '@/components/ui';
 
@@ -31,7 +30,6 @@ interface WorkflowCardProps {
   // Generic actions
   onSendMessage?: (customer: Customer) => void;
   onArchive?: (customer: Customer) => void;
-  onRestore?: (customer: Customer) => void;
   onResetToInitial?: (customer: Customer) => void;
 
   // Workflow actions
@@ -54,7 +52,6 @@ function WorkflowCard({
   showActions = true,
   onSendMessage,
   onArchive,
-  onRestore,
   onResetToInitial,
   checkStoreCampinas,
   checkStoreDomPedro,
@@ -67,15 +64,9 @@ function WorkflowCard({
 }: WorkflowCardProps) {
   // Compute customer state
   const status = getCustomerStatus(customer.createdAt);
-  const isFinalized = customer.status === 'completed';
-  const isArchived = customer.archived;
 
   // Determine border styling based on state
-  const borderClass = isFinalized
-    ? 'border-l-emerald-500 bg-emerald-50/50'
-    : isArchived
-      ? 'border-l-orange-500 bg-orange-50'
-      : status.borderClass + ' bg-gray-50';
+  const borderClass = status.borderClass + ' bg-gray-50';
 
   return (
     <div
@@ -86,8 +77,6 @@ function WorkflowCard({
         <div className="hidden md:flex absolute top-3 right-3 flex-col gap-2">
           {/* Reset to Initial State */}
           {onResetToInitial &&
-            !isFinalized &&
-            !isArchived &&
             (customer.consultingStore ||
               customer.status === 'awaiting_transfer' ||
               customer.status === 'ready_for_pickup') && (
@@ -100,19 +89,8 @@ function WorkflowCard({
               </button>
             )}
 
-          {/* Restore Archived */}
-          {onRestore && isArchived && (
-            <button
-              onClick={() => onRestore(customer)}
-              className="inline-flex items-center justify-center w-9 h-9 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer shadow-sm"
-              title="Restaurar cliente"
-            >
-              <i className="fa-solid fa-arrow-rotate-left text-lg" />
-            </button>
-          )}
-
           {/* Archive Active */}
-          {onArchive && !isFinalized && (
+          {onArchive && (
             <button
               onClick={() => onArchive(customer)}
               className="inline-flex items-center justify-center w-9 h-9 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer shadow-sm"
@@ -123,7 +101,7 @@ function WorkflowCard({
           )}
 
           {/* Send WhatsApp Message */}
-          {onSendMessage && !isFinalized && (
+          {onSendMessage && (
             <button
               onClick={() => onSendMessage(customer)}
               className="inline-flex items-center justify-center w-9 h-9 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer shadow-sm"
@@ -136,22 +114,12 @@ function WorkflowCard({
       )}
 
       {/* Header: Name + Badges */}
-      <div className="flex items-start justify-between mb-3 gap-2 md:pr-20">
+      <div className="flex items-start justify-between mb-1 gap-2 md:pr-20">
         <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
             {customer.name}
           </h3>
-          {isFinalized ? (
-            <i
-              className="fa-solid fa-circle-check text-emerald-600 text-sm"
-              title="Venda Concluída"
-            />
-          ) : (
-            <span
-              className={`inline-block w-2 h-2 rounded-full ${status.dotClass}`}
-              title={status.label}
-            />
-          )}
+
           {customer.salesperson && (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full whitespace-nowrap">
               <i className="fa-solid fa-user text-[10px]"></i>
@@ -164,113 +132,69 @@ function WorkflowCard({
       {/* Timeline & Product Info */}
       <div className="space-y-2 sm:space-y-3">
         {/* Timeline based on status - inline with phone on desktop, separate on mobile */}
-        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 flex-wrap">
-          {isFinalized && customer.completedAt ? (
-            // Stage: COMPLETED
-            <>
-              <i className="hidden sm:inline fa-solid fa-calendar-check text-emerald-600 text-[10px]"></i>
-              <span className="text-gray-700">
-                {formatDateTime(customer.completedAt)}
-              </span>
-              <span className="text-gray-400">•</span>
-              <i className="hidden sm:inline fa-solid fa-hourglass-end text-purple-600 text-[10px]"></i>
-              <span className="text-purple-700">
-                {getDaysBetween(customer.createdAt, customer.completedAt)}
-              </span>
-              {customer.sourceStore && (
-                <>
-                  <span className="text-gray-400">•</span>
-                  <i className="hidden sm:inline fa-solid fa-store text-blue-600 text-[10px]"></i>
-                  <span className="text-blue-700">{customer.sourceStore}</span>
-                </>
-              )}
-            </>
-          ) : isArchived && customer.archivedAt ? (
-            // Stage: ARCHIVED
-            <>
-              <i className="hidden sm:inline fa-solid fa-calendar-xmark text-orange-600 text-[10px]"></i>
-              <span className="sm:hidden text-gray-500">Arquivado</span>
-              <span className="hidden sm:inline text-gray-500">Arquivado:</span>
-              <span className="text-gray-700">
-                {getTimeAgo(customer.archivedAt)}
-              </span>
-              {customer.archiveReason && (
-                <>
-                  <span className="text-gray-400">•</span>
-                  <span className="text-gray-600">
-                    {customer.archiveReason}
-                  </span>
-                </>
-              )}
-            </>
-          ) : customer.status === 'ready_for_pickup' && customer.contactedAt ? (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-1 text-xs sm:text-sm sm:flex-wrap">
+          {customer.status === 'ready_for_pickup' && customer.contactedAt ? (
             // Stage: READY FOR PICKUP
-            <>
-              <i className="hidden sm:inline fa-solid fa-clock text-green-600 text-[10px]"></i>
-              <span className="sm:hidden text-gray-500">Pronto</span>
-              <span className="hidden sm:inline text-gray-500">Pronto há:</span>
-              <span className="text-green-700">
-                {getTimeAgo(customer.contactedAt)}
-              </span>
+            <div
+              className={`flex items-center gap-1.5 flex-wrap ${status.textClass}`}
+            >
+              <i
+                className={`fa-solid fa-clock ${status.iconClass} text-[10px]`}
+              ></i>
+              <span>Pronto há:</span>
+              <span>{getTimeAgo(customer.contactedAt)}</span>
               {customer.sourceStore && (
                 <>
-                  <span className="text-gray-400">•</span>
-                  <i className="hidden sm:inline fa-solid fa-store text-blue-600 text-[10px]"></i>
-                  <span className="text-blue-700">{customer.sourceStore}</span>
+                  <span className="text-gray-400 mx-1">•</span>
+                  <i
+                    className={`fa-solid fa-store ${status.iconClass} text-[10px]`}
+                  ></i>
+                  <span>{customer.sourceStore}</span>
                 </>
               )}
-            </>
+            </div>
           ) : customer.status === 'awaiting_transfer' ? (
             // Stage: AWAITING TRANSFER
-            <>
-              <i className="hidden sm:inline fa-solid fa-truck text-blue-600 text-[10px]"></i>
-              <span className="text-gray-500">Transferência:</span>
-              <span className="text-blue-700">
-                {customer.sourceStore || '...'}
-              </span>
+            <div
+              className={`flex items-center gap-1.5 flex-wrap ${status.textClass}`}
+            >
+              <i
+                className={`fa-solid fa-truck ${status.iconClass} text-[10px]`}
+              ></i>
+              <span>Transferência:</span>
+              <span>{customer.sourceStore || '...'}</span>
               {customer.transferredAt && (
                 <>
-                  <span className="text-gray-400">•</span>
-                  <i className="hidden sm:inline fa-solid fa-clock text-gray-500 text-[10px]"></i>
-                  <span className="text-gray-600">
-                    {getTimeAgo(customer.transferredAt)}
-                  </span>
+                  <span className="text-gray-400 mx-1">•</span>
+                  <i
+                    className={`fa-solid fa-clock ${status.iconClass} text-[10px]`}
+                  ></i>
+                  <span>{getTimeAgo(customer.transferredAt)}</span>
                 </>
               )}
-            </>
+            </div>
           ) : (
             // Stage: PENDING (default)
-            <>
-              <i className="hidden sm:inline fa-solid fa-clock text-gray-500 text-[10px]"></i>
-              <span className="sm:hidden text-gray-500">Aguardando</span>
-              <span className="hidden sm:inline text-gray-500">
-                Aguardando há:
-              </span>
-              <span className={status.textClass}>
-                {getTimeAgo(customer.createdAt)}
-              </span>
-            </>
+            <div
+              className={`flex items-center gap-1.5 flex-wrap ${status.textClass}`}
+            >
+              <i
+                className={`fa-solid fa-clock ${status.iconClass} text-[10px]`}
+              ></i>
+              <span>Aguardando há:</span>
+              <span>{getTimeAgo(customer.createdAt)}</span>
+            </div>
           )}
 
           {/* Phone Number - inline on desktop (sm+), separate line on mobile */}
           {showActions && (
-            <>
-              <span className="hidden sm:inline text-gray-400">•</span>
-              <i className="hidden sm:inline fa-solid fa-phone text-gray-500 text-[10px]"></i>
-              <span className="hidden sm:inline text-gray-600">
-                {customer.phone}
-              </span>
-            </>
+            <div className="flex items-center gap-1.5 text-gray-600">
+              <span className="hidden sm:inline text-gray-400 mx-1">•</span>
+              <i className="fa-solid fa-phone text-[10px]"></i>
+              <span>{customer.phone}</span>
+            </div>
           )}
         </div>
-
-        {/* Phone Number - mobile only (separate line) */}
-        {showActions && (
-          <div className="sm:hidden flex items-center gap-2 text-xs text-gray-600">
-            <i className="fa-solid fa-phone text-gray-500 text-[10px]"></i>
-            <span className="text-gray-600">{customer.phone}</span>
-          </div>
-        )}
 
         {/* Product Details - inline on desktop, name highlighted + details below on mobile */}
         <div className="hidden sm:flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
@@ -448,14 +372,6 @@ function WorkflowCard({
             <i className="fa-solid fa-circle-check text-sm sm:text-xs"></i>
             <span className="font-medium">Cliente Comprou</span>
           </button>
-        )}
-
-        {/* STATE 6: Completed - Display Only */}
-        {customer.status === 'completed' && completeOrder && (
-          <span className="inline-flex items-center gap-1 text-xs text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full font-medium">
-            <i className="fa-solid fa-circle-check text-[10px]"></i>
-            Venda Concluída
-          </span>
         )}
       </div>
     </div>

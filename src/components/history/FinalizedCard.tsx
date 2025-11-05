@@ -89,13 +89,21 @@ function HistoryCard({ customer }: HistoryCardProps) {
       </div>
 
       {/* Footer : sourceStore + Salesperson */}
-      <div className="border-t mt-3 pt-2 border-emerald-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <div className="border-t mt-3 pt-2 border-emerald-200 flex flex-row sm:items-center justify-between gap-2">
+        {/* Salesperson */}
+        {customer.salesperson && (
+          <div className="inline-flex items-center gap-1.5 text-xs">
+            <i className="fa-solid fa-user text-[10px] text-gray-600"></i>
+            <span className="font-medium text-gray-700">
+              {customer.salesperson}
+            </span>
+          </div>
+        )}
         {/* Badge de Origem */}
         {customer.sourceStore === 'Jundiaí' ? (
           // Reposição Local
           <div className="inline-flex items-center gap-1.5 text-xs bg-emerald-100 px-2 py-1 rounded-full whitespace-nowrap">
-            <i className="fa-solid fa-box text-[10px] text-gray-600"></i>
-            <span className="text-gray-500">Reposição:</span>
+            <i className="fa-solid fa-store text-[10px] text-gray-600"></i>
             <span className="font-medium text-gray-700">
               {customer.sourceStore}
             </span>
@@ -105,7 +113,6 @@ function HistoryCard({ customer }: HistoryCardProps) {
           // Transferência de outra loja
           <div className="inline-flex items-center gap-1.5 text-xs bg-blue-100 px-2 py-1 rounded-full whitespace-nowrap">
             <i className="fa-solid fa-truck-fast text-[10px] text-gray-600"></i>
-            <span className="text-gray-500">Transferência:</span>
             <span className="font-medium text-gray-700">
               {customer.sourceStore}
             </span>
@@ -115,15 +122,6 @@ function HistoryCard({ customer }: HistoryCardProps) {
           <div className="inline-flex items-center gap-1.5 text-xs text-amber-600">
             <i className="fa-solid fa-triangle-exclamation text-[10px]"></i>
             <span className="font-medium">Adicionar origem</span>
-          </div>
-        )}
-        {/* Salesperson */}
-        {customer.salesperson && (
-          <div className="inline-flex items-center gap-1.5 text-xs">
-            <i className="fa-solid fa-user text-[10px] text-gray-600"></i>
-            <span className="font-medium text-gray-700">
-              {customer.salesperson}
-            </span>
           </div>
         )}
       </div>
