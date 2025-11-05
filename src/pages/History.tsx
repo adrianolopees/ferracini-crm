@@ -149,7 +149,7 @@ function History() {
       toast.success(`${customerToDelete.name} excluído permanentemente!`);
       setDeleteModalOpen(false);
       setCustomerToDelete(null);
-      fetchAllCustomers(); // Recarregar listas
+      fetchAllCustomers();
     } catch (error) {
       console.error('Erro ao excluir cliente:', error);
       toast.error('Erro ao excluir cliente');
