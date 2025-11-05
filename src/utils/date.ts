@@ -41,7 +41,7 @@ export const getDaysWaiting = (isoString: string): number => {
 
 export const getDaysBetween = (startDate: string, endDate: string): string => {
   const diffMs = new Date(endDate).getTime() - new Date(startDate).getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffDays = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
   if (diffDays === 0) return 'Menos de 1 dia';
   return `${diffDays} dia${diffDays > 1 ? 's' : ''}`;
 };

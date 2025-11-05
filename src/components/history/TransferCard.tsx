@@ -69,12 +69,6 @@ interface TransferCardProps {
 function TransferCard({ customer }: TransferCardProps) {
   const storeColor = getStoreColor(customer.sourceStore);
 
-  // Calculate transfer duration (from requested to arrived)
-  const transferDays =
-    customer.contactedAt && customer.transferredAt
-      ? getDaysBetween(customer.transferredAt, customer.contactedAt)
-      : null;
-
   return (
     <div
       className={`border-l-4 ${storeColor.border} ${storeColor.bg} rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200`}
@@ -85,17 +79,17 @@ function TransferCard({ customer }: TransferCardProps) {
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
             {customer.name}
           </h3>
-          {transferDays && (
+          {customer.contactedAt && customer.transferredAt && (
             <span
               className={`${storeColor.icon} text-xs px-2 py-1 rounded font-medium whitespace-nowrap`}
             >
               <i className="fa-solid fa-truck-fast text-[10px] pr-1"></i>
-              {transferDays}
+              {getDaysBetween(customer.transferredAt, customer.contactedAt)}
             </span>
           )}
         </div>
 
-        {/* Source Store - sempre no topo direito */}
+        {/* Source Store */}
         <span
           className={`inline-flex items-center gap-1 text-xs font-semibold ${storeColor.storeBadge} px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0`}
         >
@@ -133,8 +127,9 @@ function TransferCard({ customer }: TransferCardProps) {
             {customer.color}
           </span>
         </div>
-        {/* Timeline - Responsivo: vertical em mobile, horizontal em desktop */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs sm:text-sm text-gray-600">
+
+        {/* Timeline  */}
+        <div className="flex flex-row sm:items-center gap-2 text-xs sm:text-sm text-gray-600">
           <span className="flex items-center gap-1 whitespace-nowrap">
             <i className={`fa-solid fa-clipboard-list ${storeColor.icon}`}></i>
             {formatDate(customer.createdAt)}
@@ -157,7 +152,7 @@ function TransferCard({ customer }: TransferCardProps) {
 
       {/* Footer: Salesperson */}
       <div
-        className={`mt-2 pt-2 border-t ${storeColor.timeline} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2`}
+        className={`mt-2 pt-2 border-t ${storeColor.timeline} flex flex-row sm:items-center justify-between gap-2`}
       >
         {customer.salesperson && (
           <div className="inline-flex items-center gap-1.5 text-xs">
@@ -171,8 +166,10 @@ function TransferCard({ customer }: TransferCardProps) {
         )}
         {/* Badge "Não vendido" (SÓ se arquivado) */}
         {customer.archived && (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold bg-orange-100 text-gray-500 px-2 py-0.5 rounded-full whitespace-nowrap">
-            <i className="fa-solid fa-box-archive text-[10px]"></i>
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 sm:px-1 py-0.5 rounded-full whitespace-nowrap">
+            <i
+              className={`fa-solid fa-box-archive ${storeColor.icon} text-[10px]`}
+            ></i>
             Não vendido
           </span>
         )}
