@@ -15,7 +15,7 @@
  */
 
 import { Customer } from '@/types/customer';
-import { formatDateTime, formatDaysElapsed } from '@/utils';
+import { formatDateTime, getDaysBetween } from '@/utils';
 
 /* ============================================================================
  * TYPES
@@ -43,7 +43,7 @@ function HistoryCard({ customer }: HistoryCardProps) {
           {customer.completedAt && (
             <span className="text-gray-500 text-xs px-2 py-1 rounded-full font-medium bg-gray-100 whitespace-nowrap">
               <i className="fa-solid fa-hourglass-end text-gray-700 text-[10px] pr-1"></i>
-              {formatDaysElapsed(customer.createdAt, customer.completedAt)}
+              {getDaysBetween(customer.createdAt, customer.completedAt)}
             </span>
           )}
         </div>

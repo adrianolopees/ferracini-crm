@@ -1,4 +1,4 @@
-import { getDaysWaiting } from '@/utils/formatDate';
+import { getDaysWaiting } from '@/utils/date';
 
 export function getCustomerStatus(createdAt: string) {
   const daysWaiting = getDaysWaiting(createdAt);

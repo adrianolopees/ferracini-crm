@@ -16,11 +16,7 @@
  */
 
 import { Customer } from '@/types/customer';
-import {
-  formatDistanceToNow,
-  formatDateTime,
-  formatDaysElapsed,
-} from '@/utils';
+import { getTimeAgo, formatDateTime, getDaysBetween } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
 import { Button } from '@/components/ui';
 
@@ -179,7 +175,7 @@ function WorkflowCard({
               <span className="text-gray-400">•</span>
               <i className="hidden sm:inline fa-solid fa-hourglass-end text-purple-600 text-[10px]"></i>
               <span className="text-purple-700">
-                {formatDaysElapsed(customer.createdAt, customer.completedAt)}
+                {getDaysBetween(customer.createdAt, customer.completedAt)}
               </span>
               {customer.sourceStore && (
                 <>
@@ -196,7 +192,7 @@ function WorkflowCard({
               <span className="sm:hidden text-gray-500">Arquivado</span>
               <span className="hidden sm:inline text-gray-500">Arquivado:</span>
               <span className="text-gray-700">
-                {formatDistanceToNow(customer.archivedAt)}
+                {getTimeAgo(customer.archivedAt)}
               </span>
               {customer.archiveReason && (
                 <>
@@ -214,7 +210,7 @@ function WorkflowCard({
               <span className="sm:hidden text-gray-500">Pronto</span>
               <span className="hidden sm:inline text-gray-500">Pronto há:</span>
               <span className="text-green-700">
-                {formatDistanceToNow(customer.contactedAt)}
+                {getTimeAgo(customer.contactedAt)}
               </span>
               {customer.sourceStore && (
                 <>
@@ -237,7 +233,7 @@ function WorkflowCard({
                   <span className="text-gray-400">•</span>
                   <i className="hidden sm:inline fa-solid fa-clock text-gray-500 text-[10px]"></i>
                   <span className="text-gray-600">
-                    {formatDistanceToNow(customer.transferredAt)}
+                    {getTimeAgo(customer.transferredAt)}
                   </span>
                 </>
               )}
@@ -251,7 +247,7 @@ function WorkflowCard({
                 Aguardando há:
               </span>
               <span className={status.textClass}>
-                {formatDistanceToNow(customer.createdAt)}
+                {getTimeAgo(customer.createdAt)}
               </span>
             </>
           )}

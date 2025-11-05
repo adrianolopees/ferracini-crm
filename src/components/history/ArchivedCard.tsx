@@ -15,7 +15,7 @@
  */
 
 import { Customer, ArchiveReason } from '@/types/customer';
-import { formatDistanceToNow, formatDaysElapsed } from '@/utils';
+import { getTimeAgo, getDaysBetween } from '@/utils';
 
 /* ============================================================================
  * CONSTANTS
@@ -62,7 +62,7 @@ function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
 
   // Calculate days waiting before archive
   const daysWaiting = customer.archivedAt
-    ? formatDaysElapsed(customer.createdAt, customer.archivedAt)
+    ? getDaysBetween(customer.createdAt, customer.archivedAt)
     : null;
 
   return (
@@ -117,7 +117,7 @@ function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
             <i className="fa-solid fa-calendar-xmark text-gray-600 text-[10px]"></i>
             <span className="text-gray-500">Arquivado:</span>
             <span className="text-gray-700">
-              {formatDistanceToNow(customer.archivedAt)}
+              {getTimeAgo(customer.archivedAt)}
             </span>
           </>
         )}

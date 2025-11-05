@@ -1,3 +1,3 @@
-export * from './formatDate';
+export * from './date';
 export * from './formatPhone';
 export * from './firebaseErrors';

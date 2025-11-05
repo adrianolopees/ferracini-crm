@@ -12,12 +12,12 @@ import {
   FinalizedCard,
 } from '@/components/history';
 import { AnimatePresence } from 'framer-motion';
-import { useCustomerActions } from '@/hooks';
+import { restoreFromArchive } from '@/services/customerActionService';
 
 type TabType = 'finalized' | 'transfers' | 'archived';
 
 function History() {
-  const [activeTab, setActiveTab] = useState<TabType>('finalized');
+  const [activeTab, setActiveTab] = useState<TabType>('transfers');
   const [searchTerm, setSearchTerm] = useState('');
   const [finalizedCustomers, setFinalizedCustomers] = useState<Customer[]>([]);
   const [transferCustomers, setTransferCustomers] = useState<Customer[]>([]);
@@ -31,8 +31,6 @@ function History() {
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
     null
   );
-
-  const { restoreFromArchive } = useCustomerActions();
 
   // Buscar clientes ao carregar
   useEffect(() => {
@@ -160,16 +158,16 @@ function History() {
 
   const tabs = [
     {
+      id: 'transfers',
+      label: 'Transferências',
+      count: transferCustomers.length,
+      icon: 'fa-solid fa-truck-fast',
+    },
+    {
       id: 'finalized',
       label: 'Finalizados',
       count: finalizedCustomers.length,
       icon: 'fa-solid fa-circle-check',
-    },
-    {
-      id: 'transfers',
-      label: 'Transferências',
-      count: transferCustomers.length,
-      icon: 'fa-solid fa-arrows-turn-right',
     },
     {
       id: 'archived',
@@ -215,41 +213,41 @@ function History() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                  {/* Não Finalizados */}
+                  {/* Total */}
                   <button
-                    onClick={() => setTransferFilter('not_finalized')}
+                    onClick={() => setTransferFilter('all')}
                     className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
-                      transferFilter === 'not_finalized'
-                        ? 'bg-orange-500 border-orange-600 shadow-md scale-105'
-                        : 'bg-white border-orange-200 hover:border-orange-400'
+                      transferFilter === 'all'
+                        ? 'bg-emerald-500 border-emerald-600 shadow-md scale-105'
+                        : 'bg-white border-emerald-200 hover:border-emerald-400'
                     }`}
                   >
                     <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
-                        className={`fa-solid fa-box-archive text-xs ${
-                          transferFilter === 'not_finalized'
+                        className={`fa-solid fa-chart-line text-xs ${
+                          transferFilter === 'all'
                             ? 'text-white'
-                            : 'text-orange-500'
+                            : 'text-emerald-500'
                         }`}
                       ></i>
                       <span
                         className={`text-xs font-medium truncate ${
-                          transferFilter === 'not_finalized'
+                          transferFilter === 'all'
                             ? 'text-white'
                             : 'text-gray-600'
                         }`}
                       >
-                        Não Finalizados
+                        Total
                       </span>
                     </div>
                     <div
                       className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'not_finalized'
+                        transferFilter === 'all'
                           ? 'text-white'
-                          : 'text-orange-600'
+                          : 'text-emerald-600'
                       }`}
                     >
-                      {transferCustomers.filter((c) => c.archived).length}
+                      {transferCustomers.length}
                     </div>
                   </button>
 
@@ -337,41 +335,41 @@ function History() {
                     </div>
                   </button>
 
-                  {/* Total */}
+                  {/* Não Finalizados */}
                   <button
-                    onClick={() => setTransferFilter('all')}
+                    onClick={() => setTransferFilter('not_finalized')}
                     className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
-                      transferFilter === 'all'
-                        ? 'bg-emerald-500 border-emerald-600 shadow-md scale-105'
-                        : 'bg-white border-emerald-200 hover:border-emerald-400'
+                      transferFilter === 'not_finalized'
+                        ? 'bg-orange-500 border-orange-600 shadow-md scale-105'
+                        : 'bg-white border-orange-200 hover:border-orange-400'
                     }`}
                   >
                     <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
-                        className={`fa-solid fa-chart-line text-xs ${
-                          transferFilter === 'all'
+                        className={`fa-solid fa-box-archive text-xs ${
+                          transferFilter === 'not_finalized'
                             ? 'text-white'
-                            : 'text-emerald-500'
+                            : 'text-orange-500'
                         }`}
                       ></i>
                       <span
                         className={`text-xs font-medium truncate ${
-                          transferFilter === 'all'
+                          transferFilter === 'not_finalized'
                             ? 'text-white'
                             : 'text-gray-600'
                         }`}
                       >
-                        Total
+                        Não Finalizados
                       </span>
                     </div>
                     <div
                       className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'all'
+                        transferFilter === 'not_finalized'
                           ? 'text-white'
-                          : 'text-emerald-600'
+                          : 'text-orange-600'
                       }`}
                     >
-                      {transferCustomers.length}
+                      {transferCustomers.filter((c) => c.archived).length}
                     </div>
                   </button>
                 </div>

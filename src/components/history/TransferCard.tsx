@@ -15,7 +15,7 @@
  */
 
 import { Customer } from '@/types/customer';
-import { formatDateTime, formatDaysElapsed } from '@/utils';
+import { formatDate, getDaysBetween } from '@/utils';
 
 /* ============================================================================
  * CONSTANTS
@@ -72,7 +72,7 @@ function TransferCard({ customer }: TransferCardProps) {
   // Calculate transfer duration (from requested to arrived)
   const transferDays =
     customer.contactedAt && customer.transferredAt
-      ? formatDaysElapsed(customer.transferredAt, customer.contactedAt)
+      ? getDaysBetween(customer.transferredAt, customer.contactedAt)
       : null;
 
   return (
@@ -137,23 +137,19 @@ function TransferCard({ customer }: TransferCardProps) {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-xs sm:text-sm text-gray-600">
           <span className="flex items-center gap-1 whitespace-nowrap">
             <i className={`fa-solid fa-clipboard-list ${storeColor.icon}`}></i>
-            {formatDateTime(customer.createdAt)}
+            {formatDate(customer.createdAt)}
           </span>
 
           {customer.contactedAt && (
             <span className="flex items-center gap-1 whitespace-nowrap">
-              <i
-                className={`fa-solid fa-location-dot ${storeColor.icon}`}
-              ></i>
-              {formatDateTime(customer.contactedAt)}
+              <i className={`fa-solid fa-location-dot ${storeColor.icon}`}></i>
+              {formatDate(customer.contactedAt)}
             </span>
           )}
           {customer.completedAt && (
             <span className="flex items-center gap-1 whitespace-nowrap">
-              <i
-                className={`fa-solid fa-circle-check ${storeColor.icon}`}
-              ></i>
-              {formatDateTime(customer.completedAt)}
+              <i className={`fa-solid fa-circle-check ${storeColor.icon}`}></i>
+              {formatDate(customer.completedAt)}
             </span>
           )}
         </div>

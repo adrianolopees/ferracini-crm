@@ -6,7 +6,17 @@ import { ActionCard, MetricCard } from '@/components/dashboard';
 import { TopProductsChart } from '@/components/charts';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';
 import { useDashboardMetrics, useCustomersList } from '@/hooks';
-import { useCustomerActions } from '@/hooks';
+import {
+  checkStoreCampinas,
+  checkStoreDomPedro,
+  confirmStoreStock,
+  acceptTransfer,
+  rejectStoreStock,
+  productArrived,
+  declineTransfer,
+  completeOrder,
+  resetToInitial,
+} from '@/services/customerActionService';
 import { Customer, ArchiveReason } from '@/types/customer';
 import { sendGenericMessage } from '@/services/whatsappService';
 
@@ -19,17 +29,6 @@ function Dashboard() {
     'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null
   >(null);
 
-  const {
-    checkStoreCampinas,
-    checkStoreDomPedro,
-    confirmStoreStock,
-    acceptTransfer,
-    rejectStoreStock,
-    productArrived,
-    declineTransfer,
-    completeOrder,
-    resetToInitial,
-  } = useCustomerActions();
 
   const { metrics, loading, refresh: refreshMetrics } = useDashboardMetrics();
   const {
