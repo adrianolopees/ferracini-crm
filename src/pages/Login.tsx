@@ -83,7 +83,12 @@ function Login() {
               required
             />
 
-            <Button type="submit" disabled={isLoading}>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              fullWidth={true}
+              className="flex justify-center"
+            >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
                   <Spinner size="sm" />
