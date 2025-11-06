@@ -63,10 +63,8 @@ function WorkflowCard({
   declineTransfer,
 }: WorkflowCardProps) {
   // Compute customer state
-  const status = getCustomerStatus(customer.createdAt);
-
-  // Determine border styling based on state
-  const borderClass = status.borderClass + 'bg-gray-50';
+  const status = getCustomerStatus(customer.createdAt, customer.status);
+  const borderClass = status.borderClass + ' bg-gray-50';
 
   return (
     <div
@@ -117,7 +115,14 @@ function WorkflowCard({
       <div className="flex items-start justify-between mb-1 gap-2 md:pr-20">
         <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{customer.name}</h3>
-
+          {/* Badge de Urgêncy */}
+          {status.daysWaiting >= 14 && (
+            <span className="inline-flex items-center gap-1 text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full font-medium whitespace-nowrap">
+              <i className="fa-solid fa-exclamation-triangle text-[10px]"></i>
+              <span>{status.daysWaiting} dias!</span>
+            </span>
+          )}
+          {/* Badge de Vendedor */}
           {customer.salesperson && (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full whitespace-nowrap">
               <i className="fa-solid fa-user text-[10px]"></i>
@@ -131,47 +136,51 @@ function WorkflowCard({
       <div className="space-y-2 sm:space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-1 text-xs sm:text-sm sm:flex-wrap">
           {customer.status === 'ready_for_pickup' && customer.contactedAt ? (
-            // Stage: READY FOR PICKUP
-            <div className={`flex items-center gap-1.5 flex-wrap ${status.textClass}`}>
-              <i className={`fa-solid fa-clock ${status.iconClass} text-[10px]`}></i>
-              <span>Pronto há:</span>
-              <span>{getTimeAgo(customer.contactedAt)}</span>
+            // Stage: READY FOR PICKUP - Tempo em destaque
+            <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+              <i className="fa-solid fa-check-circle text-gray-500 text-xs"></i>
+              <span className="text-gray-600">Pronto há</span>
+              <span className="text-gray-900 font-bold text-sm sm:text-base">{getTimeAgo(customer.contactedAt)}</span>
               {customer.sourceStore && (
                 <>
                   <span className="text-gray-400 mx-1">•</span>
-                  <i className={`fa-solid fa-store ${status.iconClass} text-[10px]`}></i>
-                  <span>{customer.sourceStore}</span>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <i className="fa-solid fa-store text-gray-500 text-xs"></i>
+                    <span className="text-gray-600">{customer.sourceStore}</span>
+                  </div>
                 </>
               )}
             </div>
           ) : customer.status === 'awaiting_transfer' ? (
-            // Stage: AWAITING TRANSFER
-            <div className={`flex items-center gap-1.5 flex-wrap ${status.textClass}`}>
-              <i className={`fa-solid fa-truck ${status.iconClass} text-[10px]`}></i>
-              <span>Transferência:</span>
-              <span>{customer.sourceStore}</span>
+            // Stage: AWAITING TRANSFER - Loja em destaque
+            <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+              <i className="fa-solid fa-truck-fast text-gray-500 text-xs"></i>
+              <span className="text-gray-600">Transferência:</span>
+              <span className="text-gray-900 font-bold text-sm sm:text-base uppercase">{customer.sourceStore}</span>
               {customer.transferredAt && (
                 <>
                   <span className="text-gray-400 mx-1">•</span>
-                  <i className={`fa-solid fa-clock ${status.iconClass} text-[10px]`}></i>
-                  <span>{getTimeAgo(customer.transferredAt)}</span>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <i className="fa-solid fa-clock text-gray-500 text-xs"></i>
+                    <span className="text-gray-600">há {getTimeAgo(customer.transferredAt)}</span>
+                  </div>
                 </>
               )}
             </div>
           ) : (
-            // Stage: PENDING (default)
-            <div className={`flex items-center gap-1.5 flex-wrap ${status.textClass}`}>
-              <i className={`fa-solid fa-clock ${status.iconClass} text-[10px]`}></i>
-              <span>Aguardando há:</span>
-              <span>{getTimeAgo(customer.createdAt)}</span>
+            // Stage: PENDING - Tempo em destaque
+            <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+              <i className="fa-solid fa-clock text-gray-500 text-xs"></i>
+              <span className="text-gray-600">Aguardando há</span>
+              <span className="text-gray-900 font-bold text-sm sm:text-base">{getTimeAgo(customer.createdAt)}</span>
             </div>
           )}
 
-          {/* Phone Number */}
+          {/* Phone Number - Secundário */}
           {showActions && (
-            <div className="flex items-center gap-1.5 text-gray-600">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
               <span className="hidden sm:inline text-gray-400 mx-1">•</span>
-              <i className="fa-solid fa-phone text-[10px]"></i>
+              <i className="fa-solid fa-phone text-xs"></i>
               <span>{customer.phone}</span>
             </div>
           )}
@@ -182,17 +191,17 @@ function WorkflowCard({
           <span className="font-medium text-gray-900">{customer.model}</span>
           <span className="text-gray-400">•</span>
           <span className="flex items-center gap-1">
-            <i className="fa-solid fa-barcode text-[10px]"></i>
+            <i className="fa-solid fa-barcode text-xs"></i>
             {customer.reference}
           </span>
           <span className="text-gray-400">•</span>
           <span className="flex items-center gap-1">
-            <i className="fa-solid fa-ruler text-[10px]"></i>
+            <i className="fa-solid fa-ruler text-xs"></i>
             Nº {customer.size}
           </span>
           <span className="text-gray-400">•</span>
           <span className="flex items-center gap-1">
-            <i className="fa-solid fa-palette text-[10px]"></i>
+            <i className="fa-solid fa-palette text-xs"></i>
             {customer.color}
           </span>
         </div>

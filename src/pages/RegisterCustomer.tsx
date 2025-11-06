@@ -45,6 +45,7 @@ function RegisterCustomer() {
           model: data.model.toLowerCase(),
           createdAt: new Date().toISOString(),
           archived: false,
+          status: 'pending',
         }),
         {
           loading: 'Salvando cliente...',

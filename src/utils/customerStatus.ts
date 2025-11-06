@@ -1,42 +1,43 @@
 import { getDaysWaiting } from '@/utils/date';
 
-export function getCustomerStatus(createdAt: string) {
+export function getCustomerStatus(createdAt: string, status?: string) {
   const daysWaiting = getDaysWaiting(createdAt);
 
-  // Vermelho: 7 dias ou mais
-  if (daysWaiting >= 14) {
+  if (status === 'awaiting_transfer') {
     return {
       daysWaiting,
-      urgency: 'urgent' as const,
-      borderClass: 'border-l-red-500 border-red-200',
-      dotClass: 'bg-red-500',
-      textClass: 'text-red-500 font-medium',
-      iconClass: 'text-red-500',
-      label: 'Urgente - 14 dias ou mais',
+      borderClass: 'border-l-orange-500 border-orange-200',
+      textClass: 'text-orange-600',
+      iconClass: 'text-orange-500',
+      label: 'Em transferência',
     };
   }
 
-  // Amarelo: Entre 7 e 13 dias
-  if (daysWaiting >= 7) {
+  if (status === 'ready_for_pickup') {
     return {
       daysWaiting,
-      urgency: 'warning' as const,
-      borderClass: 'border-l-yellow-500 border-yellow-200',
-      dotClass: 'bg-yellow-500',
-      textClass: 'text-yellow-600 font-medium',
-      iconClass: 'text-yellow-600',
-      label: 'Atenção - 7 e 13 dias',
+      borderClass: 'border-l-green-500 border-green-200 ',
+      textClass: 'text-gray-600',
+      iconClass: 'text-gray-500',
+      label: 'Pronto para retirada',
     };
   }
 
-  // Verde: Até 6 dias
+  if (status === 'pending') {
+    return {
+      daysWaiting,
+      borderClass: 'border-l-blue-500 border-blue-200 ',
+      textClass: 'text-gray-600',
+      iconClass: 'text-gray-500',
+      label: 'Aguardando',
+    };
+  }
+
   return {
     daysWaiting,
-    urgency: 'normal' as const,
-    borderClass: 'border-l-green-500 border-gray-200',
-    dotClass: 'bg-green-500',
-    textClass: 'text-green-600 font-medium',
-    iconClass: 'text-green-600',
-    label: 'Recente - até 6 dias',
+    borderClass: 'border-l-gray-400 border-gray-200 ',
+    textClass: 'text-gray-600',
+    iconClass: 'text-gray-500',
+    label: 'Inicial',
   };
 }
