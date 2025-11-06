@@ -5,21 +5,10 @@ interface AnimatedContainerProps {
   children: ReactNode;
   className?: string;
   delay?: number;
-  type?:
-    | 'fade'
-    | 'slideUp'
-    | 'slideDown'
-    | 'slideLeft'
-    | 'slideRight'
-    | 'scale';
+  type?: 'fade' | 'slideUp' | 'slideDown' | 'slideLeft' | 'slideRight' | 'scale';
 }
 
-function AnimatedContainer({
-  children,
-  className = '',
-  delay = 0,
-  type = 'fade',
-}: AnimatedContainerProps) {
+function AnimatedContainer({ children, className = '', delay = 0, type = 'fade' }: AnimatedContainerProps) {
   const variants = {
     fade: {
       initial: { opacity: 0 },

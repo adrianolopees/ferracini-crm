@@ -40,25 +40,17 @@ function useCustomersList({ modalType, isOpen }: UseCustomersListProps) {
 
         if (modalType === 'awaiting') {
           // Modal "Aguardando" - mostra TODOS clientes pendentes
-          filtered = activeCustomers.filter(
-            (c) => !c.status || c.status === 'pending'
-          );
+          filtered = activeCustomers.filter((c) => !c.status || c.status === 'pending');
         } else if (modalType === 'awaiting_transfer') {
           // Modal "Aguardando Transferência"
-          filtered = activeCustomers.filter(
-            (c) => c.status === 'awaiting_transfer'
-          );
+          filtered = activeCustomers.filter((c) => c.status === 'awaiting_transfer');
         } else if (modalType === 'ready_for_pickup') {
           // Modal "Pronto para Retirada"
-          filtered = activeCustomers.filter(
-            (c) => c.status === 'ready_for_pickup'
-          );
+          filtered = activeCustomers.filter((c) => c.status === 'ready_for_pickup');
         }
 
         // Ordenar por mais urgente
-        filtered.sort(
-          (a, b) => getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt)
-        );
+        filtered.sort((a, b) => getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt));
 
         setCustomers(filtered);
       } catch (error) {

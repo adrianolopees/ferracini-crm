@@ -22,13 +22,8 @@ import { sendGenericMessage } from '@/services/whatsappService';
 
 function Dashboard() {
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
-  const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(
-    null
-  );
-  const [modalType, setModalType] = useState<
-    'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null
-  >(null);
-
+  const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
+  const [modalType, setModalType] = useState<'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null>(null);
 
   const { metrics, loading, refresh: refreshMetrics } = useDashboardMetrics();
   const {
@@ -102,10 +97,7 @@ function Dashboard() {
     setArchiveModalOpen(true);
   };
 
-  const handleArchiveCustomer = async (
-    reason: ArchiveReason,
-    notes?: string
-  ) => {
+  const handleArchiveCustomer = async (reason: ArchiveReason, notes?: string) => {
     if (!customerToArchive) return;
 
     try {
@@ -158,12 +150,9 @@ function Dashboard() {
     }
   };
   const getModalTitle = () => {
-    if (modalType === 'awaiting')
-      return `Clientes Aguardando (${metrics.totalActive})`;
-    if (modalType === 'awaiting_transfer')
-      return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
-    if (modalType === 'ready_for_pickup')
-      return `Pronto para Retirada (${metrics.totalReadyForPickup})`;
+    if (modalType === 'awaiting') return `Clientes Aguardando (${metrics.totalActive})`;
+    if (modalType === 'awaiting_transfer') return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
+    if (modalType === 'ready_for_pickup') return `Pronto para Retirada (${metrics.totalReadyForPickup})`;
     return '';
   };
 
@@ -180,9 +169,7 @@ function Dashboard() {
             title="Aguardando"
             value={metrics.totalActive}
             subtitle={
-              metrics.urgentCustomers > 0
-                ? `${metrics.urgentCustomers} urgente(s)`
-                : 'Clientes na fila de espera'
+              metrics.urgentCustomers > 0 ? `${metrics.urgentCustomers} urgente(s)` : 'Clientes na fila de espera'
             }
             icon="fa-solid fa-clock"
             colorScheme="blue"
@@ -226,9 +213,7 @@ function Dashboard() {
       <div className="px-4 max-w-5xl mx-auto mt-8 mb-6">
         <AnimatedContainer type="slideUp" delay={0.1}>
           <div className="bg-white rounded-2xl shadow-xl p-6">
-            <h2 className="text-lg font-semibold text-gray-700 mb-6">
-              Estatísticas
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-700 mb-6">Estatísticas</h2>
 
             {/* Mini Cards de Métricas */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -243,11 +228,7 @@ function Dashboard() {
 
               <MetricCard
                 title="Total Ativos"
-                value={
-                  metrics.totalActive +
-                  metrics.totalAwaitingTransfer +
-                  metrics.totalReadyForPickup
-                }
+                value={metrics.totalActive + metrics.totalAwaitingTransfer + metrics.totalReadyForPickup}
                 subtitle="clientes"
                 icon="fa-solid fa-users"
                 colorScheme="blue"

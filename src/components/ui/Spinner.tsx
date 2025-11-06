@@ -26,10 +26,6 @@ function Spinner({ size = 'fullscreen' }: SpinnerProps) {
     lg: 'w-8 h-8 border-3',
   };
 
-  return (
-    <div
-      className={`${sizes[size]} border-white border-t-transparent rounded-full animate-spin`}
-    />
-  );
+  return <div className={`${sizes[size]} border-white border-t-transparent rounded-full animate-spin`} />;
 }
 export default Spinner;

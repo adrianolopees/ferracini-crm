@@ -6,11 +6,7 @@ import { Customer } from '@/types/customer';
 import { Input, PageLayout, Tabs } from '@/components/ui';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { ConfirmModal } from '@/components/modals';
-import {
-  TransferCard,
-  ArchivedCard,
-  FinalizedCard,
-} from '@/components/history';
+import { TransferCard, ArchivedCard, FinalizedCard } from '@/components/history';
 import { AnimatePresence } from 'framer-motion';
 import { restoreFromArchive } from '@/services/customerActionService';
 
@@ -23,14 +19,10 @@ function History() {
   const [transferCustomers, setTransferCustomers] = useState<Customer[]>([]);
   const [archivedCustomers, setArchivedCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
-  const [transferFilter, setTransferFilter] = useState<
-    'all' | 'Campinas' | 'Dom Pedro' | 'not_finalized'
-  >('all');
+  const [transferFilter, setTransferFilter] = useState<'all' | 'Campinas' | 'Dom Pedro' | 'not_finalized'>('all');
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
-    null
-  );
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
   // Buscar clientes ao carregar
   useEffect(() => {
@@ -76,14 +68,7 @@ function History() {
       );
       setFilteredCustomers(filtered);
     }
-  }, [
-    searchTerm,
-    activeTab,
-    finalizedCustomers,
-    transferCustomers,
-    archivedCustomers,
-    transferFilter,
-  ]);
+  }, [searchTerm, activeTab, finalizedCustomers, transferCustomers, archivedCustomers, transferFilter]);
 
   const fetchAllCustomers = async () => {
     try {
@@ -105,10 +90,7 @@ function History() {
         } else if (customerData.status === 'completed') {
           finalized.push({ id: doc.id, ...customerData } as Customer);
         }
-        if (
-          customerData.sourceStore === 'Campinas' ||
-          customerData.sourceStore === 'Dom Pedro'
-        ) {
+        if (customerData.sourceStore === 'Campinas' || customerData.sourceStore === 'Dom Pedro') {
           transfers.push({ id: doc.id, ...customerData } as Customer);
         }
       });
@@ -187,11 +169,7 @@ function History() {
       {/* Tabs e Conteúdo */}
       <AnimatedContainer type="slideUp" delay={0.2}>
         <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 mb-6">
-          <Tabs
-            tabs={tabs}
-            activeTab={activeTab}
-            onTabChange={(tabId) => setActiveTab(tabId as TabType)}
-          >
+          <Tabs tabs={tabs} activeTab={activeTab} onTabChange={(tabId) => setActiveTab(tabId as TabType)}>
             {/* Busca */}
             <div className="mb-4 sm:mb-6">
               <Input
@@ -207,9 +185,7 @@ function History() {
               <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <i className="fa-solid fa-filter text-blue-600 text-sm"></i>
-                  <h3 className="text-sm font-semibold text-gray-800">
-                    Filtros de Transferências
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-800">Filtros de Transferências</h3>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
@@ -225,16 +201,12 @@ function History() {
                     <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
                         className={`fa-solid fa-chart-line text-xs ${
-                          transferFilter === 'all'
-                            ? 'text-white'
-                            : 'text-emerald-500'
+                          transferFilter === 'all' ? 'text-white' : 'text-emerald-500'
                         }`}
                       ></i>
                       <span
                         className={`text-xs font-medium truncate ${
-                          transferFilter === 'all'
-                            ? 'text-white'
-                            : 'text-gray-600'
+                          transferFilter === 'all' ? 'text-white' : 'text-gray-600'
                         }`}
                       >
                         Total
@@ -242,9 +214,7 @@ function History() {
                     </div>
                     <div
                       className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'all'
-                          ? 'text-white'
-                          : 'text-emerald-600'
+                        transferFilter === 'all' ? 'text-white' : 'text-emerald-600'
                       }`}
                     >
                       {transferCustomers.length}
@@ -263,16 +233,12 @@ function History() {
                     <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
                         className={`fa-solid fa-store text-xs ${
-                          transferFilter === 'Campinas'
-                            ? 'text-white'
-                            : 'text-blue-500'
+                          transferFilter === 'Campinas' ? 'text-white' : 'text-blue-500'
                         }`}
                       ></i>
                       <span
                         className={`text-xs font-medium truncate ${
-                          transferFilter === 'Campinas'
-                            ? 'text-white'
-                            : 'text-gray-600'
+                          transferFilter === 'Campinas' ? 'text-white' : 'text-gray-600'
                         }`}
                       >
                         Campinas
@@ -280,16 +246,10 @@ function History() {
                     </div>
                     <div
                       className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'Campinas'
-                          ? 'text-white'
-                          : 'text-blue-600'
+                        transferFilter === 'Campinas' ? 'text-white' : 'text-blue-600'
                       }`}
                     >
-                      {
-                        transferCustomers.filter(
-                          (c) => c.sourceStore === 'Campinas'
-                        ).length
-                      }
+                      {transferCustomers.filter((c) => c.sourceStore === 'Campinas').length}
                     </div>
                   </button>
 
@@ -305,16 +265,12 @@ function History() {
                     <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
                         className={`fa-solid fa-store text-xs ${
-                          transferFilter === 'Dom Pedro'
-                            ? 'text-white'
-                            : 'text-purple-500'
+                          transferFilter === 'Dom Pedro' ? 'text-white' : 'text-purple-500'
                         }`}
                       ></i>
                       <span
                         className={`text-xs font-medium truncate ${
-                          transferFilter === 'Dom Pedro'
-                            ? 'text-white'
-                            : 'text-gray-600'
+                          transferFilter === 'Dom Pedro' ? 'text-white' : 'text-gray-600'
                         }`}
                       >
                         Dom Pedro
@@ -322,16 +278,10 @@ function History() {
                     </div>
                     <div
                       className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'Dom Pedro'
-                          ? 'text-white'
-                          : 'text-purple-600'
+                        transferFilter === 'Dom Pedro' ? 'text-white' : 'text-purple-600'
                       }`}
                     >
-                      {
-                        transferCustomers.filter(
-                          (c) => c.sourceStore === 'Dom Pedro'
-                        ).length
-                      }
+                      {transferCustomers.filter((c) => c.sourceStore === 'Dom Pedro').length}
                     </div>
                   </button>
 
@@ -347,16 +297,12 @@ function History() {
                     <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
                       <i
                         className={`fa-solid fa-box-archive text-xs ${
-                          transferFilter === 'not_finalized'
-                            ? 'text-white'
-                            : 'text-orange-500'
+                          transferFilter === 'not_finalized' ? 'text-white' : 'text-orange-500'
                         }`}
                       ></i>
                       <span
                         className={`text-xs font-medium truncate ${
-                          transferFilter === 'not_finalized'
-                            ? 'text-white'
-                            : 'text-gray-600'
+                          transferFilter === 'not_finalized' ? 'text-white' : 'text-gray-600'
                         }`}
                       >
                         Não Finalizados
@@ -364,9 +310,7 @@ function History() {
                     </div>
                     <div
                       className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'not_finalized'
-                          ? 'text-white'
-                          : 'text-orange-600'
+                        transferFilter === 'not_finalized' ? 'text-white' : 'text-orange-600'
                       }`}
                     >
                       {transferCustomers.filter((c) => c.archived).length}
@@ -405,9 +349,7 @@ function History() {
                           ? 'Nenhuma transferência recebida ainda'
                           : 'Nenhum cliente arquivado'}
                   </p>
-                  <p className="text-gray-500 text-sm mt-1">
-                    {searchTerm && 'Tente outro termo de busca'}
-                  </p>
+                  <p className="text-gray-500 text-sm mt-1">{searchTerm && 'Tente outro termo de busca'}</p>
                 </div>
               ) : (
                 <AnimatePresence mode="popLayout">
@@ -416,18 +358,11 @@ function History() {
                     const isTransferTab = activeTab === 'transfers';
 
                     return (
-                      <AnimatedListItem
-                        key={`${activeTab}-${customer.id}`}
-                        index={index}
-                      >
+                      <AnimatedListItem key={`${activeTab}-${customer.id}`} index={index}>
                         {isTransferTab ? (
                           <TransferCard customer={customer} />
                         ) : isArchivedTab ? (
-                          <ArchivedCard
-                            customer={customer}
-                            onRestore={handleRestore}
-                            onDelete={handleDelete}
-                          />
+                          <ArchivedCard customer={customer} onRestore={handleRestore} onDelete={handleDelete} />
                         ) : (
                           <FinalizedCard customer={customer} />
                         )}

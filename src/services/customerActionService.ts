@@ -7,11 +7,7 @@ import {
   sendStoreCampinas,
   sendStoreDomPedro,
 } from '@/services/whatsappService';
-import {
-  moveToAwaitingTransfer,
-  markAsContacted,
-  moveToFinished,
-} from '@/services/customerStatusService';
+import { moveToAwaitingTransfer, markAsContacted, moveToFinished } from '@/services/customerStatusService';
 
 export async function checkStoreCampinas(customer: Customer): Promise<void> {
   await updateDoc(doc(db, 'customers', customer.id), {
@@ -49,11 +45,7 @@ export async function acceptTransfer(customer: Customer): Promise<void> {
   });
 }
 
-export async function declineTransfer(
-  customer: Customer,
-  reason: ArchiveReason,
-  notes?: string
-): Promise<void> {
+export async function declineTransfer(customer: Customer, reason: ArchiveReason, notes?: string): Promise<void> {
   await updateDoc(doc(db, 'customers', customer.id), {
     archived: true,
     archiveReason: reason,

@@ -9,14 +9,8 @@ interface ArchiveModalProps {
   customerName: string;
 }
 
-function ArchiveModal({
-  isOpen,
-  onClose,
-  onConfirm,
-  customerName,
-}: ArchiveModalProps) {
-  const [selectedReason, setSelectedReason] =
-    useState<ArchiveReason>('gave_up');
+function ArchiveModal({ isOpen, onClose, onConfirm, customerName }: ArchiveModalProps) {
+  const [selectedReason, setSelectedReason] = useState<ArchiveReason>('gave_up');
   const [notes, setNotes] = useState('');
 
   const reasons: { value: ArchiveReason; label: string }[] = [
@@ -42,26 +36,18 @@ function ArchiveModal({
   };
 
   return (
-    <DialogModal
-      isOpen={isOpen}
-      onClose={handleCancel}
-      title="Arquivar Cliente"
-    >
+    <DialogModal isOpen={isOpen} onClose={handleCancel} title="Arquivar Cliente">
       <div className="space-y-4">
         <p className="text-gray-700">
           Deseja arquivar <span className="font-semibold">{customerName}</span>?
         </p>
         <p className="text-sm text-gray-500">
-          O cliente será removido da lista ativa, mas seus dados serão
-          preservados no histórico.
+          O cliente será removido da lista ativa, mas seus dados serão preservados no histórico.
         </p>
 
         {/* Dropdown de motivo */}
         <div>
-          <label
-            htmlFor="archive-reason"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
+          <label htmlFor="archive-reason" className="block text-sm font-medium text-gray-700 mb-2">
             Motivo do arquivamento *
           </label>
           <select
@@ -80,10 +66,7 @@ function ArchiveModal({
 
         {/* Textarea para observações */}
         <div>
-          <label
-            htmlFor="archive-notes"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
+          <label htmlFor="archive-notes" className="block text-sm font-medium text-gray-700 mb-2">
             Observações (opcional)
           </label>
           <textarea

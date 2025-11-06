@@ -76,13 +76,9 @@ function TransferCard({ customer }: TransferCardProps) {
       {/* Header: Name + Transfer Time Badge + Store Badge */}
       <div className="flex items-start justify-between mb-3 gap-2">
         <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
-            {customer.name}
-          </h3>
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{customer.name}</h3>
           {customer.contactedAt && customer.transferredAt && (
-            <span
-              className={`${storeColor.icon} text-xs px-2 py-1 rounded font-medium whitespace-nowrap`}
-            >
+            <span className={`${storeColor.icon} text-xs px-2 py-1 rounded font-medium whitespace-nowrap`}>
               <i className="fa-solid fa-truck-fast text-[10px] pr-1"></i>
               {getDaysBetween(customer.transferredAt, customer.contactedAt)}
             </span>
@@ -102,28 +98,20 @@ function TransferCard({ customer }: TransferCardProps) {
       <div className="space-y-2 sm:space-y-3">
         {/* Product Details */}
         <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
-          <span className="font-stretch-50% text-gray-900">
-            {customer.model}
-          </span>
+          <span className="font-stretch-50% text-gray-900">{customer.model}</span>
           <span className="text-gray-400">•</span>
           <span className="flex items-center gap-1">
-            <i
-              className={`fa-solid fa-barcode ${storeColor.icon} text-[10px]`}
-            ></i>
+            <i className={`fa-solid fa-barcode ${storeColor.icon} text-[10px]`}></i>
             {customer.reference}
           </span>
           <span className="text-gray-400">•</span>
           <span className="flex items-center gap-1">
-            <i
-              className={`fa-solid fa-ruler ${storeColor.icon} text-[10px]`}
-            ></i>
+            <i className={`fa-solid fa-ruler ${storeColor.icon} text-[10px]`}></i>
             Nº {customer.size}
           </span>
           <span className="text-gray-400">•</span>
           <span className="flex items-center gap-1">
-            <i
-              className={`fa-solid fa-palette ${storeColor.icon} text-[10px]`}
-            ></i>
+            <i className={`fa-solid fa-palette ${storeColor.icon} text-[10px]`}></i>
             {customer.color}
           </span>
         </div>
@@ -151,25 +139,17 @@ function TransferCard({ customer }: TransferCardProps) {
       </div>
 
       {/* Footer: Salesperson */}
-      <div
-        className={`mt-2 pt-2 border-t ${storeColor.timeline} flex flex-row sm:items-center justify-between gap-2`}
-      >
+      <div className={`mt-2 pt-2 border-t ${storeColor.timeline} flex flex-row sm:items-center justify-between gap-2`}>
         {customer.salesperson && (
           <div className="inline-flex items-center gap-1.5 text-xs">
-            <i
-              className={`fa-solid fa-user ${storeColor.icon} text-[10px]`}
-            ></i>
-            <span className="font-medium text-gray-700">
-              {customer.salesperson}
-            </span>
+            <i className={`fa-solid fa-user ${storeColor.icon} text-[10px]`}></i>
+            <span className="font-medium text-gray-700">{customer.salesperson}</span>
           </div>
         )}
         {/* Badge "Não vendido" (SÓ se arquivado) */}
         {customer.archived && (
           <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 sm:px-1 py-0.5 rounded-full whitespace-nowrap">
-            <i
-              className={`fa-solid fa-box-archive ${storeColor.icon} text-[10px]`}
-            ></i>
+            <i className={`fa-solid fa-box-archive ${storeColor.icon} text-[10px]`}></i>
             Não vendido
           </span>
         )}

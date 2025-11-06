@@ -1,12 +1,5 @@
 import { useState, ChangeEvent } from 'react';
-import {
-  collection,
-  query,
-  where,
-  getDocs,
-  doc,
-  updateDoc,
-} from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { db } from '@/services/firebase';
 import { notifyProductArrived } from '@/services/whatsappService';
@@ -20,9 +13,7 @@ function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
-  const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(
-    null
-  );
+  const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
 
   const handleSearch = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -37,20 +28,11 @@ function SearchCustomers() {
       const valorBuscado = value.toLowerCase().trim();
 
       // Busca por referência e modelo
-      const refQuery = query(
-        collection(db, 'customers'),
-        where('reference', '==', valorBuscado)
-      );
+      const refQuery = query(collection(db, 'customers'), where('reference', '==', valorBuscado));
 
-      const modeloQuery = query(
-        collection(db, 'customers'),
-        where('model', '==', valorBuscado)
-      );
+      const modeloQuery = query(collection(db, 'customers'), where('model', '==', valorBuscado));
 
-      const [refSnapshot, modeloSnapshot] = await Promise.all([
-        getDocs(refQuery),
-        getDocs(modeloQuery),
-      ]);
+      const [refSnapshot, modeloSnapshot] = await Promise.all([getDocs(refQuery), getDocs(modeloQuery)]);
 
       const results: Customer[] = [];
 
@@ -61,11 +43,7 @@ function SearchCustomers() {
         // - Não arquivados
         // - Status inicial (aguardando)
         // - Não consultando outra loja (não está em processo de transferência)
-        if (
-          !customer.archived &&
-          (!customer.status || customer.status === 'pending') &&
-          !customer.consultingStore
-        ) {
+        if (!customer.archived && (!customer.status || customer.status === 'pending') && !customer.consultingStore) {
           results.push(customer);
         }
       });
@@ -117,10 +95,7 @@ function SearchCustomers() {
     setArchiveModalOpen(true);
   };
 
-  const handleArchiveCustomer = async (
-    reason: ArchiveReason,
-    notes?: string
-  ) => {
+  const handleArchiveCustomer = async (reason: ArchiveReason, notes?: string) => {
     if (!customerToArchive) return;
 
     try {
@@ -168,22 +143,14 @@ function SearchCustomers() {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
                   <i className="fa-solid fa-magnifying-glass text-gray-400 text-2xl"></i>
                 </div>
-                <p className="text-gray-600 font-medium">
-                  Nenhum cliente encontrado
-                </p>
-                <p className="text-gray-500 text-sm mt-1">
-                  Tente buscar por outro modelo ou referência
-                </p>
+                <p className="text-gray-600 font-medium">Nenhum cliente encontrado</p>
+                <p className="text-gray-500 text-sm mt-1">Tente buscar por outro modelo ou referência</p>
               </div>
             )}
 
             {customers.map((customer, index) => (
               <AnimatedListItem key={customer.id} index={index}>
-                <WorkflowCard
-                  customer={customer}
-                  onSendMessage={handleWhatsApp}
-                  onArchive={handleArchiveClick}
-                />
+                <WorkflowCard customer={customer} onSendMessage={handleWhatsApp} onArchive={handleArchiveClick} />
               </AnimatedListItem>
             ))}
           </div>

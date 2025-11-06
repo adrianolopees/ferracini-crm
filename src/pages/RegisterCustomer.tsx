@@ -69,11 +69,7 @@ function RegisterCustomer() {
       maxWidth="2xl"
     >
       {/* Card do Formulário */}
-      <AnimatedContainer
-        type="slideUp"
-        delay={0.2}
-        className="bg-white rounded-2xl shadow-xl p-8 "
-      >
+      <AnimatedContainer type="slideUp" delay={0.2} className="bg-white rounded-2xl shadow-xl p-8 ">
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           {/* Mensagem de erro global */}
           {errorMessage && (
@@ -166,12 +162,7 @@ function RegisterCustomer() {
           </div>
 
           <div className="pt-4">
-            <Button
-              type="submit"
-              disabled={isLoading}
-              fullWidth={true}
-              className="flex justify-center items-center"
-            >
+            <Button type="submit" disabled={isLoading} fullWidth={true} className="flex justify-center items-center">
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
                   <Spinner size="sm" />
@@ -179,8 +170,7 @@ function RegisterCustomer() {
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2 ">
-                  <i className="fa-solid fa-bookmark"></i>{' '}
-                  {/* Adicione ícone */}
+                  <i className="fa-solid fa-bookmark"></i> {/* Adicione ícone */}
                   Registrar
                 </span>
               )}

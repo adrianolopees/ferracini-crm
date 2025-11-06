@@ -29,9 +29,7 @@ function Navigation() {
             <button
               onClick={() => navigate('/dashboard')}
               className={`flex flex-col sm:flex-row items-center gap-0.5 px-3 sm:px-6 py-2 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
-                isDashboard
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 sm:hover:text-gray-900'
+                isDashboard ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
               <i className="fa-solid fa-tachometer-alt text-xl sm:text-base pr-1"></i>
@@ -41,9 +39,7 @@ function Navigation() {
             <button
               onClick={() => navigate('/register')}
               className={`flex flex-col sm:flex-row items-center gap-0.5 px-3 sm:px-6 py-2 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
-                isRegister
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 sm:hover:text-gray-900'
+                isRegister ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
               <i className="fa-solid fa-user-plus text-xl sm:text-base pr-1"></i>
@@ -53,9 +49,7 @@ function Navigation() {
             <button
               onClick={() => navigate('/search')}
               className={`flex flex-col sm:flex-row items-center gap-0.5 px-3 sm:px-6 py-2 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
-                isSearch
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 sm:hover:text-gray-900'
+                isSearch ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
               <i className="fa-solid fa-magnifying-glass text-xl sm:text-base pr-1"></i>
@@ -65,9 +59,7 @@ function Navigation() {
             <button
               onClick={() => navigate('/history')}
               className={`flex flex-col sm:flex-row items-center gap-0.5 px-3 sm:px-6 py-2 sm:py-2 rounded-md text-sm sm:text-base font-medium transition-all duration-200 cursor-pointer ${
-                isHistory
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 sm:hover:text-gray-900'
+                isHistory ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 sm:hover:text-gray-900'
               }`}
             >
               <i className="fa-solid fa-clock-rotate-left text-xl sm:text-base pr-1"></i>
@@ -87,9 +79,7 @@ function Navigation() {
             ) : (
               <i className="fa-solid fa-person-walking-arrow-right text-lg"></i>
             )}
-            <span className="ml-2 hidden sm:inline">
-              {isLoggingOut ? 'Saindo...' : 'Sair'}
-            </span>
+            <span className="ml-2 hidden sm:inline">{isLoggingOut ? 'Saindo...' : 'Sair'}</span>
           </button>
         </div>
       </div>

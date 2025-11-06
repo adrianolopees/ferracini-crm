@@ -61,18 +61,14 @@ function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
   const reasonLabel = getArchiveReasonLabel(customer.archiveReason);
 
   // Calculate days waiting before archive
-  const daysWaiting = customer.archivedAt
-    ? getDaysBetween(customer.createdAt, customer.archivedAt)
-    : null;
+  const daysWaiting = customer.archivedAt ? getDaysBetween(customer.createdAt, customer.archivedAt) : null;
 
   return (
     <div className="border-l-4 border-l-gray-400 bg-gray-50 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200">
       {/* Header: Name + Days Waiting Badge */}
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2 sm:gap-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">
-            {customer.name}
-          </h3>
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{customer.name}</h3>
 
           {/* Badge Days Waiting */}
           {daysWaiting && (
@@ -116,9 +112,7 @@ function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
           <>
             <i className="fa-solid fa-calendar-xmark text-gray-600 text-[10px]"></i>
             <span className="text-gray-500">Arquivado:</span>
-            <span className="text-gray-700">
-              {getTimeAgo(customer.archivedAt)}
-            </span>
+            <span className="text-gray-700">{getTimeAgo(customer.archivedAt)}</span>
           </>
         )}
       </div>
@@ -137,9 +131,7 @@ function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
         {customer.salesperson && (
           <div className="inline-flex items-center gap-1.5 text-xs">
             <i className="fa-solid fa-user text-[10px] text-gray-600"></i>
-            <span className="font-medium text-gray-700">
-              {customer.salesperson}
-            </span>
+            <span className="font-medium text-gray-700">{customer.salesperson}</span>
           </div>
         )}
 

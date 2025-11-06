@@ -1,10 +1,5 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  User,
-} from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 
 interface AuthProviderProps {
@@ -45,12 +40,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  return (
-    <AuthContext.Provider
-      value={{ user, login, logout, loading, isLoggingOut }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, login, logout, loading, isLoggingOut }}>{children}</AuthContext.Provider>;
 }
 export { AuthContext };

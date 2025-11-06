@@ -65,8 +65,7 @@ function useDashboardMetrics() {
           }
         });
 
-        const averageWaitTime =
-          awaitingCount > 0 ? Math.round(totalDays / awaitingCount) : 0;
+        const averageWaitTime = awaitingCount > 0 ? Math.round(totalDays / awaitingCount) : 0;
 
         setMetrics({
           totalActive: awaitingCount,

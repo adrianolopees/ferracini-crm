@@ -2,10 +2,7 @@ import { z } from 'zod';
 
 export const formSchema = z.object({
   name: z.string().min(1, 'Cliente não pode estar em branco!').trim(),
-  phone: z
-    .string()
-    .min(1, 'Celular não pode estar em branco!')
-    .length(15, 'Número incompleto!'),
+  phone: z.string().min(1, 'Celular não pode estar em branco!').length(15, 'Número incompleto!'),
   model: z
     .string()
     .min(1, 'Modelo não pode estar em branco!')

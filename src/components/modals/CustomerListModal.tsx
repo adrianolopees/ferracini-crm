@@ -52,9 +52,7 @@ function CustomerListModal({
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
               <i className="fa-solid fa-inbox text-gray-400 text-2xl"></i>
             </div>
-            <p className="text-gray-600 font-medium">
-              Nenhum cliente encontrado
-            </p>
+            <p className="text-gray-600 font-medium">Nenhum cliente encontrado</p>
           </div>
         ) : (
           <div className="space-y-4">

@@ -58,32 +58,17 @@ const COLOR_SCHEMES = {
   },
 };
 
-function MetricCard({
-  title,
-  value,
-  subtitle,
-  icon,
-  colorScheme,
-  loading = false,
-}: MetricCardProps) {
+function MetricCard({ title, value, subtitle, icon, colorScheme, loading = false }: MetricCardProps) {
   const colors = COLOR_SCHEMES[colorScheme];
 
   return (
-    <div
-      className={`bg-gradient-to-br ${colors.gradient} rounded-lg p-4 border ${colors.border}`}
-    >
+    <div className={`bg-gradient-to-br ${colors.gradient} rounded-lg p-4 border ${colors.border}`}>
       <div className="flex items-center gap-2 mb-2">
         <i className={`${icon} ${colors.icon}`} />
         <p className={`text-xs font-medium ${colors.text}`}>{title}</p>
       </div>
       <p className={`text-3xl font-bold ${colors.number}`}>
-        {loading ? (
-          <i
-            className={`fa-solid fa-spinner fa-spin ${colors.icon} text-2xl`}
-          />
-        ) : (
-          value
-        )}
+        {loading ? <i className={`fa-solid fa-spinner fa-spin ${colors.icon} text-2xl`} /> : value}
       </p>
       <p className={`text-xs ${colors.subtitle} mt-1`}>{subtitle}</p>
     </div>

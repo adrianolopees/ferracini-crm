@@ -1,14 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useTopProducts } from '@/hooks';
 
 function TopProductsChart() {
@@ -53,12 +44,8 @@ function TopProductsChart() {
   if (products.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6 mt-8">
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
-          Produtos Mais Procurados
-        </h2>
-        <p className="text-gray-500 text-center py-8">
-          Nenhum produto cadastrado ainda
-        </p>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Produtos Mais Procurados</h2>
+        <p className="text-gray-500 text-center py-8">Nenhum produto cadastrado ainda</p>
       </div>
     );
   }
@@ -88,13 +75,9 @@ function TopProductsChart() {
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <span className="text-xl flex-shrink-0">{icon}</span>
-                    <span className="text-sm text-gray-700 font-medium truncate">
-                      {product.name}
-                    </span>
+                    <span className="text-sm text-gray-700 font-medium truncate">{product.name}</span>
                   </div>
-                  <span className="text-base font-bold text-blue-600 flex-shrink-0">
-                    {product.count}
-                  </span>
+                  <span className="text-base font-bold text-blue-600 flex-shrink-0">{product.count}</span>
                 </div>
               );
             })}
@@ -137,12 +120,7 @@ function TopProductsChart() {
             <XAxis type="number" tick={{ fill: '#6B7280', fontSize: 12 }} />
 
             {/* Eixo Y (nomes dos produtos) */}
-            <YAxis
-              type="category"
-              dataKey="name"
-              width={80}
-              tick={{ fill: '#6B7280', fontSize: 12 }}
-            />
+            <YAxis type="category" dataKey="name" width={80} tick={{ fill: '#6B7280', fontSize: 12 }} />
 
             {/* Tooltip ao passar mouse */}
             <Tooltip
@@ -155,10 +133,7 @@ function TopProductsChart() {
                 fontSize: '14px',
                 boxShadow: '0 10px 25px rgba(59, 130, 246, 0.15)',
               }}
-              formatter={(value: number) => [
-                `${value} ${value === 1 ? 'cliente' : 'clientes'}`,
-                'Total',
-              ]}
+              formatter={(value: number) => [`${value} ${value === 1 ? 'cliente' : 'clientes'}`, 'Total']}
               labelStyle={{
                 fontWeight: 'bold',
                 marginBottom: '4px',
@@ -171,10 +146,7 @@ function TopProductsChart() {
             {/* Barras */}
             <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={25}>
               {products.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Bar>
           </BarChart>
@@ -185,8 +157,7 @@ function TopProductsChart() {
       {!isMobile && (
         <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1">
           <i className="fa-solid fa-chart-simple text-blue-500"></i>
-          Baseado em {products.reduce((sum, p) => sum + p.count, 0)} reservas
-          ativas
+          Baseado em {products.reduce((sum, p) => sum + p.count, 0)} reservas ativas
         </p>
       )}
     </div>

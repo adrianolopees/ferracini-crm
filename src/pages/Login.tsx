@@ -83,12 +83,7 @@ function Login() {
               required
             />
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              fullWidth={true}
-              className="flex justify-center"
-            >
+            <Button type="submit" disabled={isLoading} fullWidth={true} className="flex justify-center">
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
                   <Spinner size="sm" />
@@ -102,9 +97,7 @@ function Login() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-gray-600 mt-6 text-sm">
-          © 2025 Adriano Lopes. Todos os direitos reservados.
-        </p>
+        <p className="text-center text-gray-600 mt-6 text-sm">© 2025 Adriano Lopes. Todos os direitos reservados.</p>
       </div>
     </div>
   );

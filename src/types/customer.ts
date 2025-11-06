@@ -1,15 +1,6 @@
-export type CustomerStatus =
-  | 'pending'
-  | 'awaiting_transfer'
-  | 'ready_for_pickup'
-  | 'completed';
+export type CustomerStatus = 'pending' | 'awaiting_transfer' | 'ready_for_pickup' | 'completed';
 
-export type ArchiveReason =
-  | 'gave_up'
-  | 'no_response'
-  | 'bought_elsewhere'
-  | 'product_unavailable'
-  | 'other';
+export type ArchiveReason = 'gave_up' | 'no_response' | 'bought_elsewhere' | 'product_unavailable' | 'other';
 
 export interface Customer {
   id: string;

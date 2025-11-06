@@ -27,9 +27,7 @@ function useTopProducts(limit: number = 10) {
           }
         });
 
-        const productsArray = Object.entries(modeloCounts).map(
-          ([name, count]) => ({ name, count })
-        );
+        const productsArray = Object.entries(modeloCounts).map(([name, count]) => ({ name, count }));
 
         const sortedProducts = productsArray.sort((a, b) => b.count - a.count);
 
