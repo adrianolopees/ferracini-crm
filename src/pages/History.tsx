@@ -173,7 +173,7 @@ function History() {
   const tabs = [
     {
       id: 'transfers',
-      label: 'Transferências',
+      label: 'Transferidos',
       count: transferCustomers.length,
       icon: 'fa-solid fa-truck-fast',
     },
@@ -185,7 +185,7 @@ function History() {
     },
     {
       id: 'long_wait',
-      label: 'Espera Longa',
+      label: '30+ dias',
       count: longWaitCustomers.length,
       icon: 'fa-solid fa-clock',
     },

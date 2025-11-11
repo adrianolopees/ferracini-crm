@@ -42,7 +42,7 @@ function useCustomersList({ modalType }: UseCustomersListProps) {
           // Modal "Aguardando" - mostra clientes pendentes EXCETO os com 30+ dias
           filtered = activeCustomers.filter((c) => {
             const isPending = !c.status || c.status === 'pending';
-            const isNotLongWait = getDaysWaiting(c.createdAt) <= 29;
+            const isNotLongWait = getDaysWaiting(c.createdAt) < 30;
             return isPending && isNotLongWait;
           });
         } else if (modalType === 'awaiting_transfer') {

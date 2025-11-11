@@ -30,7 +30,7 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
                   onTabChange(tab.id);
                 }}
                 className={`
-                  flex-1 px-2 sm:px-4 py-3 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 cursor-pointer
+                  flex-1 min-w-0 px-1 sm:px-2 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1 cursor-pointer
                   ${
                     isActive
                       ? 'border-blue-500 text-blue-600'
@@ -39,16 +39,16 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
                 `}
               >
                 {/* Ícone - maior em mobile */}
-                {tab.icon && <i className={`${tab.icon} text-xl sm:text-base`}></i>}
+                {tab.icon && <i className={`${tab.icon} text-base sm:text-base flex-shrink-0`}></i>}
 
                 {/* Label - apenas desktop */}
-                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="hidden sm:inline text-[11px] sm:text-xs truncate min-w-0 max-w-[90px]">{tab.label}</span>
 
                 {/* Badge de contagem */}
                 {tab.count !== undefined && (
                   <span
                     className={`
-                      px-2 py-0.5 rounded-full text-xs font-semibold
+                      px-1 py-0.5 rounded-full text-[10px] font-semibold flex-shrink-0 min-w-[20px] text-center
                       ${isActive ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}
                     `}
                   >

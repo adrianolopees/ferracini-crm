@@ -49,18 +49,18 @@ function useDashboardMetrics() {
           const daysWaiting = getDaysWaiting(data.createdAt);
 
           // Contadores por status (EXCLUIR clientes com 30+ dias do "pending")
-          if (status === 'pending' && daysWaiting <= 29) awaitingCount++;
+          if (status === 'pending' && daysWaiting < 30) awaitingCount++;
           if (status === 'awaiting_transfer') awaitingTransferCount++;
           if (status === 'ready_for_pickup') readyForPickupCount++;
           if (status === 'completed') finishedCount++;
 
           // Urgente se aguardando há 7+ dias (mas menos de 30)
-          if (status === 'pending' && daysWaiting >= 7 && daysWaiting <= 29) {
+          if (status === 'pending' && daysWaiting >= 7 && daysWaiting < 30) {
             urgentCount++;
           }
 
           // Tempo médio apenas para aguardando (menos de 30 dias)
-          if (status === 'pending' && daysWaiting <= 29) {
+          if (status === 'pending' && daysWaiting < 30) {
             totalDays += daysWaiting;
           }
         });

@@ -20,11 +20,11 @@ function useLongWaitCustomers() {
         allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
       });
 
-      // Filtrar: ativos + aguardando + mais de 30 dias
+      // Filtrar: ativos + aguardando + 30 dias ou mais
       const longWaitCustomers = allCustomers.filter((c) => {
         const isActive = !c.archived;
         const isPending = !c.status || c.status === 'pending';
-        const isLongWait = getDaysWaiting(c.createdAt) > 29;
+        const isLongWait = getDaysWaiting(c.createdAt) >= 30;
         return isActive && isPending && isLongWait;
       });
 

@@ -70,14 +70,15 @@ function LongWaitCard({ customer, onContact, onReadyForPickup, onArchive }: Long
       </div>
 
       {/* Ações */}
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         {onContact && (
           <button
             onClick={() => onContact(customer)}
             className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm font-medium"
           >
             <i className="fa-brands fa-whatsapp"></i>
-            Contactar
+            <span className="hidden sm:inline">Contactar</span>
+            <span className="sm:hidden">WhatsApp</span>
           </button>
         )}
         {onReadyForPickup && (
