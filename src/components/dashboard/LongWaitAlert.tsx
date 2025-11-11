@@ -17,15 +17,16 @@ function LongWaitAlert({ count, loading, onClick }: LongWaitAlertProps) {
             <i className="fa-solid fa-clock text-yellow-600 text-xl mr-3"></i>
             <div>
               <p className="text-sm font-medium text-yellow-800">
-                ⚠️ {count} cliente{count > 1 ? 's' : ''} aguardando há mais de 30 dias são movidos para pagina de
-                histórico.
+                {count} cliente{count > 1 ? 's' : ''} aguardando há 30+ dias
               </p>
-              <p className="text-xs text-yellow-700 mt-1">Estes clientes podem precisar de atenção</p>
+              <p className="text-xs text-yellow-700 mt-1">
+                {count > 1 ? 'Foram movidos' : 'Foi movido'} automaticamente para Histórico → 30+ dias
+              </p>
             </div>
           </div>
           <button
             onClick={onClick}
-            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer"
           >
             Ver Lista
           </button>

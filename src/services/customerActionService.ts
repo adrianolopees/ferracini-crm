@@ -106,8 +106,8 @@ export async function autoArchiveExpiredCustomers() {
     const activeCustomers = allCustomers.filter((c) => !c.archived);
     //Filtrandos por tempo de espera
     const expiredCustomers = activeCustomers.filter((c) => {
-      const daysWainting = getDaysWaiting(c.createdAt);
-      return daysWainting > 30;
+      const daysWaiting = getDaysWaiting(c.createdAt);
+      return daysWaiting > 30;
     });
 
     for (const customer of expiredCustomers) {

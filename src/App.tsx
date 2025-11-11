@@ -1,9 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
-import RegisterCustomer from '@/pages/RegisterCustomer';
-import SearchCustomers from '@/pages/SearchCustomers';
-import Dashboard from '@/pages/Dashboard';
-import History from '@/pages/History';
+import { RegisterCustomer, SearchCustomers, Dashboard, History } from '@/pages';
 import { ProtectedRoute } from '@/components/routing';
 import Login from '@/pages/Login';
 

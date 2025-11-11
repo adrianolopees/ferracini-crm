@@ -47,10 +47,6 @@ export async function moveToFinished(customer: Customer): Promise<void> {
   await updateCustomerStatus(customer.id, 'completed');
 }
 
-export async function moveToAwaiting(customer: Customer): Promise<void> {
-  await updateCustomerStatus(customer.id, 'pending');
-}
-
 export async function markAsContacted(customer: Customer): Promise<void> {
   await updateCustomerStatus(customer.id, 'ready_for_pickup');
 }

@@ -11,7 +11,6 @@ import { TransferCard, ArchivedCard, FinalizedCard, LongWaitCard } from '@/compo
 import { AnimatePresence } from 'framer-motion';
 import { restoreFromArchive, moveToReadyForPickup } from '@/services/customerActionService';
 import { useLongWaitCustomers } from '@/hooks';
-import { getDaysWaiting } from '@/utils/date';
 import { sendGenericMessage } from '@/services/whatsappService';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
@@ -31,7 +30,7 @@ function History() {
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
   // Hook para clientes em espera longa
-  const { customers: longWaitCustomers, loading: longWaitLoading } = useLongWaitCustomers();
+  const { customers: longWaitCustomers } = useLongWaitCustomers();
 
   // Buscar clientes ao carregar
   useEffect(() => {
@@ -79,7 +78,15 @@ function History() {
       );
       setFilteredCustomers(filtered);
     }
-  }, [searchTerm, activeTab, finalizedCustomers, transferCustomers, archivedCustomers, longWaitCustomers, transferFilter]);
+  }, [
+    searchTerm,
+    activeTab,
+    finalizedCustomers,
+    transferCustomers,
+    archivedCustomers,
+    longWaitCustomers,
+    transferFilter,
+  ]);
 
   const fetchAllCustomers = async () => {
     try {
