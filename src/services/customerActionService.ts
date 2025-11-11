@@ -1,4 +1,4 @@
-import { updateDoc, doc } from 'firebase/firestore';
+import { updateDoc, doc, collection, query, getDocs } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Customer, ArchiveReason } from '@/types/customer';
 import {
@@ -8,6 +8,7 @@ import {
   sendStoreDomPedro,
 } from '@/services/whatsappService';
 import { moveToAwaitingTransfer, markAsContacted, moveToFinished } from '@/services/customerStatusService';
+import { getDaysWaiting } from '@/utils';
 
 export async function checkStoreCampinas(customer: Customer): Promise<void> {
   await updateDoc(doc(db, 'customers', customer.id), {
@@ -74,6 +75,13 @@ export async function restoreFromArchive(customer: Customer): Promise<void> {
   });
 }
 
+export async function moveToReadyForPickup(customer: Customer): Promise<void> {
+  await updateDoc(doc(db, 'customers', customer.id), {
+    status: 'ready_for_pickup',
+    contactedAt: new Date().toISOString(),
+  });
+}
+
 export async function resetToInitial(customer: Customer): Promise<void> {
   await updateDoc(doc(db, 'customers', customer.id), {
     consultingStore: null,
@@ -83,4 +91,36 @@ export async function resetToInitial(customer: Customer): Promise<void> {
     transferredAt: null,
     contactedAt: null,
   });
+}
+
+export async function autoArchiveExpiredCustomers() {
+  try {
+    const customersQuery = query(collection(db, 'customers'));
+    const snapshot = await getDocs(customersQuery);
+    let allCustomers: Customer[] = [];
+    //Busca todos os clientes
+    snapshot.forEach((doc) => {
+      allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
+    });
+    //Filtra só clientes ativos (não arquivados)
+    const activeCustomers = allCustomers.filter((c) => !c.archived);
+    //Filtrandos por tempo de espera
+    const expiredCustomers = activeCustomers.filter((c) => {
+      const daysWainting = getDaysWaiting(c.createdAt);
+      return daysWainting > 30;
+    });
+
+    for (const customer of expiredCustomers) {
+      await declineTransfer(
+        customer,
+        'exceeded_wait_time',
+        `Arquivado automaticamente após ${getDaysWaiting(customer.createdAt)} dias de espera`
+      );
+    }
+
+    return expiredCustomers.length;
+  } catch (error) {
+    console.error('Erro ao arquivar clientes expirados:', error);
+    throw error;
+  }
 }

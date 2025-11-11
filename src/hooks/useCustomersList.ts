@@ -8,13 +8,13 @@ type ModalType = 'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null;
 
 interface UseCustomersListProps {
   modalType: ModalType;
-  isOpen: boolean;
 }
 
-function useCustomersList({ modalType, isOpen }: UseCustomersListProps) {
+function useCustomersList({ modalType }: UseCustomersListProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const isOpen = modalType !== null;
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
   }, []);
@@ -32,15 +32,19 @@ function useCustomersList({ modalType, isOpen }: UseCustomersListProps) {
           allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
         });
 
-        // Primeiro: filtrar clientes arquivados (não mostrar em nenhuma lista)
+        // Primeiro: filtrar clientes  nao arquivados (não mostrar em nenhuma lista)
         const activeCustomers = allCustomers.filter((c) => !c.archived);
 
         // Filtrar baseado no tipo
         let filtered = activeCustomers;
 
         if (modalType === 'awaiting') {
-          // Modal "Aguardando" - mostra TODOS clientes pendentes
-          filtered = activeCustomers.filter((c) => !c.status || c.status === 'pending');
+          // Modal "Aguardando" - mostra clientes pendentes EXCETO os com 30+ dias
+          filtered = activeCustomers.filter((c) => {
+            const isPending = !c.status || c.status === 'pending';
+            const isNotLongWait = getDaysWaiting(c.createdAt) <= 29;
+            return isPending && isNotLongWait;
+          });
         } else if (modalType === 'awaiting_transfer') {
           // Modal "Aguardando Transferência"
           filtered = activeCustomers.filter((c) => c.status === 'awaiting_transfer');

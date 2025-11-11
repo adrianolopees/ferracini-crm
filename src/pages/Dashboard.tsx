@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
-import { ActionCard, MetricCard } from '@/components/dashboard';
+import { ActionCard, MetricCard, LongWaitAlert } from '@/components/dashboard';
 import { TopProductsChart } from '@/components/charts';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';
-import { useDashboardMetrics, useCustomersList } from '@/hooks';
+import { useDashboardMetrics, useCustomersList, useLongWaitCustomers } from '@/hooks';
 import {
   checkStoreCampinas,
   checkStoreDomPedro,
@@ -21,22 +22,18 @@ import { Customer, ArchiveReason } from '@/types/customer';
 import { sendGenericMessage } from '@/services/whatsappService';
 
 function Dashboard() {
+  const navigate = useNavigate();
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [modalType, setModalType] = useState<'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null>(null);
 
   const { metrics, loading, refresh: refreshMetrics } = useDashboardMetrics();
-  const {
-    customers,
-    loading: customersLoading,
-    refresh: refreshCustomers,
-  } = useCustomersList({ modalType, isOpen: modalType !== null });
-
+  const { customers, loading: customersLoading, refresh: refreshCustomers } = useCustomersList({ modalType });
   const refreshAll = () => {
     refreshMetrics();
     refreshCustomers();
   };
-
+  const { count: longWaitCount, loading: longWaitLoading } = useLongWaitCustomers();
   const handleCheckStoreCampinas = async (customer: Customer) => {
     try {
       await checkStoreCampinas(customer);
@@ -149,6 +146,11 @@ function Dashboard() {
       toast.error('Erro ao resetar cliente');
     }
   };
+
+  const handleViewLongWait = () => {
+    navigate('/history?tab=long_wait');
+  };
+
   const getModalTitle = () => {
     if (modalType === 'awaiting') return `Clientes Aguardando (${metrics.totalActive})`;
     if (modalType === 'awaiting_transfer') return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
@@ -207,6 +209,11 @@ function Dashboard() {
             onClick={() => setModalType('ready_for_pickup')}
           />
         </AnimatedContainer>
+      </div>
+
+      {/* Banner de Espera Longa */}
+      <div className="px-4 max-w-5xl mx-auto mt-6">
+        <LongWaitAlert count={longWaitCount} loading={longWaitLoading} onClick={handleViewLongWait} />
       </div>
 
       {/* Estatísticas */}

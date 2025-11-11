@@ -70,7 +70,7 @@ function WorkflowCard({
     <div
       className={`${borderClass} rounded-lg p-3 sm:p-4 border-l-4 hover:shadow-md transition-shadow duration-200 relative`}
     >
-      {/* Top-Right Action Buttons - Hidden on mobile, visible on md+ */}
+      {/* Top-Right Action Buttons */}
       {showActions && (
         <div className="hidden md:flex absolute top-3 right-3 flex-col gap-2">
           {/* Reset to Initial State */}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
@@ -6,14 +7,19 @@ import { Customer } from '@/types/customer';
 import { Input, PageLayout, Tabs } from '@/components/ui';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { ConfirmModal } from '@/components/modals';
-import { TransferCard, ArchivedCard, FinalizedCard } from '@/components/history';
+import { TransferCard, ArchivedCard, FinalizedCard, LongWaitCard } from '@/components/history';
 import { AnimatePresence } from 'framer-motion';
-import { restoreFromArchive } from '@/services/customerActionService';
+import { restoreFromArchive, moveToReadyForPickup } from '@/services/customerActionService';
+import { useLongWaitCustomers } from '@/hooks';
+import { getDaysWaiting } from '@/utils/date';
+import { sendGenericMessage } from '@/services/whatsappService';
 
-type TabType = 'finalized' | 'transfers' | 'archived';
+type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
 
 function History() {
-  const [activeTab, setActiveTab] = useState<TabType>('transfers');
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab') as TabType | null;
+  const [activeTab, setActiveTab] = useState<TabType>(tabParam || 'transfers');
   const [searchTerm, setSearchTerm] = useState('');
   const [finalizedCustomers, setFinalizedCustomers] = useState<Customer[]>([]);
   const [transferCustomers, setTransferCustomers] = useState<Customer[]>([]);
@@ -23,6 +29,9 @@ function History() {
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
+
+  // Hook para clientes em espera longa
+  const { customers: longWaitCustomers, loading: longWaitLoading } = useLongWaitCustomers();
 
   // Buscar clientes ao carregar
   useEffect(() => {
@@ -42,7 +51,9 @@ function History() {
         ? finalizedCustomers
         : activeTab === 'transfers'
           ? transferCustomers
-          : archivedCustomers;
+          : activeTab === 'long_wait'
+            ? longWaitCustomers
+            : archivedCustomers;
 
     customers =
       activeTab === 'transfers' && transferFilter !== 'all'
@@ -68,7 +79,7 @@ function History() {
       );
       setFilteredCustomers(filtered);
     }
-  }, [searchTerm, activeTab, finalizedCustomers, transferCustomers, archivedCustomers, transferFilter]);
+  }, [searchTerm, activeTab, finalizedCustomers, transferCustomers, archivedCustomers, longWaitCustomers, transferFilter]);
 
   const fetchAllCustomers = async () => {
     try {
@@ -138,6 +149,27 @@ function History() {
     }
   };
 
+  const handleContact = (customer: Customer) => {
+    sendGenericMessage(customer);
+    toast.success(`WhatsApp aberto para ${customer.name}`);
+  };
+
+  const handleReadyForPickup = async (customer: Customer) => {
+    try {
+      await moveToReadyForPickup(customer);
+      toast.success(`${customer.name} movido para Pronto para Retirada!`);
+      fetchAllCustomers();
+    } catch (error) {
+      console.error('Erro ao mover cliente:', error);
+      toast.error('Erro ao atualizar cliente');
+    }
+  };
+
+  const handleArchiveFromLongWait = (customer: Customer) => {
+    setCustomerToDelete(customer);
+    setDeleteModalOpen(true);
+  };
+
   const tabs = [
     {
       id: 'transfers',
@@ -150,6 +182,12 @@ function History() {
       label: 'Finalizados',
       count: finalizedCustomers.length,
       icon: 'fa-solid fa-circle-check',
+    },
+    {
+      id: 'long_wait',
+      label: 'Espera Longa',
+      count: longWaitCustomers.length,
+      icon: 'fa-solid fa-clock',
     },
     {
       id: 'archived',
@@ -336,7 +374,9 @@ function History() {
                           ? 'fa-solid fa-circle-check'
                           : activeTab === 'transfers'
                             ? 'fa-solid fa-arrows-turn-right'
-                            : 'fa-solid fa-archive'
+                            : activeTab === 'long_wait'
+                              ? 'fa-solid fa-clock'
+                              : 'fa-solid fa-archive'
                       }`}
                     ></i>
                   </div>
@@ -347,7 +387,9 @@ function History() {
                         ? 'Nenhuma venda finalizada ainda'
                         : activeTab === 'transfers'
                           ? 'Nenhuma transferência recebida ainda'
-                          : 'Nenhum cliente arquivado'}
+                          : activeTab === 'long_wait'
+                            ? 'Nenhum cliente aguardando há mais de 30 dias'
+                            : 'Nenhum cliente arquivado'}
                   </p>
                   <p className="text-gray-500 text-sm mt-1">{searchTerm && 'Tente outro termo de busca'}</p>
                 </div>
@@ -356,6 +398,7 @@ function History() {
                   {filteredCustomers.map((customer, index) => {
                     const isArchivedTab = activeTab === 'archived';
                     const isTransferTab = activeTab === 'transfers';
+                    const isLongWaitTab = activeTab === 'long_wait';
 
                     return (
                       <AnimatedListItem key={`${activeTab}-${customer.id}`} index={index}>
@@ -363,6 +406,13 @@ function History() {
                           <TransferCard customer={customer} />
                         ) : isArchivedTab ? (
                           <ArchivedCard customer={customer} onRestore={handleRestore} onDelete={handleDelete} />
+                        ) : isLongWaitTab ? (
+                          <LongWaitCard
+                            customer={customer}
+                            onContact={handleContact}
+                            onReadyForPickup={handleReadyForPickup}
+                            onArchive={handleArchiveFromLongWait}
+                          />
                         ) : (
                           <FinalizedCard customer={customer} />
                         )}
