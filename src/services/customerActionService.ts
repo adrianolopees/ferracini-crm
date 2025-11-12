@@ -1,4 +1,4 @@
-import { updateDoc, doc, collection, query, getDocs } from 'firebase/firestore';
+import { updateDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { Customer, ArchiveReason } from '@/types/customer';
 import {
@@ -8,7 +8,55 @@ import {
   sendStoreDomPedro,
 } from '@/services/whatsappService';
 import { moveToAwaitingTransfer, markAsContacted, moveToFinished } from '@/services/customerStatusService';
-import { getDaysWaiting } from '@/utils';
+
+// ============================================
+// 🔹 FUNÇÕES GENÉRICAS (Low-level)
+// ============================================
+export async function archiveCustomer(customer: Customer, reason: ArchiveReason, notes?: string): Promise<void> {
+  await updateDoc(doc(db, 'customers', customer.id), {
+    archived: true,
+    archiveReason: reason,
+    archivedAt: new Date().toISOString(),
+    notes: notes || '',
+  });
+}
+
+export async function restoreFromArchive(customer: Customer): Promise<void> {
+  await updateDoc(doc(db, 'customers', customer.id), {
+    archived: false,
+    archiveReason: null,
+    archivedAt: null,
+    notes: null,
+    status: 'ready_for_pickup',
+    contactedAt: new Date().toISOString(),
+  });
+}
+
+export async function deleteCustomer(customer: Customer): Promise<void> {
+  await deleteDoc(doc(db, 'customers', customer.id));
+}
+
+export async function moveToReadyForPickup(customer: Customer): Promise<void> {
+  await updateDoc(doc(db, 'customers', customer.id), {
+    status: 'ready_for_pickup',
+    contactedAt: new Date().toISOString(),
+  });
+}
+
+export async function resetToInitial(customer: Customer): Promise<void> {
+  await updateDoc(doc(db, 'customers', customer.id), {
+    consultingStore: null,
+    storeHasStock: false,
+    status: 'pending',
+    sourceStore: null,
+    transferredAt: null,
+    contactedAt: null,
+  });
+}
+
+// ============================================
+// 🔹 FUNÇÕES DE NEGÓCIO (High-level)
+// ============================================
 
 export async function checkStoreCampinas(customer: Customer): Promise<void> {
   await updateDoc(doc(db, 'customers', customer.id), {
@@ -48,11 +96,11 @@ export async function acceptTransfer(customer: Customer): Promise<void> {
 
 export async function declineTransfer(customer: Customer, reason: ArchiveReason, notes?: string): Promise<void> {
   await updateDoc(doc(db, 'customers', customer.id), {
-    archived: true,
-    archiveReason: reason,
-    archivedAt: new Date().toISOString(),
-    notes: notes || '',
+    consultingStore: null,
+    sotreHasStock: false,
   });
+
+  await archiveCustomer(customer, reason, notes);
 }
 
 export async function productArrived(customer: Customer): Promise<void> {
@@ -62,65 +110,4 @@ export async function productArrived(customer: Customer): Promise<void> {
 
 export async function completeOrder(customer: Customer): Promise<void> {
   await moveToFinished(customer);
-}
-
-export async function restoreFromArchive(customer: Customer): Promise<void> {
-  await updateDoc(doc(db, 'customers', customer.id), {
-    archived: false,
-    archiveReason: null,
-    archivedAt: null,
-    notes: null,
-    status: 'ready_for_pickup',
-    contactedAt: new Date().toISOString(),
-  });
-}
-
-export async function moveToReadyForPickup(customer: Customer): Promise<void> {
-  await updateDoc(doc(db, 'customers', customer.id), {
-    status: 'ready_for_pickup',
-    contactedAt: new Date().toISOString(),
-  });
-}
-
-export async function resetToInitial(customer: Customer): Promise<void> {
-  await updateDoc(doc(db, 'customers', customer.id), {
-    consultingStore: null,
-    storeHasStock: false,
-    status: 'pending',
-    sourceStore: null,
-    transferredAt: null,
-    contactedAt: null,
-  });
-}
-
-export async function autoArchiveExpiredCustomers() {
-  try {
-    const customersQuery = query(collection(db, 'customers'));
-    const snapshot = await getDocs(customersQuery);
-    let allCustomers: Customer[] = [];
-    //Busca todos os clientes
-    snapshot.forEach((doc) => {
-      allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
-    });
-    //Filtra só clientes ativos (não arquivados)
-    const activeCustomers = allCustomers.filter((c) => !c.archived);
-    //Filtrandos por tempo de espera
-    const expiredCustomers = activeCustomers.filter((c) => {
-      const daysWaiting = getDaysWaiting(c.createdAt);
-      return daysWaiting > 30;
-    });
-
-    for (const customer of expiredCustomers) {
-      await declineTransfer(
-        customer,
-        'exceeded_wait_time',
-        `Arquivado automaticamente após ${getDaysWaiting(customer.createdAt)} dias de espera`
-      );
-    }
-
-    return expiredCustomers.length;
-  } catch (error) {
-    console.error('Erro ao arquivar clientes expirados:', error);
-    throw error;
-  }
 }

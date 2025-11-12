@@ -8,6 +8,7 @@ import { Input, PageLayout } from '@/components/ui';
 import { WorkflowCard } from '@/components/dashboard';
 import { ArchiveModal } from '@/components/modals';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
+import { archiveCustomer } from '@/services/customerActionService';
 
 function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -97,21 +98,9 @@ function SearchCustomers() {
 
   const handleArchiveCustomer = async (reason: ArchiveReason, notes?: string) => {
     if (!customerToArchive) return;
-
     try {
-      await updateDoc(doc(db, 'customers', customerToArchive.id), {
-        archived: true,
-        archivedAt: new Date().toISOString(),
-        archiveReason: reason,
-        notes: notes || '',
-      });
-
+      await archiveCustomer(customerToArchive, reason, notes);
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
-      setArchiveModalOpen(false);
-      setCustomerToArchive(null);
-
-      // Atualiza lista de resultados (remove da tela)
-      setCustomers(customers.filter((c) => c.id !== customerToArchive.id));
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
       toast.error('Erro ao arquivar cliente');

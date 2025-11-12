@@ -99,6 +99,7 @@ function History() {
       return customers;
     }
 
+    // Filtrar por termo de busca
     const term = searchTerm.toLowerCase();
     return customers.filter(
       (customer) =>
@@ -164,7 +165,7 @@ function History() {
     }
   };
 
-  const handleDelete = async (customer: Customer) => {
+  const handleDelete = (customer: Customer) => {
     setCustomerToDelete(customer);
     setDeleteModalOpen(true);
   };
@@ -271,6 +272,25 @@ function History() {
     },
   ];
 
+  const emptyStateConfig: Record<TabType, { icon: string; message: string }> = {
+    finalized: {
+      icon: 'fa-solid fa-circle-check',
+      message: 'Nenhuma venda finalizada ainda',
+    },
+    transfers: {
+      icon: 'fa-solid fa-arrows-turn-right',
+      message: 'Nenhuma transferência recebida ainda',
+    },
+    long_wait: {
+      icon: 'fa-solid fa-clock',
+      message: 'Nenhum cliente aguardando há mais de 30 dias',
+    },
+    archived: {
+      icon: 'fa-solid fa-archive',
+      message: 'Nenhum cliente arquivado',
+    },
+  };
+
   return (
     <PageLayout
       title="Histórico de"
@@ -300,7 +320,7 @@ function History() {
                   <h3 className="text-sm font-semibold text-gray-800">Filtros de Transferências</h3>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   {filterButtons.map((filter) => (
                     <FilterButton
                       key={filter.value}
@@ -323,30 +343,12 @@ function History() {
               ) : filteredCustomers.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                    <i
-                      className={`text-gray-400 text-2xl ${
-                        activeTab === 'finalized'
-                          ? 'fa-solid fa-circle-check'
-                          : activeTab === 'transfers'
-                            ? 'fa-solid fa-arrows-turn-right'
-                            : activeTab === 'long_wait'
-                              ? 'fa-solid fa-clock'
-                              : 'fa-solid fa-archive'
-                      }`}
-                    ></i>
+                    <i className={`text-gray-400 text-2xl ${emptyStateConfig[activeTab].icon}`}></i>
                   </div>
                   <p className="text-gray-600 font-medium">
-                    {searchTerm
-                      ? 'Nenhum resultado encontrado'
-                      : activeTab === 'finalized'
-                        ? 'Nenhuma venda finalizada ainda'
-                        : activeTab === 'transfers'
-                          ? 'Nenhuma transferência recebida ainda'
-                          : activeTab === 'long_wait'
-                            ? 'Nenhum cliente aguardando há mais de 30 dias'
-                            : 'Nenhum cliente arquivado'}
+                    {searchTerm ? 'Nenhum resultado encontrado' : emptyStateConfig[activeTab].message}
                   </p>
-                  <p className="text-gray-500 text-sm mt-1">{searchTerm && 'Tente outro termo de busca'}</p>
+                  {searchTerm && <p className="text-gray-500 text-sm mt-1">Tente outro termo de busca</p>}
                 </div>
               ) : (
                 <AnimatePresence mode="popLayout">

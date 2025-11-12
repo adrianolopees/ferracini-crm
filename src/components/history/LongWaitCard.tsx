@@ -27,7 +27,7 @@ function LongWaitCard({ customer, onContact, onReadyForPickup, onArchive }: Long
   const daysWaiting = getDaysWaiting(customer.createdAt);
 
   return (
-    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-500 rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow">
+    <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200">
       {/* Header - Tempo de Espera */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -48,7 +48,7 @@ function LongWaitCard({ customer, onContact, onReadyForPickup, onArchive }: Long
       {/* Cliente e Produto */}
       <div className="bg-white rounded-lg p-3 mb-3">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
+          <div className="flex flex-row gap-4">
             <div className="flex items-center gap-2 mb-2">
               <i className="fa-solid fa-user text-gray-400 text-sm"></i>
               <p className="font-semibold text-gray-800">{customer.name}</p>
