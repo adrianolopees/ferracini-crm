@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { collection, getDocs, query } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { getAllCustomers } from '@/repositories';
 import { getDaysWaiting } from '@/utils';
 
 interface DashboardMetrics {
@@ -30,7 +29,7 @@ function useDashboardMetrics() {
   useEffect(() => {
     async function fetchMetrics() {
       try {
-        const snapshot = await getDocs(query(collection(db, 'customers')));
+        const allCustomers = await getAllCustomers();
 
         let urgentCount = 0;
         let totalDays = 0;
@@ -39,14 +38,12 @@ function useDashboardMetrics() {
         let readyForPickupCount = 0;
         let finishedCount = 0;
 
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-
+        allCustomers.forEach((customer) => {
           // PROTEÇÃO: Ignorar clientes arquivados
-          if (data.archived) return;
+          if (customer.archived) return;
 
-          const status = data.status || 'pending';
-          const daysWaiting = getDaysWaiting(data.createdAt);
+          const status = customer.status || 'pending';
+          const daysWaiting = getDaysWaiting(customer.createdAt);
 
           // Contadores por status (EXCLUIR clientes com 30+ dias do "pending")
           if (status === 'pending' && daysWaiting < 30) awaitingCount++;

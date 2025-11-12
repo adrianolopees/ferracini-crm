@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { collection, query, getDocs } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { getAllCustomers } from '@/repositories';
 import { Customer } from '@/types/customer';
 import { getDaysWaiting } from '@/utils';
 
@@ -24,15 +23,10 @@ function useCustomersList({ modalType }: UseCustomersListProps) {
     async function fetchCustomers() {
       setLoading(true);
       try {
-        let allCustomers: Customer[] = [];
+        // Busca todos os clientes do repository
+        const allCustomers = await getAllCustomers();
 
-        const customersQuery = query(collection(db, 'customers'));
-        const snapshot = await getDocs(customersQuery);
-        snapshot.forEach((doc) => {
-          allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
-        });
-
-        // Primeiro: filtrar clientes  nao arquivados (não mostrar em nenhuma lista)
+        // Filtrar clientes não arquivados
         const activeCustomers = allCustomers.filter((c) => !c.archived);
 
         // Filtrar baseado no tipo

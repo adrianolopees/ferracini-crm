@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { getAllCustomers } from '@/repositories';
 
 interface ProductCount {
   name: string;
@@ -14,13 +13,12 @@ function useTopProducts(limit: number = 10) {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const snapshot = await getDocs(collection(db, 'customers'));
+        const allCustomers = await getAllCustomers();
 
         const modeloCounts: Record<string, number> = {};
 
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const modelo = data.model;
+        allCustomers.forEach((customer) => {
+          const modelo = customer.model;
 
           if (modelo) {
             modeloCounts[modelo] = (modeloCounts[modelo] || 0) + 1;

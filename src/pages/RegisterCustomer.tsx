@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { createCustomer } from '@/repositories';
 import { formSchema, FormData } from '@/schemas/registerSchema';
 import { getFirebaseErrorMessage, maskPhone } from '@/utils';
 import toast from 'react-hot-toast';
@@ -39,7 +38,7 @@ function RegisterCustomer() {
 
     try {
       await toast.promise(
-        addDoc(collection(db, 'customers'), {
+        createCustomer({
           ...data,
           reference: data.reference.toLowerCase(),
           model: data.model.toLowerCase(),

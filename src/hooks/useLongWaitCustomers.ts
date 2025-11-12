@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, getDocs } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { getAllCustomers } from '@/repositories';
 import { Customer } from '@/types/customer';
 import { getDaysWaiting } from '@/utils/date';
 
@@ -12,13 +11,7 @@ function useLongWaitCustomers() {
   const fetchLongWaitCustomers = async () => {
     setLoading(true);
     try {
-      const customersQuery = query(collection(db, 'customers'));
-      const snapshot = await getDocs(customersQuery);
-
-      let allCustomers: Customer[] = [];
-      snapshot.forEach((doc) => {
-        allCustomers.push({ id: doc.id, ...doc.data() } as Customer);
-      });
+      const allCustomers = await getAllCustomers();
 
       // Filtrar: ativos + aguardando + 30 dias ou mais
       const longWaitCustomers = allCustomers.filter((c) => {

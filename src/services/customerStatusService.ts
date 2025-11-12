@@ -1,5 +1,4 @@
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { updateCustomer } from '@/repositories';
 import { Customer, CustomerStatus } from '@/types/customer';
 
 export async function updateCustomerStatus(
@@ -30,8 +29,7 @@ export async function updateCustomerStatus(
       break;
   }
 
-  const customerRef = doc(db, 'customers', customerId);
-  await updateDoc(customerRef, updateData);
+  await updateCustomer(customerId, updateData);
 }
 
 export async function moveToAwaitingTransfer(
