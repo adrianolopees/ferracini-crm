@@ -19,14 +19,14 @@ export interface Customer {
   salesperson?: string;
   createdAt: string;
   status?: CustomerStatus;
-  contactedAt?: string;
-  transferredAt?: string;
+  contactedAt?: string | null;
+  transferredAt?: string | null;
   completedAt?: string;
-  sourceStore?: 'Campinas' | 'Dom Pedro' | 'Jundiaí';
+  sourceStore?: 'Campinas' | 'Dom Pedro' | 'Jundiaí' | null;
   archived?: boolean;
-  archiveReason?: ArchiveReason;
-  archivedAt?: string;
-  notes?: string;
-  consultingStore?: 'Campinas' | 'Dom Pedro';
+  archiveReason?: ArchiveReason | null;
+  archivedAt?: string | null;
+  notes?: string | null;
+  consultingStore?: 'Campinas' | 'Dom Pedro' | null;
   storeHasStock?: boolean;
 }

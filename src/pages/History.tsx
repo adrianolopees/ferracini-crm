@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { collection, getDocs, doc } from 'firebase/firestore';
-import { db } from '@/services/firebase';
+import { getAllCustomers } from '@/repositories';
 import toast from 'react-hot-toast';
 import { Customer, ArchiveReason } from '@/types/customer';
 import { Input, PageLayout, Tabs } from '@/components/ui';
@@ -9,7 +8,12 @@ import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { ConfirmModal, ArchiveModal } from '@/components/modals';
 import { TransferCard, ArchivedCard, FinalizedCard, LongWaitCard } from '@/components/history';
 import { AnimatePresence } from 'framer-motion';
-import { restoreFromArchive, moveToReadyForPickup, archiveCustomer, deleteCustomer } from '@/services/customerActionService';
+import {
+  restoreFromArchive,
+  moveToReadyForPickup,
+  archiveCustomer,
+  deleteCustomer,
+} from '@/services/customerActionService';
 import { useLongWaitCustomers } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 
@@ -126,24 +130,24 @@ function History() {
     try {
       setLoading(true);
 
+      // ✅ Busca todos os clientes do repository
+      const allCustomers = await getAllCustomers();
+
+      // Categoriza localmente
       const finalized: Customer[] = [];
       const transfers: Customer[] = [];
       const archived: Customer[] = [];
 
-      const snapshot = await getDocs(collection(db, 'customers'));
-
-      snapshot.forEach((doc) => {
-        const customerData = doc.data();
-
-        if (customerData.archived) {
-          if (customerData.status !== 'completed') {
-            archived.push({ id: doc.id, ...customerData } as Customer);
-          }
-        } else if (customerData.status === 'completed') {
-          finalized.push({ id: doc.id, ...customerData } as Customer);
+      // ✅ Agora sim o forEach funciona
+      allCustomers.forEach((customer) => {
+        if (customer.archived && customer.status !== 'completed') {
+          archived.push(customer);
+        } else if (customer.status === 'completed') {
+          finalized.push(customer);
         }
-        if (customerData.sourceStore === 'Campinas' || customerData.sourceStore === 'Dom Pedro') {
-          transfers.push({ id: doc.id, ...customerData } as Customer);
+
+        if (customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro') {
+          transfers.push(customer);
         }
       });
 

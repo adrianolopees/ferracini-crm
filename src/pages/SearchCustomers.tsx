@@ -1,7 +1,6 @@
 import { useState, ChangeEvent } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
-import { db } from '@/services/firebase';
+import { findCustomersByReference, findCustomersByModel, updateCustomer } from '@/repositories';
 import { notifyProductArrived } from '@/services/whatsappService';
 import { Customer, ArchiveReason } from '@/types/customer';
 import { Input, PageLayout } from '@/components/ui';
@@ -26,34 +25,27 @@ function SearchCustomers() {
     }
 
     try {
-      const valorBuscado = value.toLowerCase().trim();
+      const valorBuscado = value.trim();
 
-      // Busca por referência e modelo
-      const refQuery = query(collection(db, 'customers'), where('reference', '==', valorBuscado));
-
-      const modeloQuery = query(collection(db, 'customers'), where('model', '==', valorBuscado));
-
-      const [refSnapshot, modeloSnapshot] = await Promise.all([getDocs(refQuery), getDocs(modeloQuery)]);
+      // Busca por referência e modelo usando repository
+      const [refResults, modelResults] = await Promise.all([
+        findCustomersByReference(valorBuscado),
+        findCustomersByModel(valorBuscado),
+      ]);
 
       const results: Customer[] = [];
 
       // Adiciona resultados por referência
-      refSnapshot.forEach((doc) => {
-        const customer = { id: doc.id, ...doc.data() } as Customer;
-        // Filtra apenas clientes aguardando produto NOVO:
-        // - Não arquivados
-        // - Status inicial (aguardando)
-        // - Não consultando outra loja (não está em processo de transferência)
+      refResults.forEach((customer) => {
         if (!customer.archived && (!customer.status || customer.status === 'pending') && !customer.consultingStore) {
           results.push(customer);
         }
       });
 
       // Adiciona resultados por modelo (sem duplicar)
-      modeloSnapshot.forEach((doc) => {
-        const customer = { id: doc.id, ...doc.data() } as Customer;
+      modelResults.forEach((customer) => {
         if (
-          !results.some((c) => c.id === doc.id) &&
+          !results.some((c) => c.id === customer.id) &&
           !customer.archived &&
           (!customer.status || customer.status === 'pending') &&
           !customer.consultingStore
@@ -70,20 +62,14 @@ function SearchCustomers() {
 
   const handleWhatsApp = async (customer: Customer) => {
     try {
-      // 1. Atualizar status do cliente para ready_for_pickup
-      await updateDoc(doc(db, 'customers', customer.id), {
+      await updateCustomer(customer.id, {
         status: 'ready_for_pickup',
         contactedAt: new Date().toISOString(),
         sourceStore: 'Jundiaí',
       });
 
-      // 2. Abrir WhatsApp
       notifyProductArrived(customer);
-
-      // 3. Mostrar mensagem de sucesso
       toast.success(`${customer.name} movido para "Pronto para Retirada"!`);
-
-      // 4. Atualizar lista de resultados (remove da tela)
       setCustomers(customers.filter((c) => c.id !== customer.id));
     } catch (error) {
       console.error('Erro ao processar contato:', error);
