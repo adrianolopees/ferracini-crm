@@ -98,6 +98,7 @@ function Dashboard() {
     if (!customerToArchive) return;
 
     try {
+      // Usa declineTransfer pois limpa dados de consulta/transferência antes de arquivar
       await declineTransfer(customerToArchive, reason, notes || '');
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);

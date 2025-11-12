@@ -97,7 +97,7 @@ export async function acceptTransfer(customer: Customer): Promise<void> {
 export async function declineTransfer(customer: Customer, reason: ArchiveReason, notes?: string): Promise<void> {
   await updateDoc(doc(db, 'customers', customer.id), {
     consultingStore: null,
-    sotreHasStock: false,
+    storeHasStock: false,
   });
 
   await archiveCustomer(customer, reason, notes);

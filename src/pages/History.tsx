@@ -1,15 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import toast from 'react-hot-toast';
-import { Customer } from '@/types/customer';
+import { Customer, ArchiveReason } from '@/types/customer';
 import { Input, PageLayout, Tabs } from '@/components/ui';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
-import { ConfirmModal } from '@/components/modals';
+import { ConfirmModal, ArchiveModal } from '@/components/modals';
 import { TransferCard, ArchivedCard, FinalizedCard, LongWaitCard } from '@/components/history';
 import { AnimatePresence } from 'framer-motion';
-import { restoreFromArchive, moveToReadyForPickup } from '@/services/customerActionService';
+import { restoreFromArchive, moveToReadyForPickup, archiveCustomer, deleteCustomer } from '@/services/customerActionService';
 import { useLongWaitCustomers } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 
@@ -62,6 +62,10 @@ function History() {
   const [archivedCustomers, setArchivedCustomers] = useState<Customer[]>([]);
   const [transferFilter, setTransferFilter] = useState<'all' | 'Campinas' | 'Dom Pedro'>('all');
   const [loading, setLoading] = useState(true);
+
+  // Modais de arquivamento e delete
+  const [archiveModalOpen, setArchiveModalOpen] = useState(false);
+  const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
@@ -174,7 +178,7 @@ function History() {
     if (!customerToDelete) return;
 
     try {
-      await deleteDoc(doc(db, 'customers', customerToDelete.id));
+      await deleteCustomer(customerToDelete);
       toast.success(`${customerToDelete.name} excluído permanentemente!`);
       setDeleteModalOpen(false);
       setCustomerToDelete(null);
@@ -201,9 +205,26 @@ function History() {
     }
   };
 
+  // Handler para arquivar clientes de long_wait
   const handleArchiveFromLongWait = (customer: Customer) => {
-    setCustomerToDelete(customer);
-    setDeleteModalOpen(true);
+    setCustomerToArchive(customer);
+    setArchiveModalOpen(true);
+  };
+
+  // Handler para confirmar arquivamento
+  const handleConfirmArchive = async (reason: ArchiveReason, notes?: string) => {
+    if (!customerToArchive) return;
+
+    try {
+      await archiveCustomer(customerToArchive, reason, notes || '');
+      toast.success(`${customerToArchive.name} arquivado com sucesso!`);
+      setArchiveModalOpen(false);
+      setCustomerToArchive(null);
+      fetchAllCustomers();
+    } catch (error) {
+      console.error('Erro ao arquivar cliente:', error);
+      toast.error('Erro ao arquivar cliente');
+    }
   };
 
   const tabs = [
@@ -382,6 +403,15 @@ function History() {
           </Tabs>
         </div>
       </AnimatedContainer>
+      {/* Modal de Arquivamento */}
+      <ArchiveModal
+        isOpen={archiveModalOpen}
+        onClose={() => setArchiveModalOpen(false)}
+        onConfirm={handleConfirmArchive}
+        customerName={customerToArchive?.name || ''}
+      />
+
+      {/* Modal de Delete Permanente */}
       <ConfirmModal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}
