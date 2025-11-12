@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
@@ -15,6 +15,43 @@ import { sendGenericMessage } from '@/services/whatsappService';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
 
+type FilterButtonProps = {
+  label: string;
+  icon: string;
+  count: number;
+  isActive: boolean;
+  onClick: () => void;
+  colorScheme: {
+    active: string;
+    inactive: string;
+    icon: string;
+    text: string;
+  };
+};
+
+function FilterButton({ label, icon, count, isActive, onClick, colorScheme }: FilterButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
+        isActive
+          ? `${colorScheme.active} shadow-md scale-105`
+          : `bg-white ${colorScheme.inactive} hover:border-${colorScheme.text.split('-')[1]}-400`
+      }`}
+    >
+      <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
+        <i className={`${icon} text-xs ${isActive ? 'text-white' : colorScheme.icon}`}></i>
+        <span className={`text-xs font-medium truncate ${isActive ? 'text-white' : 'text-gray-600'}`}>{label}</span>
+      </div>
+      <div
+        className={`text-lg sm:text-xl font-bold text-center sm:text-left ${isActive ? 'text-white' : colorScheme.text}`}
+      >
+        {count}
+      </div>
+    </button>
+  );
+}
+
 function History() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get('tab') as TabType | null;
@@ -23,8 +60,7 @@ function History() {
   const [finalizedCustomers, setFinalizedCustomers] = useState<Customer[]>([]);
   const [transferCustomers, setTransferCustomers] = useState<Customer[]>([]);
   const [archivedCustomers, setArchivedCustomers] = useState<Customer[]>([]);
-  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
-  const [transferFilter, setTransferFilter] = useState<'all' | 'Campinas' | 'Dom Pedro' | 'not_finalized'>('all');
+  const [transferFilter, setTransferFilter] = useState<'all' | 'Campinas' | 'Dom Pedro'>('all');
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
@@ -43,41 +79,34 @@ function History() {
     setTransferFilter('all');
   }, [activeTab]);
 
-  // Filtrar quando mudar busca ou listas
-  useEffect(() => {
-    let customers =
-      activeTab === 'finalized'
-        ? finalizedCustomers
-        : activeTab === 'transfers'
-          ? transferCustomers
-          : activeTab === 'long_wait'
-            ? longWaitCustomers
-            : archivedCustomers;
+  const filteredCustomers = useMemo(() => {
+    // Selecionar a lista base
+    const customersByTab: Record<TabType, Customer[]> = {
+      finalized: finalizedCustomers,
+      transfers: transferCustomers,
+      archived: archivedCustomers,
+      long_wait: longWaitCustomers,
+    };
+    let customers = customersByTab[activeTab] || [];
 
-    customers =
-      activeTab === 'transfers' && transferFilter !== 'all'
-        ? transferFilter === 'Campinas'
-          ? customers.filter((c) => c.sourceStore === 'Campinas')
-          : transferFilter === 'Dom Pedro'
-            ? customers.filter((c) => c.sourceStore === 'Dom Pedro')
-            : transferFilter === 'not_finalized'
-              ? customers.filter((c) => c.archived)
-              : customers
-        : customers;
-
-    if (searchTerm.trim() === '') {
-      setFilteredCustomers(customers);
-    } else {
-      const term = searchTerm.toLowerCase();
-      const filtered = customers.filter(
-        (customer) =>
-          customer.name.toLowerCase().includes(term) ||
-          customer.model.toLowerCase().includes(term) ||
-          customer.reference.toLowerCase().includes(term) ||
-          customer.phone.includes(term)
-      );
-      setFilteredCustomers(filtered);
+    // Aplicar filtro de transferências
+    if (activeTab === 'transfers' && transferFilter !== 'all') {
+      customers = customers.filter((customer) => customer.sourceStore === transferFilter);
     }
+
+    // Aplicar busca
+    if (searchTerm.trim() === '') {
+      return customers;
+    }
+
+    const term = searchTerm.toLowerCase();
+    return customers.filter(
+      (customer) =>
+        customer.name.toLowerCase().includes(term) ||
+        customer.model.toLowerCase().includes(term) ||
+        customer.reference.toLowerCase().includes(term) ||
+        customer.phone.includes(term)
+    );
   }, [
     searchTerm,
     activeTab,
@@ -116,7 +145,6 @@ function History() {
       setFinalizedCustomers(finalized);
       setTransferCustomers(transfers);
       setArchivedCustomers(archived);
-      setFilteredCustomers(finalized); // Por padrão mostra finalizados
     } catch (error) {
       console.error('Erro ao buscar histórico:', error);
       toast.error('Erro ao carregar histórico');
@@ -204,6 +232,45 @@ function History() {
     },
   ];
 
+  const filterButtons = [
+    {
+      value: 'all' as const,
+      label: 'Total',
+      icon: 'fa-solid fa-chart-line',
+      count: transferCustomers.length,
+      colorScheme: {
+        active: 'bg-emerald-500 border-emerald-600',
+        inactive: 'border-emerald-200',
+        icon: 'text-emerald-500',
+        text: 'text-emerald-600',
+      },
+    },
+    {
+      value: 'Campinas' as const,
+      label: 'Campinas',
+      icon: 'fa-solid fa-store',
+      count: transferCustomers.filter((c) => c.sourceStore === 'Campinas').length,
+      colorScheme: {
+        active: 'bg-blue-500 border-blue-600',
+        inactive: 'border-blue-200',
+        icon: 'text-blue-500',
+        text: 'text-blue-600',
+      },
+    },
+    {
+      value: 'Dom Pedro' as const,
+      label: 'Dom Pedro',
+      icon: 'fa-solid fa-store',
+      count: transferCustomers.filter((c) => c.sourceStore === 'Dom Pedro').length,
+      colorScheme: {
+        active: 'bg-purple-500 border-purple-600',
+        inactive: 'border-purple-200',
+        icon: 'text-purple-500',
+        text: 'text-purple-600',
+      },
+    },
+  ];
+
   return (
     <PageLayout
       title="Histórico de"
@@ -234,133 +301,14 @@ function History() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                  {/* Total */}
-                  <button
-                    onClick={() => setTransferFilter('all')}
-                    className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
-                      transferFilter === 'all'
-                        ? 'bg-emerald-500 border-emerald-600 shadow-md scale-105'
-                        : 'bg-white border-emerald-200 hover:border-emerald-400'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-                      <i
-                        className={`fa-solid fa-chart-line text-xs ${
-                          transferFilter === 'all' ? 'text-white' : 'text-emerald-500'
-                        }`}
-                      ></i>
-                      <span
-                        className={`text-xs font-medium truncate ${
-                          transferFilter === 'all' ? 'text-white' : 'text-gray-600'
-                        }`}
-                      >
-                        Total
-                      </span>
-                    </div>
-                    <div
-                      className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'all' ? 'text-white' : 'text-emerald-600'
-                      }`}
-                    >
-                      {transferCustomers.length}
-                    </div>
-                  </button>
-
-                  {/* Campinas */}
-                  <button
-                    onClick={() => setTransferFilter('Campinas')}
-                    className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
-                      transferFilter === 'Campinas'
-                        ? 'bg-blue-500 border-blue-600 shadow-md scale-105'
-                        : 'bg-white border-blue-200 hover:border-blue-400'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-                      <i
-                        className={`fa-solid fa-store text-xs ${
-                          transferFilter === 'Campinas' ? 'text-white' : 'text-blue-500'
-                        }`}
-                      ></i>
-                      <span
-                        className={`text-xs font-medium truncate ${
-                          transferFilter === 'Campinas' ? 'text-white' : 'text-gray-600'
-                        }`}
-                      >
-                        Campinas
-                      </span>
-                    </div>
-                    <div
-                      className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'Campinas' ? 'text-white' : 'text-blue-600'
-                      }`}
-                    >
-                      {transferCustomers.filter((c) => c.sourceStore === 'Campinas').length}
-                    </div>
-                  </button>
-
-                  {/* Dom Pedro */}
-                  <button
-                    onClick={() => setTransferFilter('Dom Pedro')}
-                    className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
-                      transferFilter === 'Dom Pedro'
-                        ? 'bg-purple-500 border-purple-600 shadow-md scale-105'
-                        : 'bg-white border-purple-200 hover:border-purple-400'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-                      <i
-                        className={`fa-solid fa-store text-xs ${
-                          transferFilter === 'Dom Pedro' ? 'text-white' : 'text-purple-500'
-                        }`}
-                      ></i>
-                      <span
-                        className={`text-xs font-medium truncate ${
-                          transferFilter === 'Dom Pedro' ? 'text-white' : 'text-gray-600'
-                        }`}
-                      >
-                        Dom Pedro
-                      </span>
-                    </div>
-                    <div
-                      className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'Dom Pedro' ? 'text-white' : 'text-purple-600'
-                      }`}
-                    >
-                      {transferCustomers.filter((c) => c.sourceStore === 'Dom Pedro').length}
-                    </div>
-                  </button>
-
-                  {/* Não Finalizados */}
-                  <button
-                    onClick={() => setTransferFilter('not_finalized')}
-                    className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
-                      transferFilter === 'not_finalized'
-                        ? 'bg-orange-500 border-orange-600 shadow-md scale-105'
-                        : 'bg-white border-orange-200 hover:border-orange-400'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-                      <i
-                        className={`fa-solid fa-box-archive text-xs ${
-                          transferFilter === 'not_finalized' ? 'text-white' : 'text-orange-500'
-                        }`}
-                      ></i>
-                      <span
-                        className={`text-xs font-medium truncate ${
-                          transferFilter === 'not_finalized' ? 'text-white' : 'text-gray-600'
-                        }`}
-                      >
-                        Não Finalizados
-                      </span>
-                    </div>
-                    <div
-                      className={`text-lg sm:text-xl font-bold text-center sm:text-left ${
-                        transferFilter === 'not_finalized' ? 'text-white' : 'text-orange-600'
-                      }`}
-                    >
-                      {transferCustomers.filter((c) => c.archived).length}
-                    </div>
-                  </button>
+                  {filterButtons.map((filter) => (
+                    <FilterButton
+                      key={filter.value}
+                      {...filter}
+                      isActive={transferFilter === filter.value}
+                      onClick={() => setTransferFilter(filter.value)}
+                    />
+                  ))}
                 </div>
               </div>
             )}
