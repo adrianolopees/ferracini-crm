@@ -1,5 +1,5 @@
 import { updateCustomer } from '@/repositories';
-import { Customer, CustomerStatus } from '@/types/customer';
+import { Customer, CustomerStatus } from '@/schemas/customer';
 
 export async function updateCustomerStatus(
   customerId: string,

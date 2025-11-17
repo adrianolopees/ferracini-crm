@@ -13,7 +13,7 @@
  * @module components/history/LongWaitCard
  */
 
-import { Customer } from '@/types/customer';
+import { Customer } from '@/schemas/customer';
 import { formatDate, getDaysWaiting } from '@/utils';
 
 interface LongWaitCardProps {

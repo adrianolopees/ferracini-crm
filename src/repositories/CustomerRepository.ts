@@ -1,6 +1,6 @@
 import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, query, where } from 'firebase/firestore';
 import { db } from '@/services/firebase';
-import { Customer, ArchiveReason } from '@/types/customer';
+import { Customer, ArchiveReason } from '@/schemas/customer';
 
 const COLLECTION_NAME = 'customers';
 

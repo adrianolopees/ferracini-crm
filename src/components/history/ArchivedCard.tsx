@@ -14,7 +14,7 @@
  * @module components/features/ArchivedCard
  */
 
-import { Customer, ArchiveReason } from '@/types/customer';
+import { Customer, ArchiveReason } from '@/schemas/customer';
 import { getTimeAgo, getDaysBetween } from '@/utils';
 
 /* ============================================================================

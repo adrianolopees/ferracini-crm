@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Customer, ArchiveReason } from '@/types/customer';
+import { Customer, ArchiveReason } from '@/schemas/customer';
 import { Input, PageLayout, Tabs } from '@/components/ui';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { ConfirmModal, ArchiveModal } from '@/components/modals';

@@ -1,5 +1,5 @@
 import { DialogModal } from '@/components/modals';
-import { Customer } from '@/types/customer';
+import { Customer } from '@/schemas/customer';
 import { AnimatedListItem } from '@/components/animations';
 import { WorkflowCard } from '@/components/dashboard';
 

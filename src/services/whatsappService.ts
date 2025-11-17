@@ -1,4 +1,4 @@
-import { Customer } from '@/types/customer';
+import { Customer } from '@/schemas/customer';
 
 const domPedroNumber = '(19) 99682-1710';
 const campinasNumber = '(19) 98221-5561';

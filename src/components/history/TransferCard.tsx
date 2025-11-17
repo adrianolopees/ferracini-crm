@@ -14,7 +14,7 @@
  * @module components/features/TransferCard
  */
 
-import { Customer } from '@/types/customer';
+import { Customer } from '@/schemas/customer';
 import { formatDate, getDaysBetween } from '@/utils';
 
 /* ============================================================================
