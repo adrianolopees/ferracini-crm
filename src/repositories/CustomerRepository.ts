@@ -51,6 +51,7 @@ export async function findCustomersByStatus(status: Customer['status']): Promise
   const snapshot = await getDocs(q);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
 }
+
 export async function findCustomersByReference(reference: string): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('reference', '==', reference.toLowerCase()));
   const snapshot = await getDocs(q);

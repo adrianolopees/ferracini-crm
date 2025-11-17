@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { getAllCustomers } from '@/repositories';
 import toast from 'react-hot-toast';
 import { Customer, ArchiveReason } from '@/types/customer';
 import { Input, PageLayout, Tabs } from '@/components/ui';
@@ -14,7 +13,7 @@ import {
   archiveCustomer,
   deleteCustomer,
 } from '@/services/customerActionService';
-import { useLongWaitCustomers } from '@/hooks';
+import { useDashboardData } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
@@ -61,11 +60,7 @@ function History() {
   const tabParam = searchParams.get('tab') as TabType | null;
   const [activeTab, setActiveTab] = useState<TabType>(tabParam || 'transfers');
   const [searchTerm, setSearchTerm] = useState('');
-  const [finalizedCustomers, setFinalizedCustomers] = useState<Customer[]>([]);
-  const [transferCustomers, setTransferCustomers] = useState<Customer[]>([]);
-  const [archivedCustomers, setArchivedCustomers] = useState<Customer[]>([]);
   const [transferFilter, setTransferFilter] = useState<'all' | 'Campinas' | 'Dom Pedro'>('all');
-  const [loading, setLoading] = useState(true);
 
   // Modais de arquivamento e delete
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
@@ -73,12 +68,12 @@ function History() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
-  // Hook para clientes em espera longa
-  const { customers: longWaitCustomers } = useLongWaitCustomers();
-
+  const { longWaitCustomers, finalizedCustomers, archivedCustomers, customersByStatus, refresh, loading } =
+    useDashboardData();
+  const transferCustomers = customersByStatus.awaiting_transfer;
   // Buscar clientes ao carregar
   useEffect(() => {
-    fetchAllCustomers();
+    refresh();
   }, []);
 
   // Limpar busca ao trocar de tab
@@ -126,47 +121,11 @@ function History() {
     transferFilter,
   ]);
 
-  const fetchAllCustomers = async () => {
-    try {
-      setLoading(true);
-
-      // ✅ Busca todos os clientes do repository
-      const allCustomers = await getAllCustomers();
-
-      // Categoriza localmente
-      const finalized: Customer[] = [];
-      const transfers: Customer[] = [];
-      const archived: Customer[] = [];
-
-      // ✅ Agora sim o forEach funciona
-      allCustomers.forEach((customer) => {
-        if (customer.archived && customer.status !== 'completed') {
-          archived.push(customer);
-        } else if (customer.status === 'completed') {
-          finalized.push(customer);
-        }
-
-        if (customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro') {
-          transfers.push(customer);
-        }
-      });
-
-      setFinalizedCustomers(finalized);
-      setTransferCustomers(transfers);
-      setArchivedCustomers(archived);
-    } catch (error) {
-      console.error('Erro ao buscar histórico:', error);
-      toast.error('Erro ao carregar histórico');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleRestore = async (customer: Customer) => {
     try {
       await restoreFromArchive(customer);
       toast.success(`${customer.name} restaurado para clientes ativos!`);
-      fetchAllCustomers();
+      refresh();
     } catch (error) {
       console.error('Erro ao restaurar cliente:', error);
       toast.error('Erro ao restaurar cliente');
@@ -186,7 +145,7 @@ function History() {
       toast.success(`${customerToDelete.name} excluído permanentemente!`);
       setDeleteModalOpen(false);
       setCustomerToDelete(null);
-      fetchAllCustomers();
+      refresh();
     } catch (error) {
       console.error('Erro ao excluir cliente:', error);
       toast.error('Erro ao excluir cliente');
@@ -202,7 +161,7 @@ function History() {
     try {
       await moveToReadyForPickup(customer);
       toast.success(`${customer.name} movido para Pronto para Retirada!`);
-      fetchAllCustomers();
+      refresh();
     } catch (error) {
       console.error('Erro ao mover cliente:', error);
       toast.error('Erro ao atualizar cliente');
@@ -224,7 +183,7 @@ function History() {
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
-      fetchAllCustomers();
+      refresh();
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
       toast.error('Erro ao arquivar cliente');

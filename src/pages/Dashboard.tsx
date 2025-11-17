@@ -6,7 +6,6 @@ import { AnimatedContainer } from '@/components/animations';
 import { ActionCard, MetricCard, LongWaitAlert } from '@/components/dashboard';
 import { TopProductsChart } from '@/components/charts';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';
-import { useDashboardMetrics, useCustomersList, useLongWaitCustomers } from '@/hooks';
 import {
   checkStoreCampinas,
   checkStoreDomPedro,
@@ -20,6 +19,7 @@ import {
 } from '@/services/customerActionService';
 import { Customer, ArchiveReason } from '@/types/customer';
 import { sendGenericMessage } from '@/services/whatsappService';
+import { useDashboardData } from '@/hooks';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -27,18 +27,14 @@ function Dashboard() {
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [modalType, setModalType] = useState<'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null>(null);
 
-  const { metrics, loading, refresh: refreshMetrics } = useDashboardMetrics();
-  const { customers, loading: customersLoading, refresh: refreshCustomers } = useCustomersList({ modalType });
-  const refreshAll = () => {
-    refreshMetrics();
-    refreshCustomers();
-  };
-  const { count: longWaitCount, loading: longWaitLoading } = useLongWaitCustomers();
+  const { metrics, customersByStatus, longWaitCount, loading, refresh } = useDashboardData();
+
+  const customers = modalType ? customersByStatus[modalType] : [];
   const handleCheckStoreCampinas = async (customer: Customer) => {
     try {
       await checkStoreCampinas(customer);
       toast('WhatsApp enviado para Loja Campinas');
-      refreshCustomers();
+      refresh();
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao consultar loja');
@@ -49,7 +45,7 @@ function Dashboard() {
     try {
       await checkStoreDomPedro(customer);
       toast('WhatsApp enviado para Loja Dom Pedro');
-      refreshCustomers();
+      refresh();
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao consultar loja');
@@ -59,7 +55,7 @@ function Dashboard() {
   const handleConfirmStoreStock = async (customer: Customer) => {
     try {
       await confirmStoreStock(customer);
-      refreshCustomers();
+      refresh();
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao notificar cliente');
@@ -70,7 +66,7 @@ function Dashboard() {
     try {
       await rejectStoreStock(customer);
       toast('Produto não disponível. Pode consultar outra loja.');
-      refreshCustomers(); // Atualiza lista sem recarregar
+      refresh();
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao atualizar status');
@@ -81,7 +77,7 @@ function Dashboard() {
     try {
       await acceptTransfer(customer);
       toast.success(`Transferência confirmada de ${customer.consultingStore}!`);
-      refreshAll(); // Atualiza lista e métricas
+      refresh();
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
       toast.error('Erro ao confirmar transferência');
@@ -103,7 +99,7 @@ function Dashboard() {
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
-      refreshAll();
+      refresh();
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
       toast.error('Erro ao arquivar cliente');
@@ -113,7 +109,7 @@ function Dashboard() {
   const handleProductArrived = async (customer: Customer) => {
     try {
       await productArrived(customer);
-      refreshAll();
+      refresh();
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
       toast.error('Erro ao atualizar status');
@@ -124,7 +120,7 @@ function Dashboard() {
     try {
       await completeOrder(customer);
       toast.success(`Venda de ${customer.name} finalizada!`);
-      refreshAll(); // Atualiza lista e métricas
+      refresh();
     } catch (error) {
       console.error('Erro ao finalizar venda:', error);
       toast.error('Erro ao finalizar venda');
@@ -135,13 +131,14 @@ function Dashboard() {
     setModalType(null); // Fecha o modal de lista primeiro
     setCustomerToArchive(customer);
     setArchiveModalOpen(true);
+    refresh();
   };
 
   const handleResetToInitial = async (customer: Customer) => {
     try {
       await resetToInitial(customer);
       toast.success(`Cliente ${customer.name} voltou ao status inicial.`);
-      refreshCustomers();
+      refresh();
     } catch (error) {
       console.error('Erro ao resetar cliente:', error);
       toast.error('Erro ao resetar cliente');
@@ -214,7 +211,7 @@ function Dashboard() {
 
       {/* Banner de Espera Longa */}
       <div className="px-4 max-w-5xl mx-auto mt-6">
-        <LongWaitAlert count={longWaitCount} loading={longWaitLoading} onClick={handleViewLongWait} />
+        <LongWaitAlert count={longWaitCount} loading={loading} onClick={handleViewLongWait} />
       </div>
 
       {/* Estatísticas */}
@@ -287,7 +284,7 @@ function Dashboard() {
         onClose={() => setModalType(null)}
         title={getModalTitle()}
         customers={customers}
-        loading={customersLoading}
+        loading={loading}
         onSendMessage={sendGenericMessage}
         onArchive={handleArchive}
         onResetToInitial={handleResetToInitial}
