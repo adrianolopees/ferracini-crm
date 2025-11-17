@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DialogModal } from '@/components/modals';
-import { ArchiveReason } from '@/schemas/customer';
+import { ArchiveReason } from '@/schemas/customerSchema';
 
 interface ArchiveModalProps {
   isOpen: boolean;

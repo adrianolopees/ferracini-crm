@@ -14,7 +14,7 @@
  * @module components/features/WorkflowCard
  */
 
-import { Customer } from '@/schemas/customer';
+import { Customer } from '@/schemas/customerSchema';
 import { getTimeAgo } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
 import { Button } from '@/components/ui';

@@ -1,4 +1,4 @@
-import { Customer, ArchiveReason } from '@/schemas/customer';
+import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import {
   notifyOtherStore,
   notifyProductArrived,

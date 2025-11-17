@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllCustomers } from '@/repositories';
-import { Customer } from '@/schemas/customer';
+import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting } from '@/utils';
 
 interface DashboardData {

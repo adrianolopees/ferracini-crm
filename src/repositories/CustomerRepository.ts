@@ -1,16 +1,25 @@
 import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, query, where } from 'firebase/firestore';
 import { db } from '@/services/firebase';
-import { Customer, ArchiveReason } from '@/schemas/customer';
+import { CustomerSchema, FirebaseCustomerSchema, Customer, ArchiveReason } from '@/schemas/customerSchema';
 
 const COLLECTION_NAME = 'customers';
 
 // ==========================================
-// 🔹 CRUD BÁSICO
+// 🔹 CRUD
 // ==========================================
 
 export async function getAllCustomers(): Promise<Customer[]> {
   const snapshot = await getDocs(collection(db, COLLECTION_NAME));
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
+  return snapshot.docs
+    .map((doc) => {
+      const result = CustomerSchema.safeParse({ id: doc.id, ...doc.data() });
+      if (!result.success) {
+        console.error(`Dados inválidos no cliente ${doc.id}:`, result.error);
+        return null;
+      }
+      return result.data;
+    })
+    .filter((c): c is Customer => c !== null);
 }
 
 export async function getCustomerById(id: string): Promise<Customer | null> {
@@ -18,19 +27,29 @@ export async function getCustomerById(id: string): Promise<Customer | null> {
   const docSnap = await getDoc(docRef);
 
   if (!docSnap.exists()) return null;
-  return { id: docSnap.id, ...docSnap.data() } as Customer;
+
+  const result = CustomerSchema.safeParse({ id: docSnap.id, ...docSnap.data() });
+  if (!result.success) {
+    console.error(`Dados inválidos no cliente ${id}:`, result.error);
+    return null;
+  }
+  return result.data;
 }
 
 export async function createCustomer(customer: Omit<Customer, 'id'>): Promise<string> {
-  const docRef = await addDoc(collection(db, COLLECTION_NAME), {
+  const validated = FirebaseCustomerSchema.parse({
     ...customer,
     createdAt: customer.createdAt || new Date().toISOString(),
   });
+  const docRef = await addDoc(collection(db, COLLECTION_NAME), validated);
   return docRef.id;
 }
 
 export async function updateCustomer(id: string, data: Partial<Customer>): Promise<void> {
-  await updateDoc(doc(db, COLLECTION_NAME, id), data);
+  // Remove o id dos dados se vier
+  const { id: _, ...dataWithoutId } = data as any;
+  const validated = FirebaseCustomerSchema.partial().parse(dataWithoutId);
+  await updateDoc(doc(db, COLLECTION_NAME, id), validated);
 }
 
 export async function deleteCustomerById(id: string): Promise<void> {

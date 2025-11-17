@@ -17,7 +17,7 @@ import {
   completeOrder,
   resetToInitial,
 } from '@/services/customerActionService';
-import { Customer, ArchiveReason } from '@/schemas/customer';
+import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { sendGenericMessage } from '@/services/whatsappService';
 import { useDashboardData } from '@/hooks';
 

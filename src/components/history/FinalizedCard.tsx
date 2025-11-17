@@ -14,7 +14,7 @@
  * @module components/features/HistoryCard
  */
 
-import { Customer } from '@/schemas/customer';
+import { Customer } from '@/schemas/customerSchema';
 import { formatDateTime, getDaysBetween } from '@/utils';
 
 /* ============================================================================

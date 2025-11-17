@@ -2,7 +2,7 @@ import { useState, ChangeEvent } from 'react';
 import toast from 'react-hot-toast';
 import { findCustomersByReference, findCustomersByModel, updateCustomer } from '@/repositories';
 import { notifyProductArrived } from '@/services/whatsappService';
-import { Customer, ArchiveReason } from '@/schemas/customer';
+import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { Input, PageLayout } from '@/components/ui';
 import { WorkflowCard } from '@/components/dashboard';
 import { ArchiveModal } from '@/components/modals';

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Schemas para os enums
 export const CustomerStatusSchema = z.enum(['pending', 'awaiting_transfer', 'ready_for_pickup', 'completed']);
 
 export const ArchiveReasonSchema = z.enum([
@@ -12,7 +11,6 @@ export const ArchiveReasonSchema = z.enum([
   'exceeded_wait_time',
 ]);
 
-// Schema principal do Customer
 export const CustomerSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -35,7 +33,9 @@ export const CustomerSchema = z.object({
   consultingStore: z.enum(['Campinas', 'Dom Pedro']).nullable().optional(),
   storeHasStock: z.boolean().optional(),
 });
-// Inferir os tipos do Zod
+
+export const FirebaseCustomerSchema = CustomerSchema.omit({ id: true });
+
 export type Customer = z.infer<typeof CustomerSchema>;
 export type CustomerStatus = z.infer<typeof CustomerStatusSchema>;
 export type ArchiveReason = z.infer<typeof ArchiveReasonSchema>;
