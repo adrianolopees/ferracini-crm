@@ -17,10 +17,10 @@ function LongWaitAlert({ count, loading, onClick }: LongWaitAlertProps) {
             <i className="fa-solid fa-clock text-yellow-600 text-xl mr-3"></i>
             <div>
               <p className="text-sm font-medium text-yellow-800">
-                {count} cliente{count > 1 ? 's' : ''} aguardando há 30+ dias
+                {count} cliente{count > 1 ? 's' : ''} estão aguardando há +30 dias
               </p>
               <p className="text-xs text-yellow-700 mt-1">
-                {count > 1 ? 'Foram movidos' : 'Foi movido'} automaticamente para Histórico → 30+ dias
+                {count > 1 ? 'Todos foram movidos' : 'Foi movido'} automaticamente para Histórico → +30 dias
               </p>
             </div>
           </div>

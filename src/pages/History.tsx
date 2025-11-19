@@ -205,7 +205,7 @@ function History() {
     },
     {
       id: 'long_wait',
-      label: '30+ dias',
+      label: '+30 dias',
       count: longWaitCustomers.length,
       icon: 'fa-solid fa-clock',
     },
