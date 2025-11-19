@@ -29,6 +29,7 @@ const ARCHIVE_REASON_LABELS: Record<ArchiveReason, string> = {
   no_response: 'Não Respondeu',
   bought_elsewhere: 'Comprou Fora',
   product_unavailable: 'Indisponível',
+  exceeded_wait_time: 'Tempo Excedido',
   other: 'Outro',
 };
 
@@ -39,7 +40,7 @@ const ARCHIVE_REASON_LABELS: Record<ArchiveReason, string> = {
 /**
  * Get localized label for archive reason
  */
-const getArchiveReasonLabel = (reason?: ArchiveReason): string => {
+const getArchiveReasonLabel = (reason?: ArchiveReason | null): string => {
   return reason ? ARCHIVE_REASON_LABELS[reason] : 'Arquivado';
 };
 

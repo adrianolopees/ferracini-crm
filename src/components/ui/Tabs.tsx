@@ -42,7 +42,9 @@ function Tabs({ tabs, activeTab, onTabChange, children }: TabsProps) {
                 {tab.icon && <i className={`${tab.icon} text-base sm:text-base flex-shrink-0`}></i>}
 
                 {/* Label - apenas desktop */}
-                <span className="hidden sm:inline text-[11px] sm:text-xs truncate min-w-0 max-w-[90px]">{tab.label}</span>
+                <span className="hidden sm:inline text-[11px] sm:text-xs truncate min-w-0 max-w-[90px]">
+                  {tab.label}
+                </span>
 
                 {/* Badge de contagem */}
                 {tab.count !== undefined && (

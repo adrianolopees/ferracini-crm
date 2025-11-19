@@ -48,10 +48,10 @@ const STORE_COLORS = {
 /**
  * Get color configuration for store
  */
-const getStoreColor = (storeName?: string) => {
+const getStoreColor = (storeName?: 'Campinas' | 'Dom Pedro' | 'Jundiaí' | null) => {
   if (storeName === 'Campinas') return STORE_COLORS.Campinas;
   if (storeName === 'Dom Pedro') return STORE_COLORS['Dom Pedro'];
-  return STORE_COLORS.Campinas; // Default
+  return STORE_COLORS.Campinas;
 };
 
 /* ============================================================================
