@@ -13,7 +13,7 @@ import {
   archiveCustomer,
   deleteCustomer,
 } from '@/services/customerActionService';
-import { useDashboardData } from '@/hooks';
+import { useCustomerMetrics } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
@@ -68,9 +68,9 @@ function History() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
-  const { longWaitCustomers, finalizedCustomers, archivedCustomers, customersByStatus, refresh, loading } =
-    useDashboardData();
-  const transferCustomers = customersByStatus.awaiting_transfer;
+  const { longWaitCustomers, finalizedCustomers, archivedCustomers, transferHistory, refresh, loading } =
+    useCustomerMetrics();
+  const transferCustomers = transferHistory;
   // Buscar clientes ao carregar
   useEffect(() => {
     refresh();
@@ -168,13 +168,11 @@ function History() {
     }
   };
 
-  // Handler para arquivar clientes de long_wait
   const handleArchiveFromLongWait = (customer: Customer) => {
     setCustomerToArchive(customer);
     setArchiveModalOpen(true);
   };
 
-  // Handler para confirmar arquivamento
   const handleConfirmArchive = async (reason: ArchiveReason, notes?: string) => {
     if (!customerToArchive) return;
 

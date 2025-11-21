@@ -19,7 +19,7 @@ import {
 } from '@/services/customerActionService';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { sendGenericMessage } from '@/services/whatsappService';
-import { useDashboardData } from '@/hooks';
+import { useCustomerMetrics } from '@/hooks';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ function Dashboard() {
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [modalType, setModalType] = useState<'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null>(null);
 
-  const { metrics, customersByStatus, longWaitCount, loading, refresh } = useDashboardData();
+  const { metrics, customersByStatus, longWaitCount, loading, refresh } = useCustomerMetrics();
 
   const customers = modalType ? customersByStatus[modalType] : [];
   const handleCheckStoreCampinas = async (customer: Customer) => {

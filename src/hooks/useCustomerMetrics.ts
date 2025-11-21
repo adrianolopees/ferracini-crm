@@ -22,6 +22,7 @@ interface DashboardData {
   // Espera longa (substitui useLongWaitCustomers)
   longWaitCustomers: Customer[];
   longWaitCount: number;
+  transferHistory: Customer[];
 
   finalizedCustomers: Customer[];
   archivedCustomers: Customer[];
@@ -51,7 +52,8 @@ function useDashboardData(): DashboardData {
     },
     longWaitCustomers: [],
     longWaitCount: 0,
-    finalizedCustomers: [], // ← NOVO
+    transferHistory: [],
+    finalizedCustomers: [],
     archivedCustomers: [],
     loading: true,
     refresh: () => {},
@@ -80,18 +82,24 @@ function useDashboardData(): DashboardData {
         const awaitingTransferCustomers: Customer[] = [];
         const readyForPickupCustomers: Customer[] = [];
         const longWaitCustomers: Customer[] = [];
+        const transferHistory: Customer[] = [];
         const finalizedCustomers: Customer[] = [];
         const archivedCustomers: Customer[] = [];
 
         allCustomers.forEach((customer) => {
-          // Adicionar clientes transferidos ANTES de verificar se está arquivado
-          if (customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro') {
+          const isTransferred = customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro';
+
+          if (isTransferred) {
+            transferHistory.push(customer);
+          }
+
+          if (customer.status === 'awaiting_transfer' && !customer.archived) {
             awaitingTransferCustomers.push(customer);
           }
 
           if (customer.archived) {
             archivedCustomers.push(customer);
-            return; // Não processar mais nada para clientes arquivados
+            return;
           }
 
           const status = customer.status || 'pending';
@@ -159,6 +167,7 @@ function useDashboardData(): DashboardData {
           longWaitCustomers,
           longWaitCount: longWaitCustomers.length,
           finalizedCustomers,
+          transferHistory,
           archivedCustomers,
           loading: false,
           refresh,
