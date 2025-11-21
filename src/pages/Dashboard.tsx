@@ -161,8 +161,8 @@ function Dashboard() {
 
   const getModalTitle = () => {
     if (modalType === 'awaiting') return `Clientes Aguardando (${metrics.totalActive})`;
-    if (modalType === 'awaiting_transfer') return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
-    if (modalType === 'ready_for_pickup') return `Pronto para Retirada (${metrics.totalReadyForPickup})`;
+    if (modalType === 'awaitingTransfer') return `Aguardando Transferência (${metrics.totalAwaitingTransfer})`;
+    if (modalType === 'readyForPickup') return `Pronto para Retirada (${metrics.totalReadyForPickup})`;
     return '';
   };
 
