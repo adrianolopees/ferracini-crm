@@ -120,7 +120,7 @@ export async function archiveCustomerById(id: string, reason: ArchiveReason, not
   });
 }
 
-export async function restoreCustomerById(id: string, status: Customer['status'] = 'ready_for_pickup'): Promise<void> {
+export async function restoreCustomerById(id: string, status: Customer['status'] = 'readyForPickup'): Promise<void> {
   await updateCustomer(id, {
     archived: false,
     archiveReason: null,

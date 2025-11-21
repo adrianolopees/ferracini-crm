@@ -76,8 +76,8 @@ function WorkflowCard({
           {/* Reset to Initial State */}
           {onResetToInitial &&
             (customer.consultingStore ||
-              customer.status === 'awaiting_transfer' ||
-              customer.status === 'ready_for_pickup') && (
+              customer.status === 'awaitingTransfer' ||
+              customer.status === 'readyForPickup') && (
               <button
                 onClick={() => onResetToInitial(customer)}
                 className="inline-flex items-center justify-center w-9 h-9 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors cursor-pointer shadow-sm"
@@ -135,7 +135,7 @@ function WorkflowCard({
       {/* Timeline & Product Info */}
       <div className="space-y-2 sm:space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center gap-1 text-xs sm:text-sm sm:flex-wrap">
-          {customer.status === 'ready_for_pickup' && customer.contactedAt ? (
+          {customer.status === 'readyForPickup' && customer.contactedAt ? (
             // Stage: READY FOR PICKUP - Tempo em destaque
             <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
               <i className="fa-solid fa-check-circle text-gray-500 text-xs"></i>
@@ -151,7 +151,7 @@ function WorkflowCard({
                 </>
               )}
             </div>
-          ) : customer.status === 'awaiting_transfer' ? (
+          ) : customer.status === 'awaitingTransfer' ? (
             // Stage: AWAITING TRANSFER - Loja em destaque
             <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
               <i className="fa-solid fa-truck-fast text-gray-500 text-xs"></i>
@@ -314,7 +314,7 @@ function WorkflowCard({
         )}
 
         {/* STATE 4: Awaiting Transfer - Product Arrived */}
-        {customer.status === 'awaiting_transfer' && productArrived && (
+        {customer.status === 'awaitingTransfer' && productArrived && (
           <Button
             onClick={() => productArrived(customer)}
             variant="green"
@@ -328,7 +328,7 @@ function WorkflowCard({
         )}
 
         {/* STATE 5: Ready for Pickup - Complete Order */}
-        {customer.status === 'ready_for_pickup' && completeOrder && (
+        {customer.status === 'readyForPickup' && completeOrder && (
           <Button
             onClick={() => completeOrder(customer)}
             variant="emerald"

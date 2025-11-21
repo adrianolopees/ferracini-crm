@@ -63,7 +63,7 @@ function SearchCustomers() {
   const handleWhatsApp = async (customer: Customer) => {
     try {
       await updateCustomer(customer.id, {
-        status: 'ready_for_pickup',
+        status: 'readyForPickup',
         contactedAt: new Date().toISOString(),
         sourceStore: 'Jundiaí',
       });

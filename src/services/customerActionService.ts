@@ -25,7 +25,7 @@ export async function deleteCustomer(customer: Customer): Promise<void> {
 
 export async function moveToReadyForPickup(customer: Customer): Promise<void> {
   await updateCustomer(customer.id, {
-    status: 'ready_for_pickup',
+    status: 'readyForPickup',
     contactedAt: new Date().toISOString(),
   });
 }

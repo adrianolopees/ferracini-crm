@@ -25,11 +25,21 @@ function Dashboard() {
   const navigate = useNavigate();
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
-  const [modalType, setModalType] = useState<'awaiting' | 'awaiting_transfer' | 'ready_for_pickup' | null>(null);
+  const [modalType, setModalType] = useState<'awaiting' | 'awaitingTransfer' | 'readyForPickup' | null>(null);
 
-  const { metrics, customersByStatus, longWaitCount, loading, refresh } = useCustomerMetrics();
+  const { metrics, lists, loading, refresh } = useCustomerMetrics();
 
-  const customers = modalType ? customersByStatus[modalType] : [];
+  const getCustomersByModalType = () => {
+    if (!modalType) return [];
+    const mapping = {
+      awaiting: lists.awaiting,
+      awaitingTransfer: lists.awaitingTransfer,
+      readyForPickup: lists.readyForPickup,
+    };
+    return mapping[modalType];
+  };
+
+  const customers = getCustomersByModalType();
   const handleCheckStoreCampinas = async (customer: Customer) => {
     try {
       await checkStoreCampinas(customer);
@@ -168,9 +178,7 @@ function Dashboard() {
           <ActionCard
             title="Aguardando"
             value={metrics.totalActive}
-            subtitle={
-              metrics.urgentCustomers > 0 ? `${metrics.urgentCustomers} urgente(s)` : 'Clientes na fila de espera'
-            }
+            subtitle={metrics.urgentCount > 0 ? `${metrics.urgentCount} urgente(s)` : 'Clientes na fila de espera'}
             icon="fa-solid fa-clock"
             colorScheme="blue"
             loading={loading}
@@ -187,7 +195,7 @@ function Dashboard() {
             icon="fa-solid fa-truck"
             colorScheme="yellow"
             loading={loading}
-            onClick={() => setModalType('awaiting_transfer')}
+            onClick={() => setModalType('awaitingTransfer')}
           />
         </AnimatedContainer>
 
@@ -204,14 +212,14 @@ function Dashboard() {
             icon="fa-solid fa-box-open"
             colorScheme="green"
             loading={loading}
-            onClick={() => setModalType('ready_for_pickup')}
+            onClick={() => setModalType('readyForPickup')}
           />
         </AnimatedContainer>
       </div>
 
       {/* Banner de Espera Longa */}
       <div className="px-4 max-w-5xl mx-auto mt-6">
-        <LongWaitAlert count={longWaitCount} loading={loading} onClick={handleViewLongWait} />
+        <LongWaitAlert count={metrics.longWaitCount} loading={loading} onClick={handleViewLongWait} />
       </div>
 
       {/* Estatísticas */}

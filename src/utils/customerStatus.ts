@@ -3,7 +3,7 @@ import { getDaysWaiting } from '@/utils/date';
 export function getCustomerStatus(createdAt: string, status?: string) {
   const daysWaiting = getDaysWaiting(createdAt);
 
-  if (status === 'awaiting_transfer') {
+  if (status === 'awaitingTransfer') {
     return {
       daysWaiting,
       borderClass: 'border-l-orange-500 border-orange-200',
@@ -13,7 +13,7 @@ export function getCustomerStatus(createdAt: string, status?: string) {
     };
   }
 
-  if (status === 'ready_for_pickup') {
+  if (status === 'readyForPickup') {
     return {
       daysWaiting,
       borderClass: 'border-l-green-500 border-green-200 ',

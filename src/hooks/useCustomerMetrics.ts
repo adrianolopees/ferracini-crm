@@ -4,30 +4,24 @@ import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting } from '@/utils';
 
 interface DashboardData {
-  // Métricas (substitui useDashboardMetrics)
   metrics: {
     totalActive: number;
     totalReadyForPickup: number;
     totalAwaitingTransfer: number;
     totalFinished: number;
     averageWaitTime: number;
-    urgentCustomers: number;
+    urgentCount: number;
+    longWaitCount: number;
   };
-  // Clientes por status (substitui useCustomersList)
-  customersByStatus: {
+  lists: {
     awaiting: Customer[];
-    awaiting_transfer: Customer[];
-    ready_for_pickup: Customer[];
+    awaitingTransfer: Customer[];
+    readyForPickup: Customer[];
+    longWait: Customer[];
+    transfer: Customer[];
+    finalized: Customer[];
+    archived: Customer[];
   };
-  // Espera longa (substitui useLongWaitCustomers)
-  longWaitCustomers: Customer[];
-  longWaitCount: number;
-  transferHistory: Customer[];
-
-  finalizedCustomers: Customer[];
-  archivedCustomers: Customer[];
-
-  // Controles
   loading: boolean;
   refresh: () => void;
 }
@@ -43,18 +37,18 @@ function useDashboardData(): DashboardData {
       totalAwaitingTransfer: 0,
       totalFinished: 0,
       averageWaitTime: 0,
-      urgentCustomers: 0,
+      urgentCount: 0,
+      longWaitCount: 0,
     },
-    customersByStatus: {
+    lists: {
       awaiting: [],
-      awaiting_transfer: [],
-      ready_for_pickup: [],
+      awaitingTransfer: [],
+      readyForPickup: [],
+      longWait: [],
+      transfer: [],
+      finalized: [],
+      archived: [],
     },
-    longWaitCustomers: [],
-    longWaitCount: 0,
-    transferHistory: [],
-    finalizedCustomers: [],
-    archivedCustomers: [],
     loading: true,
     refresh: () => {},
   });
@@ -69,20 +63,19 @@ function useDashboardData(): DashboardData {
       try {
         const allCustomers = await getAllCustomers();
 
-        // Contadores para métricas
         let urgentCount = 0;
         let totalDays = 0;
         let awaitingCount = 0;
         let awaitingTransferCount = 0;
         let readyForPickupCount = 0;
+        let longWaitCount = 0;
         let finishedCount = 0;
 
-        // Arrays para separar clientes
         const awaitingCustomers: Customer[] = [];
         const awaitingTransferCustomers: Customer[] = [];
         const readyForPickupCustomers: Customer[] = [];
         const longWaitCustomers: Customer[] = [];
-        const transferHistory: Customer[] = [];
+        const transferCustomers: Customer[] = [];
         const finalizedCustomers: Customer[] = [];
         const archivedCustomers: Customer[] = [];
 
@@ -90,10 +83,10 @@ function useDashboardData(): DashboardData {
           const isTransferred = customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro';
 
           if (isTransferred) {
-            transferHistory.push(customer);
+            transferCustomers.push(customer);
           }
 
-          if (customer.status === 'awaiting_transfer' && !customer.archived) {
+          if (customer.status === 'awaitingTransfer' && !customer.archived) {
             awaitingTransferCustomers.push(customer);
           }
 
@@ -107,7 +100,6 @@ function useDashboardData(): DashboardData {
 
           if (status === 'pending') {
             if (daysWaiting < 30) {
-              // Menos de 30 dias: vai para "Aguardando" normal
               awaitingCount++;
               awaitingCustomers.push(customer);
               totalDays += daysWaiting;
@@ -116,16 +108,16 @@ function useDashboardData(): DashboardData {
                 urgentCount++;
               }
             } else {
-              // 30+ dias: vai para "Espera Longa"
+              longWaitCount++;
               longWaitCustomers.push(customer);
             }
           }
 
-          if (status === 'awaiting_transfer') {
+          if (status === 'awaitingTransfer') {
             awaitingTransferCount++;
           }
 
-          if (status === 'ready_for_pickup') {
+          if (status === 'readyForPickup') {
             readyForPickupCount++;
             readyForPickupCustomers.push(customer);
           }
@@ -157,18 +149,18 @@ function useDashboardData(): DashboardData {
             totalAwaitingTransfer: awaitingTransferCount,
             totalFinished: finishedCount,
             averageWaitTime,
-            urgentCustomers: urgentCount,
+            urgentCount,
+            longWaitCount,
           },
-          customersByStatus: {
+          lists: {
             awaiting: awaitingCustomers,
-            awaiting_transfer: awaitingTransferCustomers,
-            ready_for_pickup: readyForPickupCustomers,
+            awaitingTransfer: awaitingTransferCustomers,
+            readyForPickup: readyForPickupCustomers,
+            longWait: longWaitCustomers,
+            transfer: transferCustomers,
+            finalized: finalizedCustomers,
+            archived: archivedCustomers,
           },
-          longWaitCustomers,
-          longWaitCount: longWaitCustomers.length,
-          finalizedCustomers,
-          transferHistory,
-          archivedCustomers,
           loading: false,
           refresh,
         });

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CustomerStatusSchema = z.enum(['pending', 'awaiting_transfer', 'ready_for_pickup', 'completed']);
+export const CustomerStatusSchema = z.enum(['pending', 'awaitingTransfer', 'readyForPickup', 'completed']);
 
 export const ArchiveReasonSchema = z.enum([
   'gave_up',
@@ -35,7 +35,6 @@ export const CustomerSchema = z.object({
 });
 
 export const FirebaseCustomerSchema = CustomerSchema.omit({ id: true });
-
 export type Customer = z.infer<typeof CustomerSchema>;
 export type CustomerStatus = z.infer<typeof CustomerStatusSchema>;
 export type ArchiveReason = z.infer<typeof ArchiveReasonSchema>;

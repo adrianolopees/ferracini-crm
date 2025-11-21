@@ -68,9 +68,8 @@ function History() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
-  const { longWaitCustomers, finalizedCustomers, archivedCustomers, transferHistory, refresh, loading } =
-    useCustomerMetrics();
-  const transferCustomers = transferHistory;
+  const { lists, refresh, loading } = useCustomerMetrics();
+
   // Buscar clientes ao carregar
   useEffect(() => {
     refresh();
@@ -85,10 +84,10 @@ function History() {
   const filteredCustomers = useMemo(() => {
     // Selecionar a lista base
     const customersByTab: Record<TabType, Customer[]> = {
-      finalized: finalizedCustomers,
-      transfers: transferCustomers,
-      archived: archivedCustomers,
-      long_wait: longWaitCustomers,
+      finalized: lists.finalized,
+      transfers: lists.transfer,
+      archived: lists.archived,
+      long_wait: lists.longWait,
     };
     let customers = customersByTab[activeTab] || [];
 
@@ -114,10 +113,10 @@ function History() {
   }, [
     searchTerm,
     activeTab,
-    finalizedCustomers,
-    transferCustomers,
-    archivedCustomers,
-    longWaitCustomers,
+    lists.finalized,
+    lists.transfer,
+    lists.archived,
+    lists.longWait,
     transferFilter,
   ]);
 
@@ -192,25 +191,25 @@ function History() {
     {
       id: 'transfers',
       label: 'Transferidos',
-      count: transferCustomers.length,
+      count: lists.transfer.length,
       icon: 'fa-solid fa-truck-fast',
     },
     {
       id: 'finalized',
       label: 'Finalizados',
-      count: finalizedCustomers.length,
+      count: lists.finalized.length,
       icon: 'fa-solid fa-circle-check',
     },
     {
       id: 'long_wait',
       label: '+30 dias',
-      count: longWaitCustomers.length,
+      count: lists.longWait.length,
       icon: 'fa-solid fa-clock',
     },
     {
       id: 'archived',
       label: 'Arquivados',
-      count: archivedCustomers.length,
+      count: lists.archived.length,
       icon: 'fa-solid fa-archive',
     },
   ];
@@ -220,7 +219,7 @@ function History() {
       value: 'all' as const,
       label: 'Total',
       icon: 'fa-solid fa-chart-line',
-      count: transferCustomers.length,
+      count: lists.transfer.length,
       colorScheme: {
         active: 'bg-emerald-500 border-emerald-600',
         inactive: 'border-emerald-200',
@@ -232,7 +231,7 @@ function History() {
       value: 'Campinas' as const,
       label: 'Campinas',
       icon: 'fa-solid fa-store',
-      count: transferCustomers.filter((c) => c.sourceStore === 'Campinas').length,
+      count: lists.transfer.filter((c) => c.sourceStore === 'Campinas').length,
       colorScheme: {
         active: 'bg-blue-500 border-blue-600',
         inactive: 'border-blue-200',
@@ -244,7 +243,7 @@ function History() {
       value: 'Dom Pedro' as const,
       label: 'Dom Pedro',
       icon: 'fa-solid fa-store',
-      count: transferCustomers.filter((c) => c.sourceStore === 'Dom Pedro').length,
+      count: lists.transfer.filter((c) => c.sourceStore === 'Dom Pedro').length,
       colorScheme: {
         active: 'bg-purple-500 border-purple-600',
         inactive: 'border-purple-200',
@@ -295,7 +294,7 @@ function History() {
             </div>
 
             {/* Resumo de Transferências com Filtros */}
-            {activeTab === 'transfers' && transferCustomers.length > 0 && (
+            {activeTab === 'transfers' && lists.transfer.length > 0 && (
               <div className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <i className="fa-solid fa-filter text-blue-600 text-sm"></i>

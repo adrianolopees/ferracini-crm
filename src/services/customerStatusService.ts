@@ -15,13 +15,13 @@ export async function updateCustomerStatus(
   };
 
   switch (newStatus) {
-    case 'awaiting_transfer':
+    case 'awaitingTransfer':
       updateData.transferredAt = now;
       if (additionalData?.sourceStore) {
         updateData.sourceStore = additionalData.sourceStore;
       }
       break;
-    case 'ready_for_pickup':
+    case 'readyForPickup':
       updateData.contactedAt = now;
       break;
     case 'completed':
@@ -36,7 +36,7 @@ export async function moveToAwaitingTransfer(
   customer: Customer,
   sourceStore: 'Campinas' | 'Dom Pedro' | 'Jundiaí'
 ): Promise<void> {
-  await updateCustomerStatus(customer.id, 'awaiting_transfer', {
+  await updateCustomerStatus(customer.id, 'awaitingTransfer', {
     sourceStore,
   });
 }
@@ -46,5 +46,5 @@ export async function moveToFinished(customer: Customer): Promise<void> {
 }
 
 export async function markAsContacted(customer: Customer): Promise<void> {
-  await updateCustomerStatus(customer.id, 'ready_for_pickup');
+  await updateCustomerStatus(customer.id, 'readyForPickup');
 }
