@@ -3,7 +3,7 @@ import { getAllCustomers } from '@/repositories';
 import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting } from '@/utils';
 
-interface DashboardData {
+interface CustomerMetrics {
   metrics: {
     totalActive: number;
     totalReadyForPickup: number;
@@ -25,12 +25,12 @@ interface DashboardData {
   loading: boolean;
   refresh: () => void;
 }
+type AccumuladorType = Pick<CustomerMetrics, 'metrics' | 'lists'> & { totalDays: number };
 
-function useDashboardData(): DashboardData {
+function useCustomerMetrics(): CustomerMetrics {
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-
-  const [data, setData] = useState<DashboardData>({
+  const [data, setData] = useState<CustomerMetrics>({
     metrics: {
       totalActive: 0,
       totalReadyForPickup: 0,
@@ -58,124 +58,119 @@ function useDashboardData(): DashboardData {
   }, []);
 
   useEffect(() => {
-    async function fetchDashboardData() {
+    async function fetchCustomerMetrics() {
       setLoading(true);
       try {
         const allCustomers = await getAllCustomers();
 
-        let urgentCount = 0;
-        let totalDays = 0;
-        let awaitingCount = 0;
-        let awaitingTransferCount = 0;
-        let readyForPickupCount = 0;
-        let longWaitCount = 0;
-        let finishedCount = 0;
+        const LONG_WAIT_DAYS = 30;
+        const URGENT_DAYS = 15;
 
-        const awaitingCustomers: Customer[] = [];
-        const awaitingTransferCustomers: Customer[] = [];
-        const readyForPickupCustomers: Customer[] = [];
-        const longWaitCustomers: Customer[] = [];
-        const transferCustomers: Customer[] = [];
-        const finalizedCustomers: Customer[] = [];
-        const archivedCustomers: Customer[] = [];
+        const processed = allCustomers.reduce<AccumuladorType>(
+          (acc, customer) => {
+            const isTransferred = customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro';
 
-        allCustomers.forEach((customer) => {
-          const isTransferred = customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro';
-
-          if (isTransferred) {
-            transferCustomers.push(customer);
-          }
-
-          if (customer.status === 'awaitingTransfer' && !customer.archived) {
-            awaitingTransferCustomers.push(customer);
-          }
-
-          if (customer.archived) {
-            archivedCustomers.push(customer);
-            return;
-          }
-
-          const status = customer.status || 'pending';
-          const daysWaiting = getDaysWaiting(customer.createdAt);
-
-          if (status === 'pending') {
-            if (daysWaiting < 30) {
-              awaitingCount++;
-              awaitingCustomers.push(customer);
-              totalDays += daysWaiting;
-
-              if (daysWaiting >= 15) {
-                urgentCount++;
-              }
-            } else {
-              longWaitCount++;
-              longWaitCustomers.push(customer);
+            if (isTransferred) {
+              acc.lists.transfer.push(customer);
             }
+
+            if (customer.status === 'awaitingTransfer' && !customer.archived) {
+              acc.metrics.totalAwaitingTransfer++;
+              acc.lists.awaitingTransfer.push(customer);
+            }
+
+            if (customer.archived) {
+              acc.lists.archived.push(customer);
+              return acc;
+            }
+
+            const status = customer.status || 'pending';
+
+            switch (status) {
+              case 'pending': {
+                const daysWaiting = getDaysWaiting(customer.createdAt);
+
+                if (daysWaiting < LONG_WAIT_DAYS) {
+                  acc.metrics.totalActive++;
+                  acc.lists.awaiting.push(customer);
+                  acc.totalDays += daysWaiting;
+
+                  if (daysWaiting >= URGENT_DAYS) {
+                    acc.metrics.urgentCount++;
+                  }
+                } else {
+                  acc.metrics.longWaitCount++;
+                  acc.lists.longWait.push(customer);
+                }
+                break;
+              }
+
+              case 'readyForPickup':
+                acc.metrics.totalReadyForPickup++;
+                acc.lists.readyForPickup.push(customer);
+                break;
+
+              case 'completed':
+                acc.metrics.totalFinished++;
+                acc.lists.finalized.push(customer);
+                break;
+            }
+
+            return acc;
+          },
+          {
+            metrics: {
+              totalActive: 0,
+              totalReadyForPickup: 0,
+              totalAwaitingTransfer: 0,
+              totalFinished: 0,
+              averageWaitTime: 0,
+              urgentCount: 0,
+              longWaitCount: 0,
+            },
+            lists: {
+              awaiting: [],
+              awaitingTransfer: [],
+              readyForPickup: [],
+              longWait: [],
+              transfer: [],
+              finalized: [],
+              archived: [],
+            },
+            totalDays: 0,
           }
+        );
 
-          if (status === 'awaitingTransfer') {
-            awaitingTransferCount++;
-          }
+        const averageWaitTime =
+          processed.metrics.totalActive > 0 ? Math.round(processed.totalDays / processed.metrics.totalActive) : 0;
 
-          if (status === 'readyForPickup') {
-            readyForPickupCount++;
-            readyForPickupCustomers.push(customer);
-          }
-
-          if (status === 'completed') {
-            finishedCount++;
-            finalizedCustomers.push(customer);
-          }
-        });
-
-        // Calcular média
-        const averageWaitTime = awaitingCount > 0 ? Math.round(totalDays / awaitingCount) : 0;
-
-        // Ordernar por quem espera a mais tempo
         const sortByDaysWaiting = (a: Customer, b: Customer) =>
           getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt);
 
-        awaitingCustomers.sort(sortByDaysWaiting);
-        awaitingTransferCustomers.sort(sortByDaysWaiting);
-        readyForPickupCustomers.sort(sortByDaysWaiting);
-        longWaitCustomers.sort(sortByDaysWaiting);
-        finalizedCustomers.sort(sortByDaysWaiting);
-        archivedCustomers.sort(sortByDaysWaiting);
-        // Atualiza com TODOS os dados processados
+        Object.values(processed.lists).forEach((list) => list.sort(sortByDaysWaiting));
+
         setData({
           metrics: {
-            totalActive: awaitingCount,
-            totalReadyForPickup: readyForPickupCount,
-            totalAwaitingTransfer: awaitingTransferCount,
-            totalFinished: finishedCount,
+            ...processed.metrics,
             averageWaitTime,
-            urgentCount,
-            longWaitCount,
           },
-          lists: {
-            awaiting: awaitingCustomers,
-            awaitingTransfer: awaitingTransferCustomers,
-            readyForPickup: readyForPickupCustomers,
-            longWait: longWaitCustomers,
-            transfer: transferCustomers,
-            finalized: finalizedCustomers,
-            archived: archivedCustomers,
-          },
+          lists: processed.lists,
           loading: false,
           refresh,
         });
       } catch (error) {
-        console.error('Erro ao buscar dados do dashboard:', error);
+        console.error('Erro ao buscar dados:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchDashboardData();
+    fetchCustomerMetrics();
   }, [refreshTrigger, refresh]);
+
   return {
     ...data,
     loading,
   };
 }
 
-export default useDashboardData;
+export default useCustomerMetrics;
