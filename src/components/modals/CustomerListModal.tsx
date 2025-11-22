@@ -9,6 +9,7 @@ interface CustomerListModalProps {
   title: string;
   customers: Customer[];
   loading: boolean;
+  highlightedCustomerId?: string | null;
   onSendMessage: (customer: Customer) => void;
   onArchive: (customer: Customer) => void;
   onResetToInitial?: (customer: Customer) => void;
@@ -28,6 +29,7 @@ function CustomerListModal({
   title,
   customers,
   loading,
+  highlightedCustomerId,
   onArchive,
   onSendMessage,
   onResetToInitial,
@@ -60,6 +62,7 @@ function CustomerListModal({
               <AnimatedListItem key={customer.id} index={index}>
                 <WorkflowCard
                   customer={customer}
+                  isHighlighted={highlightedCustomerId === customer.id}
                   onSendMessage={onSendMessage}
                   onArchive={onArchive}
                   onResetToInitial={onResetToInitial}

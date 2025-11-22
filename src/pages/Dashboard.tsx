@@ -26,6 +26,7 @@ function Dashboard() {
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [modalType, setModalType] = useState<'awaiting' | 'awaitingTransfer' | 'readyForPickup' | null>(null);
+  const [highlightedCustomerId, setHighlightedCustomerId] = useState<string | null>(null);
 
   const { metrics, lists, loading, refresh } = useCustomerMetrics();
 
@@ -44,7 +45,9 @@ function Dashboard() {
     try {
       await checkStoreCampinas(customer);
       toast('WhatsApp enviado para Loja Campinas');
+      setHighlightedCustomerId(customer.id);
       refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao consultar loja');
@@ -55,7 +58,9 @@ function Dashboard() {
     try {
       await checkStoreDomPedro(customer);
       toast('WhatsApp enviado para Loja Dom Pedro');
+      setHighlightedCustomerId(customer.id);
       refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao consultar loja');
@@ -65,7 +70,9 @@ function Dashboard() {
   const handleConfirmStoreStock = async (customer: Customer) => {
     try {
       await confirmStoreStock(customer);
+      setHighlightedCustomerId(customer.id);
       refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao notificar cliente');
@@ -76,7 +83,9 @@ function Dashboard() {
     try {
       await rejectStoreStock(customer);
       toast('Produto não disponível. Pode consultar outra loja.');
+      setHighlightedCustomerId(customer.id);
       refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro ao atualizar cliente:', error);
       toast.error('Erro ao atualizar status');
@@ -87,7 +96,9 @@ function Dashboard() {
     try {
       await acceptTransfer(customer);
       toast.success(`Transferência confirmada de ${customer.consultingStore}!`);
+      setHighlightedCustomerId(customer.id);
       refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
       toast.error('Erro ao confirmar transferência');
@@ -119,7 +130,9 @@ function Dashboard() {
   const handleProductArrived = async (customer: Customer) => {
     try {
       await productArrived(customer);
+      setHighlightedCustomerId(customer.id);
       refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro ao atualizar status:', error);
       toast.error('Erro ao atualizar status');
@@ -130,7 +143,9 @@ function Dashboard() {
     try {
       await completeOrder(customer);
       toast.success(`Venda de ${customer.name} finalizada!`);
+      setHighlightedCustomerId(customer.id);
       refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro ao finalizar venda:', error);
       toast.error('Erro ao finalizar venda');
@@ -148,7 +163,9 @@ function Dashboard() {
     try {
       await resetToInitial(customer);
       toast.success(`Cliente ${customer.name} voltou ao status inicial.`);
+      setHighlightedCustomerId(customer.id);
       refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro ao resetar cliente:', error);
       toast.error('Erro ao resetar cliente');
@@ -293,6 +310,7 @@ function Dashboard() {
         title={getModalTitle()}
         customers={customers}
         loading={loading}
+        highlightedCustomerId={highlightedCustomerId}
         onSendMessage={sendGenericMessage}
         onArchive={handleArchive}
         onResetToInitial={handleResetToInitial}

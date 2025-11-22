@@ -14,6 +14,8 @@
  * @module components/features/WorkflowCard
  */
 
+import { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Customer } from '@/schemas/customerSchema';
 import { getTimeAgo } from '@/utils';
 import { getCustomerStatus } from '@/utils/customerStatus';
@@ -26,6 +28,7 @@ import { Button } from '@/components/ui';
 interface WorkflowCardProps {
   customer: Customer;
   showActions?: boolean;
+  isHighlighted?: boolean;
 
   // Generic actions
   onSendMessage?: (customer: Customer) => void;
@@ -50,6 +53,7 @@ interface WorkflowCardProps {
 function WorkflowCard({
   customer,
   showActions = true,
+  isHighlighted = false,
   onSendMessage,
   onArchive,
   onResetToInitial,
@@ -62,12 +66,29 @@ function WorkflowCard({
   acceptTransfer,
   declineTransfer,
 }: WorkflowCardProps) {
-  // Compute customer state
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isHighlighted && cardRef.current) {
+      setTimeout(() => {
+        cardRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [isHighlighted]);
+
   const status = getCustomerStatus(customer.createdAt, customer.status);
   const borderClass = status.borderClass + ' bg-gray-50';
 
   return (
-    <div
+    <motion.div
+      ref={cardRef}
+      animate={{
+        backgroundColor: isHighlighted ? '#dbeafe' : '#f9fafb',
+      }}
+      transition={{ duration: 0.3 }}
       className={`${borderClass} rounded-lg p-3 sm:p-4 border-l-4 hover:shadow-md transition-shadow duration-200 relative`}
     >
       {/* Top-Right Action Buttons */}
@@ -341,7 +362,7 @@ function WorkflowCard({
           </Button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
