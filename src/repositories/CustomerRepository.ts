@@ -1,4 +1,4 @@
-import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, query, where } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { CustomerSchema, FirebaseCustomerSchema, Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { getCurrentTimestamp } from '@/utils';
@@ -24,38 +24,9 @@ export async function getAllCustomers(): Promise<Customer[]> {
   return snapshot.docs
     .map((doc) => {
       const result = CustomerSchema.safeParse({ id: doc.id, ...doc.data() });
-      if (!result.success) {
-        console.error(`Dados inválidos no cliente ${doc.id}:`, result.error);
-        return null;
-      }
-      return result.data;
+      return result.success ? result.data : null;
     })
     .filter((c): c is Customer => c !== null);
-}
-
-/**
- * Busca um customer específico por ID
- * Valida o documento com Zod antes de retornar
- *
- * @param id - ID do documento no Firestore
- * @returns Customer encontrado ou null se não existir/inválido
- *
- * @example
- * const customer = await getCustomerById('abc123');
- * if (customer) console.log(customer.name);
- */
-export async function getCustomerById(id: string): Promise<Customer | null> {
-  const docRef = doc(db, COLLECTION_NAME, id);
-  const docSnap = await getDoc(docRef);
-
-  if (!docSnap.exists()) return null;
-
-  const result = CustomerSchema.safeParse({ id: docSnap.id, ...docSnap.data() });
-  if (!result.success) {
-    console.error(`Dados inválidos no cliente ${id}:`, result.error);
-    return null;
-  }
-  return result.data;
 }
 
 /**
@@ -110,61 +81,65 @@ export async function updateCustomer(id: string, data: Partial<Customer>): Promi
 export async function deleteCustomerById(id: string): Promise<void> {
   await deleteDoc(doc(db, COLLECTION_NAME, id));
 }
+
 // ==========================================
 //  QUERIES ESPECÍFICAS
 // ==========================================
-
-/** @example findCustomersByStatus('pending') */
-export async function findCustomersByStatus(status: Customer['status']): Promise<Customer[]> {
-  const q = query(collection(db, COLLECTION_NAME), where('status', '==', status));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
-}
 
 /** @example findCustomersByReference('REF123') */
 export async function findCustomersByReference(reference: string): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('reference', '==', reference.toLowerCase()));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
+
+  return snapshot.docs
+    .map((doc) => {
+      const result = CustomerSchema.safeParse({ id: doc.id, ...doc.data() });
+      return result.success ? result.data : null;
+    })
+    .filter((c): c is Customer => c !== null);
 }
 
 /** @example findCustomersByModel('Sandália Confort') */
 export async function findCustomersByModel(model: string): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('model', '==', model.toLowerCase()));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
+
+  return snapshot.docs
+    .map((doc) => {
+      const result = CustomerSchema.safeParse({ id: doc.id, ...doc.data() });
+      return result.success ? result.data : null;
+    })
+    .filter((c): c is Customer => c !== null);
 }
 
 /** Busca todos os customers arquivados */
 export async function findArchivedCustomers(): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('archived', '==', true));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
+
+  return snapshot.docs
+    .map((doc) => {
+      const result = CustomerSchema.safeParse({ id: doc.id, ...doc.data() });
+      return result.success ? result.data : null;
+    })
+    .filter((c): c is Customer => c !== null);
 }
 
 /** Busca todos os customers com status 'completed' */
 export async function findCompletedCustomers(): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('status', '==', 'completed'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
-}
 
-/** Busca customers transferidos de outras lojas (Campinas ou Dom Pedro) */
-export async function findTransferCustomers(): Promise<Customer[]> {
-  const q = query(collection(db, COLLECTION_NAME), where('sourceStore', 'in', ['Campinas', 'Dom Pedro']));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
-}
-
-/** Busca todos os customers não arquivados */
-export async function findActiveCustomers(): Promise<Customer[]> {
-  const q = query(collection(db, COLLECTION_NAME), where('archived', '==', false));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Customer);
+  return snapshot.docs
+    .map((doc) => {
+      const result = CustomerSchema.safeParse({ id: doc.id, ...doc.data() });
+      return result.success ? result.data : null;
+    })
+    .filter((c): c is Customer => c !== null);
 }
 
 // ==========================================
-// 🔹 OPERAÇÕES ESPECÍFICAS DE NEGÓCIO
+// OPERAÇÕES ESPECÍFICAS DE NEGÓCIO
 // ==========================================
 
 /**
