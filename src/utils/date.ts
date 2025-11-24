@@ -44,3 +44,7 @@ export const getDaysBetween = (startDate: string, endDate: string): string => {
   const diffDays = Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
   return `${diffDays} dia${diffDays > 1 ? 's' : ''}`;
 };
+
+export const getCurrentTimestamp = (): string => {
+  return new Date().toISOString();
+};

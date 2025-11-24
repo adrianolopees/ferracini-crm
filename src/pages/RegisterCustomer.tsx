@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createCustomer } from '@/repositories';
 import { formSchema, FormData } from '@/schemas/registerSchema';
-import { getFirebaseErrorMessage, maskPhone } from '@/utils';
+import { getCurrentTimestamp, getFirebaseErrorMessage, maskPhone } from '@/utils';
 import toast from 'react-hot-toast';
 import { Input, Select, Button, Spinner, PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
@@ -42,7 +42,7 @@ function RegisterCustomer() {
           ...data,
           reference: data.reference.toLowerCase(),
           model: data.model.toLowerCase(),
-          createdAt: new Date().toISOString(),
+          createdAt: getCurrentTimestamp(),
           archived: false,
           status: 'pending',
         }),

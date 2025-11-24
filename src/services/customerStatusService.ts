@@ -1,5 +1,6 @@
 import { updateCustomer } from '@/repositories';
 import { Customer, CustomerStatus } from '@/schemas/customerSchema';
+import { getCurrentTimestamp } from '@/utils';
 
 export async function updateCustomerStatus(
   customerId: string,
@@ -8,7 +9,7 @@ export async function updateCustomerStatus(
     sourceStore?: 'Campinas' | 'Dom Pedro' | 'Jundiaí';
   }
 ): Promise<void> {
-  const now = new Date().toISOString();
+  const now = getCurrentTimestamp();
 
   const updateData: Partial<Customer> = {
     status: newStatus,
@@ -30,21 +31,4 @@ export async function updateCustomerStatus(
   }
 
   await updateCustomer(customerId, updateData);
-}
-
-export async function moveToAwaitingTransfer(
-  customer: Customer,
-  sourceStore: 'Campinas' | 'Dom Pedro' | 'Jundiaí'
-): Promise<void> {
-  await updateCustomerStatus(customer.id, 'awaitingTransfer', {
-    sourceStore,
-  });
-}
-
-export async function moveToFinished(customer: Customer): Promise<void> {
-  await updateCustomerStatus(customer.id, 'completed');
-}
-
-export async function markAsContacted(customer: Customer): Promise<void> {
-  await updateCustomerStatus(customer.id, 'readyForPickup');
 }

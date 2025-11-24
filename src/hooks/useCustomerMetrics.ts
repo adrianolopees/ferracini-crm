@@ -64,7 +64,7 @@ function useCustomerMetrics(): CustomerMetrics {
         const allCustomers = await getAllCustomers();
 
         const LONG_WAIT_DAYS = 30;
-        const URGENT_DAYS = 15;
+        const URGENT_DAYS = 14;
 
         const processed = allCustomers.reduce<AccumuladorType>(
           (acc, customer) => {

@@ -18,7 +18,7 @@ import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Customer } from '@/schemas/customerSchema';
 import { getTimeAgo } from '@/utils';
-import { getCustomerStatus } from '@/utils/customerStatus';
+import { getCustomerStatus } from '@/utils';
 import { Button } from '@/components/ui';
 
 /* ============================================================================

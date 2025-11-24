@@ -7,7 +7,7 @@ import { Input, PageLayout } from '@/components/ui';
 import { WorkflowCard } from '@/components/dashboard';
 import { ArchiveModal } from '@/components/modals';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
-import { archiveCustomer } from '@/services/customerActionService';
+import { archiveCustomer, moveToReadyForPickup } from '@/services/customerActionService';
 
 function SearchCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,12 +62,8 @@ function SearchCustomers() {
 
   const handleWhatsApp = async (customer: Customer) => {
     try {
-      await updateCustomer(customer.id, {
-        status: 'readyForPickup',
-        contactedAt: new Date().toISOString(),
-        sourceStore: 'Jundiaí',
-      });
-
+      await moveToReadyForPickup(customer);
+      await updateCustomer(customer.id, { sourceStore: 'Jundiaí' });
       notifyProductArrived(customer);
       toast.success(`${customer.name} movido para "Pronto para Retirada"!`);
       setCustomers(customers.filter((c) => c.id !== customer.id));

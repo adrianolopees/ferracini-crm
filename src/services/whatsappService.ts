@@ -1,14 +1,11 @@
 import { Customer } from '@/schemas/customerSchema';
+import { clearNumber } from '@/utils';
 
 const domPedroNumber = '(19) 99682-1710';
 const campinasNumber = '(19) 98221-5561';
 
-function formatPhone(phone: string): string {
-  return phone.replace(/\D/g, '');
-}
-
 function openWhatsApp(phone: string, message: string) {
-  const cleanPhone = formatPhone(phone);
+  const cleanPhone = clearNumber(phone);
   const url = `https://wa.me/55${cleanPhone}?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');
 }

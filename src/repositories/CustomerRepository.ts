@@ -1,6 +1,7 @@
 import { collection, getDocs, getDoc, doc, updateDoc, deleteDoc, addDoc, query, where } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { CustomerSchema, FirebaseCustomerSchema, Customer, ArchiveReason } from '@/schemas/customerSchema';
+import { getCurrentTimestamp } from '@/utils';
 
 const COLLECTION_NAME = 'customers';
 
@@ -39,14 +40,13 @@ export async function getCustomerById(id: string): Promise<Customer | null> {
 export async function createCustomer(customer: Omit<Customer, 'id'>): Promise<string> {
   const validated = FirebaseCustomerSchema.parse({
     ...customer,
-    createdAt: customer.createdAt || new Date().toISOString(),
+    createdAt: customer.createdAt || getCurrentTimestamp(),
   });
   const docRef = await addDoc(collection(db, COLLECTION_NAME), validated);
   return docRef.id;
 }
 
 export async function updateCustomer(id: string, data: Partial<Customer>): Promise<void> {
-  // Remove o id dos dados se vier
   const { id: _, ...dataWithoutId } = data as any;
   const validated = FirebaseCustomerSchema.partial().parse(dataWithoutId);
   await updateDoc(doc(db, COLLECTION_NAME, id), validated);
@@ -115,7 +115,7 @@ export async function archiveCustomerById(id: string, reason: ArchiveReason, not
   await updateCustomer(id, {
     archived: true,
     archiveReason: reason,
-    archivedAt: new Date().toISOString(),
+    archivedAt: getCurrentTimestamp(),
     notes: notes || '',
   });
 }
@@ -127,6 +127,6 @@ export async function restoreCustomerById(id: string, status: Customer['status']
     archivedAt: null,
     notes: null,
     status,
-    contactedAt: new Date().toISOString(),
+    contactedAt: getCurrentTimestamp(),
   });
 }

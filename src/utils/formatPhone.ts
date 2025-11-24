@@ -1,5 +1,5 @@
 export const maskPhone = (value: string): string => {
-  const digits = value.replace(/\D/g, '');
+  const digits = clearNumber(value);
   const limited = digits.slice(0, 11);
 
   if (limited.length <= 2) return limited;
@@ -7,4 +7,8 @@ export const maskPhone = (value: string): string => {
     return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
   }
   return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
+};
+
+export const clearNumber = (value: string): string => {
+  return value.replace(/\D/g, '');
 };

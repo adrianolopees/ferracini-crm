@@ -106,7 +106,7 @@ function Dashboard() {
   };
 
   const handleDeclineTransfer = (customer: Customer) => {
-    setModalType(null); // Fecha o modal de lista
+    setModalType(null);
     setCustomerToArchive(customer);
     setArchiveModalOpen(true);
   };
@@ -115,7 +115,6 @@ function Dashboard() {
     if (!customerToArchive) return;
 
     try {
-      // Usa declineTransfer pois limpa dados de consulta/transferência antes de arquivar
       await declineTransfer(customerToArchive, reason, notes || '');
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
@@ -153,7 +152,7 @@ function Dashboard() {
   };
 
   const handleArchive = (customer: Customer) => {
-    setModalType(null); // Fecha o modal de lista primeiro
+    setModalType(null);
     setCustomerToArchive(customer);
     setArchiveModalOpen(true);
     refresh();

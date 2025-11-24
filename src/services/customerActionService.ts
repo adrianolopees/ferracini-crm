@@ -5,8 +5,9 @@ import {
   sendStoreCampinas,
   sendStoreDomPedro,
 } from '@/services/whatsappService';
-import { moveToAwaitingTransfer, markAsContacted, moveToFinished } from '@/services/customerStatusService';
+import { updateCustomerStatus } from '@/services/customerStatusService';
 import { updateCustomer, archiveCustomerById, restoreCustomerById, deleteCustomerById } from '@/repositories';
+import { getCurrentTimestamp } from '@/utils';
 
 // ============================================
 // 🔹 FUNÇÕES GENÉRICAS (Low-level)
@@ -26,7 +27,7 @@ export async function deleteCustomer(customer: Customer): Promise<void> {
 export async function moveToReadyForPickup(customer: Customer): Promise<void> {
   await updateCustomer(customer.id, {
     status: 'readyForPickup',
-    contactedAt: new Date().toISOString(),
+    contactedAt: getCurrentTimestamp(),
   });
 }
 
@@ -91,10 +92,23 @@ export async function declineTransfer(customer: Customer, reason: ArchiveReason,
 }
 
 export async function productArrived(customer: Customer): Promise<void> {
-  await markAsContacted(customer);
+  await moveToReadyForPickup(customer);
   notifyProductArrived(customer);
 }
 
 export async function completeOrder(customer: Customer): Promise<void> {
   await moveToFinished(customer);
+}
+
+export async function moveToAwaitingTransfer(
+  customer: Customer,
+  sourceStore: 'Campinas' | 'Dom Pedro' | 'Jundiaí'
+): Promise<void> {
+  await updateCustomerStatus(customer.id, 'awaitingTransfer', {
+    sourceStore,
+  });
+}
+
+export async function moveToFinished(customer: Customer): Promise<void> {
+  await updateCustomerStatus(customer.id, 'completed');
 }

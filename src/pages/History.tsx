@@ -62,7 +62,6 @@ function History() {
   const [searchTerm, setSearchTerm] = useState('');
   const [transferFilter, setTransferFilter] = useState<'all' | 'Campinas' | 'Dom Pedro'>('all');
 
-  // Modais de arquivamento e delete
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -70,12 +69,10 @@ function History() {
 
   const { lists, refresh, loading } = useCustomerMetrics();
 
-  // Buscar clientes ao carregar
   useEffect(() => {
     refresh();
   }, []);
 
-  // Limpar busca ao trocar de tab
   useEffect(() => {
     setSearchTerm('');
     setTransferFilter('all');
@@ -110,15 +107,7 @@ function History() {
         customer.reference.toLowerCase().includes(term) ||
         customer.phone.includes(term)
     );
-  }, [
-    searchTerm,
-    activeTab,
-    lists.finalized,
-    lists.transfer,
-    lists.archived,
-    lists.longWait,
-    transferFilter,
-  ]);
+  }, [searchTerm, activeTab, lists.finalized, lists.transfer, lists.archived, lists.longWait, transferFilter]);
 
   const handleRestore = async (customer: Customer) => {
     try {
