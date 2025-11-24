@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { useProductAnalytics } from '@/hooks';
+import { useProductRanking } from '@/hooks';
 
 function TopProductsChart() {
-  const { products, loading } = useProductAnalytics(10);
+  const { products, loading } = useProductRanking(10);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
