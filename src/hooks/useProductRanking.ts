@@ -5,13 +5,13 @@ interface ProductCount {
   name: string;
   count: number;
 }
-interface TopProductsData {
+interface ProductRankingData {
   products: ProductCount[];
   loading: boolean;
   refresh: () => void;
 }
 
-function useTopProducts(limit: number = 10): TopProductsData {
+function useProductRanking(limit: number = 10): ProductRankingData {
   const [products, setProducts] = useState<ProductCount[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -53,4 +53,4 @@ function useTopProducts(limit: number = 10): TopProductsData {
   return { products, loading, refresh };
 }
 
-export default useTopProducts;
+export default useProductRanking;

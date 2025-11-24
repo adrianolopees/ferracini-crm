@@ -3,7 +3,7 @@ import { getAllCustomers } from '@/repositories';
 import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting } from '@/utils';
 
-interface CustomerMetrics {
+interface CustomerDashboard {
   metrics: {
     totalActive: number;
     totalReadyForPickup: number;
@@ -25,12 +25,12 @@ interface CustomerMetrics {
   loading: boolean;
   refresh: () => void;
 }
-type AccumuladorType = Pick<CustomerMetrics, 'metrics' | 'lists'> & { totalDays: number };
+type AccumuladorType = Pick<CustomerDashboard, 'metrics' | 'lists'> & { totalDays: number };
 
-function useCustomerMetrics(): CustomerMetrics {
+function useCustomerDashboard(): CustomerDashboard {
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [data, setData] = useState<Omit<CustomerMetrics, 'loading' | 'refresh'>>({
+  const [data, setData] = useState<Omit<CustomerDashboard, 'loading' | 'refresh'>>({
     metrics: {
       totalActive: 0,
       totalReadyForPickup: 0,
@@ -67,7 +67,6 @@ function useCustomerMetrics(): CustomerMetrics {
         const processed = allCustomers.reduce<AccumuladorType>(
           (acc, customer) => {
             const isTransferred = customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro';
-
             if (isTransferred) {
               acc.lists.transfer.push(customer);
             }
@@ -83,7 +82,6 @@ function useCustomerMetrics(): CustomerMetrics {
             }
 
             const status = customer.status || 'pending';
-
             switch (status) {
               case 'pending': {
                 const daysWaiting = getDaysWaiting(customer.createdAt);
@@ -170,4 +168,4 @@ function useCustomerMetrics(): CustomerMetrics {
   };
 }
 
-export default useCustomerMetrics;
+export default useCustomerDashboard;

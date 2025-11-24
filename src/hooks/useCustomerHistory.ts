@@ -3,7 +3,7 @@ import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting } from '@/utils';
 import { findCompletedCustomers, findArchivedCustomers, getAllCustomers } from '@/repositories';
 
-interface HistoryData {
+interface CustomerHistory {
   lists: {
     finalized: Customer[];
     transfer: Customer[];
@@ -14,10 +14,10 @@ interface HistoryData {
   refresh: () => void;
 }
 
-function useHistoryData(): HistoryData {
+function useCustomerHistory(): CustomerHistory {
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [lists, setLists] = useState<HistoryData['lists']>({
+  const [lists, setLists] = useState<CustomerHistory['lists']>({
     finalized: [],
     transfer: [],
     archived: [],
@@ -32,34 +32,41 @@ function useHistoryData(): HistoryData {
     async function fetchHistoryData() {
       setLoading(true);
       try {
-        const [finalized, archived, allCustomers] = await Promise.all([
+        const [completed, archived, allCustomers] = await Promise.all([
           findCompletedCustomers(),
           findArchivedCustomers(),
           getAllCustomers(),
         ]);
 
-        const transfer = allCustomers.filter(
-          (customer) => customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro'
-        );
-
         const LONG_WAIT_DAYS = 30;
-        const longWait = allCustomers.filter((customer) => {
-          if (customer.archived || customer.status === 'completed') {
-            return false;
+
+        const processed = allCustomers.reduce<CustomerHistory['lists']>(
+          (acc, customer) => {
+            if (customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro') {
+              acc.transfer.push(customer);
+            }
+
+            if (!customer.archived && customer.status !== 'completed') {
+              const daysWaiting = getDaysWaiting(customer.createdAt);
+              if (daysWaiting >= LONG_WAIT_DAYS) {
+                acc.longWait.push(customer);
+              }
+            }
+            return acc;
+          },
+          {
+            finalized: completed,
+            transfer: [],
+            archived: archived,
+            longWait: [],
           }
-          const daysWaiting = getDaysWaiting(customer.createdAt);
-          return daysWaiting >= LONG_WAIT_DAYS;
-        });
+        );
 
         const sortByDaysWaiting = (a: Customer, b: Customer) =>
           getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt);
 
-        setLists({
-          finalized: finalized.sort(sortByDaysWaiting),
-          transfer: transfer.sort(sortByDaysWaiting),
-          archived: archived.sort(sortByDaysWaiting),
-          longWait: longWait.sort(sortByDaysWaiting),
-        });
+        Object.values(processed).forEach((list) => list.sort(sortByDaysWaiting));
+        setLists(processed);
       } catch (error) {
         console.error('Erro ao buscar dados do histórico:', error);
       } finally {
@@ -77,4 +84,4 @@ function useHistoryData(): HistoryData {
   };
 }
 
-export default useHistoryData;
+export default useCustomerHistory;
