@@ -17,9 +17,9 @@ function LongWaitAlert({ count, loading, onClick }: LongWaitAlertProps) {
             <i className="fa-solid fa-clock text-yellow-600 text-xl mr-3"></i>
             <div>
               <p className="text-sm font-medium text-yellow-800">
-                {count} cliente{count > 1 ? 's' : ''} estão aguardando há +30 dias
+                {count} cliente{count > 1 ? 's' : ''} estão aguardando +30 dias
               </p>
-              <p className="text-xs text-yellow-700 mt-1">
+              <p className="text-xs text-yellow-700 mt-1 hidden md:flex">
                 {count > 1 ? 'Todos foram movidos' : 'Foi movido'} automaticamente para Histórico → +30 dias
               </p>
             </div>
@@ -28,7 +28,7 @@ function LongWaitAlert({ count, loading, onClick }: LongWaitAlertProps) {
             onClick={onClick}
             className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer"
           >
-            Ver Lista
+            <i className="fa-solid fa-arrow-right text-yellow-800"></i>
           </button>
         </div>
       </div>
