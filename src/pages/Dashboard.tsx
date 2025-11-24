@@ -19,7 +19,7 @@ import {
 } from '@/services/customerActionService';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { sendGenericMessage } from '@/services/whatsappService';
-import { useCustomerMetrics } from '@/hooks';
+import { useCustomerDashboard } from '@/hooks';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -28,7 +28,7 @@ function Dashboard() {
   const [modalType, setModalType] = useState<'awaiting' | 'awaitingTransfer' | 'readyForPickup' | null>(null);
   const [highlightedCustomerId, setHighlightedCustomerId] = useState<string | null>(null);
 
-  const { metrics, lists, loading, refresh } = useCustomerMetrics();
+  const { metrics, lists, loading, refresh } = useCustomerDashboard();
 
   const getCustomersByModalType = () => {
     if (!modalType) return [];

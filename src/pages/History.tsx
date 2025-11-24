@@ -13,7 +13,7 @@ import {
   archiveCustomer,
   deleteCustomer,
 } from '@/services/customerActionService';
-import { useHistoryData } from '@/hooks';
+import { useCustomerHistory } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
@@ -67,7 +67,7 @@ function History() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
-  const { lists, refresh, loading } = useHistoryData();
+  const { lists, refresh, loading } = useCustomerHistory();
 
   useEffect(() => {
     refresh();

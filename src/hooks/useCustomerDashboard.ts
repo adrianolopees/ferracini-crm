@@ -30,7 +30,7 @@ type AccumuladorType = Pick<CustomerMetrics, 'metrics' | 'lists'> & { totalDays:
 function useCustomerMetrics(): CustomerMetrics {
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [data, setData] = useState<CustomerMetrics>({
+  const [data, setData] = useState<Omit<CustomerMetrics, 'loading' | 'refresh'>>({
     metrics: {
       totalActive: 0,
       totalReadyForPickup: 0,
@@ -49,8 +49,6 @@ function useCustomerMetrics(): CustomerMetrics {
       finalized: [],
       archived: [],
     },
-    loading: true,
-    refresh: () => {},
   });
 
   const refresh = useCallback(() => {
@@ -155,8 +153,6 @@ function useCustomerMetrics(): CustomerMetrics {
             averageWaitTime,
           },
           lists: processed.lists,
-          loading: false,
-          refresh,
         });
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
@@ -165,11 +161,12 @@ function useCustomerMetrics(): CustomerMetrics {
       }
     }
     fetchCustomerMetrics();
-  }, [refreshTrigger, refresh]);
+  }, [refreshTrigger]);
 
   return {
     ...data,
     loading,
+    refresh,
   };
 }
 

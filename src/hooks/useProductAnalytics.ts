@@ -1,17 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getAllCustomers } from '@/repositories';
 
 interface ProductCount {
   name: string;
   count: number;
 }
+interface TopProductsData {
+  products: ProductCount[];
+  loading: boolean;
+  refresh: () => void;
+}
 
-function useTopProducts(limit: number = 10) {
+function useTopProducts(limit: number = 10): TopProductsData {
   const [products, setProducts] = useState<ProductCount[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const refresh = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
       try {
         const allCustomers = await getAllCustomers();
 
@@ -38,8 +49,8 @@ function useTopProducts(limit: number = 10) {
       }
     };
     fetchProducts();
-  }, [limit]);
-  return { products, loading };
+  }, [limit, refreshTrigger]);
+  return { products, loading, refresh };
 }
 
 export default useTopProducts;

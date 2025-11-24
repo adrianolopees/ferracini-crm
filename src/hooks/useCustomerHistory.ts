@@ -32,19 +32,16 @@ function useHistoryData(): HistoryData {
     async function fetchHistoryData() {
       setLoading(true);
       try {
-        // Buscar dados em paralelo - queries otimizadas
         const [finalized, archived, allCustomers] = await Promise.all([
           findCompletedCustomers(),
           findArchivedCustomers(),
-          getAllCustomers(), // Precisamos para transfer E longWait
+          getAllCustomers(),
         ]);
 
-        // Filtrar transferidos (clientes que vieram de outras lojas)
         const transfer = allCustomers.filter(
           (customer) => customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro'
         );
 
-        // Calcular longWait (clientes com mais de 30 dias)
         const LONG_WAIT_DAYS = 30;
         const longWait = allCustomers.filter((customer) => {
           if (customer.archived || customer.status === 'completed') {
@@ -54,7 +51,6 @@ function useHistoryData(): HistoryData {
           return daysWaiting >= LONG_WAIT_DAYS;
         });
 
-        // Ordenar todas as listas por dias de espera (maior primeiro)
         const sortByDaysWaiting = (a: Customer, b: Customer) =>
           getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt);
 
