@@ -56,7 +56,7 @@ function useCustomerDashboard(): CustomerDashboard {
   }, []);
 
   useEffect(() => {
-    async function fetchCustomerMetrics() {
+    const fetchCustomerDashboard = async () => {
       setLoading(true);
       try {
         const allCustomers = await getAllCustomers();
@@ -154,8 +154,8 @@ function useCustomerDashboard(): CustomerDashboard {
       } finally {
         setLoading(false);
       }
-    }
-    fetchCustomerMetrics();
+    };
+    fetchCustomerDashboard();
   }, [refreshTrigger]);
 
   return {

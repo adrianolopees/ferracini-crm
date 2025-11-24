@@ -29,7 +29,7 @@ function useCustomerHistory(): CustomerHistory {
   }, []);
 
   useEffect(() => {
-    async function fetchHistoryData() {
+    const fetchCustomerHistory = async () => {
       setLoading(true);
       try {
         const [completed, archived, allCustomers] = await Promise.all([
@@ -69,9 +69,9 @@ function useCustomerHistory(): CustomerHistory {
       } finally {
         setLoading(false);
       }
-    }
+    };
 
-    fetchHistoryData();
+    fetchCustomerHistory();
   }, [refreshTrigger]);
 
   return {

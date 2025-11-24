@@ -21,7 +21,7 @@ function useProductRanking(limit: number = 10): ProductRankingData {
   }, []);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProductRanking = async () => {
       setLoading(true);
       try {
         const allCustomers = await getAllCustomers();
@@ -48,7 +48,7 @@ function useProductRanking(limit: number = 10): ProductRankingData {
         setLoading(false);
       }
     };
-    fetchProducts();
+    fetchProductRanking();
   }, [limit, refreshTrigger]);
   return { products, loading, refresh };
 }
