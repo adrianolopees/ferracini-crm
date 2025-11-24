@@ -1,6 +1,26 @@
-import { getDaysWaiting } from '@/utils/date';
+import { getDaysWaiting } from './dateUtils';
 
-export function getCustomerStatus(createdAt: string, status?: string) {
+export interface CustomerStatusInfo {
+  daysWaiting: number;
+  borderClass: string;
+  textClass: string;
+  iconClass: string;
+  label: string;
+}
+
+/**
+ * Retorna informações visuais e textuais baseadas no status do customer
+ * Calcula dias de espera e retorna classes CSS apropriadas para cada status
+ *
+ * @param createdAt - Data de criação do customer em formato ISO string
+ * @param status - Status atual do customer (opcional)
+ * @returns Objeto com informações de estilo e label do status
+ *
+ * @example
+ * getCustomerStatus('2024-01-15', 'pending');
+ * // { daysWaiting: 10, borderClass: 'border-l-blue-500...', label: 'Aguardando', ... }
+ */
+export function getCustomerStatus(createdAt: string, status?: string): CustomerStatusInfo {
   const daysWaiting = getDaysWaiting(createdAt);
 
   if (status === 'awaitingTransfer') {

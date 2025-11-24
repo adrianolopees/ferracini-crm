@@ -1,5 +1,5 @@
 import { Customer } from '@/schemas/customerSchema';
-import { getDaysWaiting } from './date';
+import { getDaysWaiting } from './dateUtils';
 
 /**
  * Ordena lista de items por dias de espera (maior primeiro)

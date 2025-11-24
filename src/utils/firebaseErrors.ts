@@ -33,8 +33,24 @@ const firestoreErrorMessages: Record<string, string> = {
   unknown: 'Erro desconhecido',
 };
 
+/**
+ * Converte erros do Firebase (Auth e Firestore) em mensagens amigáveis em português
+ *
+ * Mapeia códigos de erro do Firebase para mensagens legíveis para o usuário.
+ * Suporta erros de autenticação (auth/*) e erros do Firestore.
+ *
+ * @param error - Erro capturado (FirebaseError, Error ou unknown)
+ * @returns Mensagem de erro em português para exibir ao usuário
+ *
+ * @example
+ * try {
+ *   await signInWithEmailAndPassword(auth, email, password);
+ * } catch (error) {
+ *   const message = getFirebaseErrorMessage(error);
+ *   toast.error(message); // "Email ou senha incorretos"
+ * }
+ */
 export function getFirebaseErrorMessage(error: unknown): string {
-  // Se não for erro do Firebase, retorna mensagem genérica
   if (!(error instanceof FirebaseError)) {
     if (error instanceof Error) {
       return error.message;
@@ -42,11 +58,9 @@ export function getFirebaseErrorMessage(error: unknown): string {
     return 'Ocorreu um erro inesperado';
   }
 
-  // Verifica se é erro de Auth
   if (error.code.startsWith('auth/')) {
     return authErrorMessages[error.code] || 'Erro de autenticação';
   }
 
-  // Verifica se é erro de Firestore
   return firestoreErrorMessages[error.code] || 'Erro ao acessar banco de dados';
 }
