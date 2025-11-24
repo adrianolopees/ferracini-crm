@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllCustomers } from '@/repositories';
 import { Customer } from '@/schemas/customerSchema';
-import { getDaysWaiting } from '@/utils';
+import { getDaysWaiting, sortCustomerLists } from '@/utils';
 
 interface CustomerDashboard {
   metrics: {
@@ -140,17 +140,14 @@ function useCustomerDashboard(): CustomerDashboard {
         const averageWaitTime =
           processed.metrics.totalActive > 0 ? Math.round(processed.totalDays / processed.metrics.totalActive) : 0;
 
-        const sortByDaysWaiting = (a: Customer, b: Customer) =>
-          getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt);
-
-        Object.values(processed.lists).forEach((list) => list.sort(sortByDaysWaiting));
+        const sortedLists = sortCustomerLists(processed.lists);
 
         setData({
           metrics: {
             ...processed.metrics,
             averageWaitTime,
           },
-          lists: processed.lists,
+          lists: sortedLists,
         });
       } catch (error) {
         console.error('Erro ao buscar dados:', error);

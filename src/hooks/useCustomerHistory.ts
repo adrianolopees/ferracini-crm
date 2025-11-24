@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Customer } from '@/schemas/customerSchema';
-import { getDaysWaiting } from '@/utils';
+import { getDaysWaiting, sortCustomerLists } from '@/utils';
 import { findCompletedCustomers, findArchivedCustomers, getAllCustomers } from '@/repositories';
 
 interface CustomerHistory {
@@ -62,11 +62,8 @@ function useCustomerHistory(): CustomerHistory {
           }
         );
 
-        const sortByDaysWaiting = (a: Customer, b: Customer) =>
-          getDaysWaiting(b.createdAt) - getDaysWaiting(a.createdAt);
-
-        Object.values(processed).forEach((list) => list.sort(sortByDaysWaiting));
-        setLists(processed);
+        const sortedLists = sortCustomerLists(processed);
+        setLists(sortedLists);
       } catch (error) {
         console.error('Erro ao buscar dados do histórico:', error);
       } finally {
