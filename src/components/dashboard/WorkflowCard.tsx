@@ -1,19 +1,3 @@
-/**
- * WorkflowCard Component
- *
- * Card usado no Dashboard e na página de Buscar Clientes
- * Exibe informações completas do cliente e todas as ações do workflow
- *
- * Estados do workflow:
- * 1. PENDING (inicial) -> escolher loja
- * 2. PENDING (consultando) -> aguardar resposta da loja
- * 3. PENDING (disponível) -> aguardar resposta do cliente
- * 4. AWAITING_TRANSFER -> produto em trânsito
- * 5. READY_FOR_PICKUP -> produto disponível para retirada
- *
- * @module components/features/WorkflowCard
- */
-
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Customer } from '@/schemas/customerSchema';
@@ -21,21 +5,15 @@ import { getTimeAgo } from '@/utils';
 import { getCustomerStatus } from '@/utils';
 import { Button } from '@/components/ui';
 
-/* ============================================================================
- * TYPES
- * ========================================================================= */
-
 interface WorkflowCardProps {
   customer: Customer;
   showActions?: boolean;
   isHighlighted?: boolean;
 
-  // Generic actions
   onSendMessage?: (customer: Customer) => void;
   onArchive?: (customer: Customer) => void;
   onResetToInitial?: (customer: Customer) => void;
 
-  // Workflow actions
   checkStoreCampinas?: (customer: Customer) => void;
   checkStoreDomPedro?: (customer: Customer) => void;
   productArrived?: (customer: Customer) => void;
@@ -45,10 +23,6 @@ interface WorkflowCardProps {
   acceptTransfer?: (customer: Customer) => void;
   declineTransfer?: (customer: Customer) => void;
 }
-
-/* ============================================================================
- * COMPONENT
- * ========================================================================= */
 
 function WorkflowCard({
   customer,
