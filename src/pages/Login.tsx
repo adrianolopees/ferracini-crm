@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks';
-import { loginShcema, LoginFormData } from '@/schemas/loginSchema';
+import { loginSchema, LoginFormData } from '@/schemas/loginSchema';
 import { getFirebaseErrorMessage } from '@/utils';
 import { Spinner, Button, Input } from '@/components/ui';
 
@@ -18,7 +18,7 @@ function Login() {
     setError,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginShcema),
+    resolver: zodResolver(loginSchema),
     mode: 'onSubmit',
   });
 

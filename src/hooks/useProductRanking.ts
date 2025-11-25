@@ -5,6 +5,7 @@ interface ProductCount {
   name: string;
   count: number;
 }
+
 interface ProductRankingData {
   products: ProductCount[];
   loading: boolean;
@@ -29,18 +30,16 @@ function useProductRanking(limit: number = 10): ProductRankingData {
         const modeloCounts: Record<string, number> = {};
 
         allCustomers.forEach((customer) => {
-          const modelo = customer.model;
-
-          if (modelo) {
-            modeloCounts[modelo] = (modeloCounts[modelo] || 0) + 1;
+          if (customer.model) {
+            modeloCounts[customer.model] = (modeloCounts[customer.model] || 0) + 1;
           }
         });
 
-        const productsArray = Object.entries(modeloCounts).map(([name, count]) => ({ name, count }));
+        const topProducts = Object.entries(modeloCounts)
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, limit);
 
-        const sortedProducts = productsArray.sort((a, b) => b.count - a.count);
-
-        const topProducts = sortedProducts.slice(0, limit);
         setProducts(topProducts);
       } catch (error) {
         console.error('Erro ao buscar produtos:', error);

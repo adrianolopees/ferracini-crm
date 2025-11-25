@@ -1,10 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-// ============================================
-// Formatação de Datas
-// ============================================
-
 /** @example formatDate('2024-01-15T10:30:00Z') // "15/01/2024" */
 export function formatDate(isoString: string): string {
   const date = new Date(isoString);
@@ -29,10 +25,6 @@ export function formatDateTime(isoString: string): string {
   });
   return `${dateStr} às ${timeStr}`;
 }
-
-// ============================================
-// Cálculos e Diferenças de Datas
-// ============================================
 
 /**
  * Calcula quantos dias se passaram desde uma data até hoje
@@ -72,10 +64,7 @@ export function getTimeAgo(isoString: string): string {
   });
 }
 
-// ============================================
-// Obtenção de Data Atual
-// ============================================
-
+/** Retorna data/hora atual em formato ISO string */
 export function getCurrentTimestamp(): string {
   return new Date().toISOString();
 }

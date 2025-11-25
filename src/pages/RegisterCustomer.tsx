@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createCustomer } from '@/repositories';
-import { formSchema, FormData } from '@/schemas/registerSchema';
+import { registerCustomerSchema, FormData } from '@/schemas/registerSchema';
 import { getCurrentTimestamp, getFirebaseErrorMessage, maskPhone } from '@/utils';
 import toast from 'react-hot-toast';
 import { Input, Select, Button, Spinner, PageLayout } from '@/components/ui';
@@ -19,7 +19,7 @@ function RegisterCustomer() {
     reset,
     formState: { errors },
   } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(registerCustomerSchema),
     mode: 'onSubmit',
     defaultValues: {
       name: '',

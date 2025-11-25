@@ -10,7 +10,7 @@ import { updateCustomer, archiveCustomerById, restoreCustomerById, deleteCustome
 import { getCurrentTimestamp } from '@/utils';
 
 // ============================================
-// 🔹 FUNÇÕES GENÉRICAS (Low-level)
+//  FUNÇÕES GENÉRICAS (Low-level)
 // ============================================
 export async function archiveCustomer(customer: Customer, reason: ArchiveReason, notes?: string): Promise<void> {
   await archiveCustomerById(customer.id, reason, notes);
@@ -43,7 +43,7 @@ export async function resetToInitial(customer: Customer): Promise<void> {
 }
 
 // ============================================
-// 🔹 FUNÇÕES DE NEGÓCIO (High-level)
+//  FUNÇÕES DE NEGÓCIO (High-level)
 // ============================================
 
 export async function checkStoreCampinas(customer: Customer): Promise<void> {
