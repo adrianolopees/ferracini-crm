@@ -8,12 +8,14 @@ interface ProductCount {
 
 interface ProductRankingData {
   products: ProductCount[];
+  totalReserves: number;
   loading: boolean;
   refresh: () => void;
 }
 
 function useProductRanking(limit: number = 10): ProductRankingData {
   const [products, setProducts] = useState<ProductCount[]>([]);
+  const [totalReserves, setTotalReserves] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -35,11 +37,14 @@ function useProductRanking(limit: number = 10): ProductRankingData {
           }
         });
 
+        const totalReserves = Object.values(modeloCounts).reduce((a, b) => a + b, 0);
+
         const topProducts = Object.entries(modeloCounts)
           .map(([name, count]) => ({ name, count }))
           .sort((a, b) => b.count - a.count)
           .slice(0, limit);
 
+        setTotalReserves(totalReserves);
         setProducts(topProducts);
       } catch (error) {
         console.error('Erro ao buscar produtos:', error);
@@ -49,7 +54,7 @@ function useProductRanking(limit: number = 10): ProductRankingData {
     };
     fetchProductRanking();
   }, [limit, refreshTrigger]);
-  return { products, loading, refresh };
+  return { products, totalReserves, loading, refresh };
 }
 
 export default useProductRanking;

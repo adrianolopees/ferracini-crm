@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
-import { ActionCard, MetricCard, LongWaitAlert } from '@/components/dashboard';
-import { TopProductsChart } from '@/components/charts';
+import { ActionCard, MetricCard, LongWaitAlert, TopProductsChart } from '@/components/dashboard';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';
 import {
   checkStoreCampinas,

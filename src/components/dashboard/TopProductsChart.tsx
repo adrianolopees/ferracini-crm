@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { useProductRanking } from '@/hooks';
 
 function TopProductsChart() {
-  const { products, loading } = useProductRanking(10);
+  const { products, totalReserves, loading } = useProductRanking(10);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -157,7 +157,7 @@ function TopProductsChart() {
       {!isMobile && (
         <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1">
           <i className="fa-solid fa-chart-simple text-blue-500"></i>
-          Baseado em {products.reduce((sum, p) => sum + p.count, 0)} reservas
+          Baseado em {totalReserves} reservas
         </p>
       )}
     </div>
