@@ -46,7 +46,7 @@ export async function createCustomer(customer: Omit<Customer, 'id'>): Promise<st
  * Atualiza campos de um customer existente (partial update)
  */
 export async function updateCustomer(id: string, data: Partial<Customer>): Promise<void> {
-  const { id: _, ...dataWithoutId } = data as any;
+  const { id: _, ...dataWithoutId } = data;
   const validated = FirebaseCustomerSchema.partial().parse(dataWithoutId);
   await updateDoc(doc(db, COLLECTION_NAME, id), validated);
 }

@@ -71,7 +71,7 @@ function History() {
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     setSearchTerm('');

@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User, UserCredential } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 
 interface AuthProviderProps {
@@ -8,7 +8,7 @@ interface AuthProviderProps {
 
 export interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<any>;
+  login: (email: string, password: string) => Promise<UserCredential>;
   logout: () => Promise<void>;
   loading: boolean;
   isLoggingOut: boolean;
