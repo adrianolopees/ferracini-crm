@@ -31,18 +31,7 @@ export async function getAllCustomers(): Promise<Customer[]> {
 
 /**
  * Cria um novo customer no Firestore
- * Adiciona timestamp de criação automaticamente se não fornecido
- *
- * @param customer - Dados do customer (sem ID)
- * @returns ID do documento criado
- * @throws {ZodError} Se validação dos dados falhar
- *
- * @example
- * const id = await createCustomer({
- *   name: 'João Silva',
- *   phone: '11987654321',
- *   status: 'pending'
- * });
+ * Adiciona createdAt automaticamente se não fornecido
  */
 export async function createCustomer(customer: Omit<Customer, 'id'>): Promise<string> {
   const validated = FirebaseCustomerSchema.parse({
@@ -54,15 +43,7 @@ export async function createCustomer(customer: Omit<Customer, 'id'>): Promise<st
 }
 
 /**
- * Atualiza campos de um customer existente
- * Valida apenas os campos fornecidos (partial update)
- *
- * @param id - ID do customer
- * @param data - Campos a atualizar (parcial)
- * @throws {ZodError} Se validação falhar
- *
- * @example
- * await updateCustomer('abc123', { status: 'completed' });
+ * Atualiza campos de um customer existente (partial update)
  */
 export async function updateCustomer(id: string, data: Partial<Customer>): Promise<void> {
   const { id: _, ...dataWithoutId } = data as any;
@@ -70,14 +51,6 @@ export async function updateCustomer(id: string, data: Partial<Customer>): Promi
   await updateDoc(doc(db, COLLECTION_NAME, id), validated);
 }
 
-/**
- * Remove permanentemente um customer do Firestore
- *
- * @param id - ID do customer a ser deletado
- *
- * @example
- * await deleteCustomerById('abc123');
- */
 export async function deleteCustomerById(id: string): Promise<void> {
   await deleteDoc(doc(db, COLLECTION_NAME, id));
 }
@@ -86,7 +59,6 @@ export async function deleteCustomerById(id: string): Promise<void> {
 //  QUERIES ESPECÍFICAS
 // ==========================================
 
-/** @example findCustomersByReference('REF123') */
 export async function findCustomersByReference(reference: string): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('reference', '==', reference.toLowerCase()));
   const snapshot = await getDocs(q);
@@ -99,7 +71,6 @@ export async function findCustomersByReference(reference: string): Promise<Custo
     .filter((c): c is Customer => c !== null);
 }
 
-/** @example findCustomersByModel('Sandália Confort') */
 export async function findCustomersByModel(model: string): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('model', '==', model.toLowerCase()));
   const snapshot = await getDocs(q);
@@ -112,7 +83,6 @@ export async function findCustomersByModel(model: string): Promise<Customer[]> {
     .filter((c): c is Customer => c !== null);
 }
 
-/** Busca todos os customers arquivados */
 export async function findArchivedCustomers(): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('archived', '==', true));
   const snapshot = await getDocs(q);
@@ -125,7 +95,6 @@ export async function findArchivedCustomers(): Promise<Customer[]> {
     .filter((c): c is Customer => c !== null);
 }
 
-/** Busca todos os customers com status 'completed' */
 export async function findCompletedCustomers(): Promise<Customer[]> {
   const q = query(collection(db, COLLECTION_NAME), where('status', '==', 'completed'));
   const snapshot = await getDocs(q);
