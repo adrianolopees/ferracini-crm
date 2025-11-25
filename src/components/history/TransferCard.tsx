@@ -1,29 +1,6 @@
-/**
- * TransferCard Component
- *
- * Card usado na página de Histórico > Transferências
- * Layout focado em relatório de transferências entre lojas
- *
- * Exibe:
- * - Loja de origem
- * - Timeline completa (solicitado, chegou, vendido)
- * - Tempo de transferência
- * - Tempo total do processo
- * - Informações do produto
- *
- * @module components/features/TransferCard
- */
-
 import { Customer } from '@/schemas/customerSchema';
 import { formatDate, getDaysBetween } from '@/utils';
 
-/* ============================================================================
- * CONSTANTS
- * ========================================================================= */
-
-/**
- * Store-specific color schemes
- */
 const STORE_COLORS = {
   Campinas: {
     border: 'border-l-blue-500',
@@ -41,30 +18,15 @@ const STORE_COLORS = {
   },
 } as const;
 
-/* ============================================================================
- * HELPER FUNCTIONS
- * ========================================================================= */
-
-/**
- * Get color configuration for store
- */
 const getStoreColor = (storeName?: 'Campinas' | 'Dom Pedro' | 'Jundiaí' | null) => {
   if (storeName === 'Campinas') return STORE_COLORS.Campinas;
   if (storeName === 'Dom Pedro') return STORE_COLORS['Dom Pedro'];
   return STORE_COLORS.Campinas;
 };
 
-/* ============================================================================
- * TYPES
- * ========================================================================= */
-
 interface TransferCardProps {
   customer: Customer;
 }
-
-/* ============================================================================
- * COMPONENT
- * ========================================================================= */
 
 function TransferCard({ customer }: TransferCardProps) {
   const storeColor = getStoreColor(customer.sourceStore);

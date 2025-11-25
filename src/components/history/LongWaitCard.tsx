@@ -1,18 +1,3 @@
-/**
- * LongWaitCard Component
- *
- * Card usado na página de Histórico > Espera Longa
- * Layout compacto para clientes aguardando há mais de 30 dias
- *
- * Exibe:
- * - Tempo de espera em destaque
- * - Produto em linha compacta
- * - Data de registro
- * - Ações: Contactar e Arquivar
- *
- * @module components/history/LongWaitCard
- */
-
 import { Customer } from '@/schemas/customerSchema';
 import { formatDate, getDaysWaiting } from '@/utils';
 

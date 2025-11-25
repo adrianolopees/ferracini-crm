@@ -1,33 +1,9 @@
-/**
- * HistoryCard Component
- *
- * Card usado na página de Histórico > Finalizados
- * Exibe vendas concluídas com foco em métricas e timeline
- *
- * Exibe:
- * - Data de conclusão
- * - Tempo total do processo
- * - Loja de origem (transferência ou reposição)
- * - Vendedor responsável
- * - Produto completo
- *
- * @module components/features/HistoryCard
- */
-
 import { Customer } from '@/schemas/customerSchema';
 import { formatDateTime, getDaysBetween } from '@/utils';
-
-/* ============================================================================
- * TYPES
- * ========================================================================= */
 
 interface HistoryCardProps {
   customer: Customer;
 }
-
-/* ============================================================================
- * COMPONENT
- * ========================================================================= */
 
 function HistoryCard({ customer }: HistoryCardProps) {
   return (

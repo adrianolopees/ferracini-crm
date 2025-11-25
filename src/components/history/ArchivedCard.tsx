@@ -1,29 +1,6 @@
-/**
- * ArchivedCard Component
- *
- * Card usado na página de Histórico > Arquivados
- * Layout compacto com foco no motivo do arquivamento
- *
- * Exibe:
- * - Motivo do arquivamento em destaque
- * - Produto em linha compacta
- * - Timeline de arquivamento (quando foi arquivado, tempo aguardando)
- * - Notas/observações
- * - Ações: Restaurar e Excluir
- *
- * @module components/features/ArchivedCard
- */
-
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { getTimeAgo, getDaysBetween } from '@/utils';
 
-/* ============================================================================
- * CONSTANTS
- * ========================================================================= */
-
-/**
- * Archive reason labels (Portuguese)
- */
 const ARCHIVE_REASON_LABELS: Record<ArchiveReason, string> = {
   gave_up: 'Desistiu',
   no_response: 'Não Respondeu',
@@ -33,30 +10,15 @@ const ARCHIVE_REASON_LABELS: Record<ArchiveReason, string> = {
   other: 'Outro',
 };
 
-/* ============================================================================
- * HELPER FUNCTIONS
- * ========================================================================= */
-
-/**
- * Get localized label for archive reason
- */
 const getArchiveReasonLabel = (reason?: ArchiveReason | null): string => {
   return reason ? ARCHIVE_REASON_LABELS[reason] : 'Arquivado';
 };
-
-/* ============================================================================
- * TYPES
- * ========================================================================= */
 
 interface ArchivedCardProps {
   customer: Customer;
   onRestore?: (customer: Customer) => void;
   onDelete?: (customer: Customer) => void;
 }
-
-/* ============================================================================
- * COMPONENT
- * ========================================================================= */
 
 function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
   const reasonLabel = getArchiveReasonLabel(customer.archiveReason);
