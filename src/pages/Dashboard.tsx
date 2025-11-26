@@ -26,7 +26,6 @@ function Dashboard() {
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [modalType, setModalType] = useState<'awaiting' | 'awaitingTransfer' | 'readyForPickup' | null>(null);
   const [highlightedCustomerId, setHighlightedCustomerId] = useState<string | null>(null);
-
   const { metrics, lists, loading, refresh } = useCustomerDashboard();
 
   const getCustomersByModalType = () => {

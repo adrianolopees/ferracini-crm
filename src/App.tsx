@@ -3,6 +3,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { RegisterCustomer, SearchCustomers, Dashboard, History } from '@/pages';
 import { ProtectedRoute } from '@/components/routing';
 import Login from '@/pages/Login';
+// import { MigrateWorkspace } from '@/pages'; // ← Comentado: migração já foi executada
 
 function App() {
   return (
@@ -42,6 +43,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        {/* Rota de migração - comentada após uso */}
+        {/* <Route
+          path="/migrate"
+          element={
+            <ProtectedRoute>
+              <MigrateWorkspace />
+            </ProtectedRoute>
+          }
+        /> */}
         <Route path="/login" element={<Login />} />
       </Routes>
     </AuthProvider>

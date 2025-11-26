@@ -834,7 +834,7 @@ Resultado: ❌ Negado (workspaces diferentes)
 4. **Ir para Firestore** → **Adicionar coleção** → Nome: `users`
 
 5. **Criar documento para usuário REAL:**
-   - Document ID: `dH7jKx9pLmN2...` (o UID copiado)
+   - Document ID: `zZTYRSzTnyUwvoGFS2y8MtqgCqu2` (o UID copiado)
    - Campos:
      ```
      email: "seu-email-real@gmail.com"
@@ -844,10 +844,10 @@ Resultado: ❌ Negado (workspaces diferentes)
      ```
 
 6. **Criar documento para usuário DEMO:**
-   - Document ID: `(o UID do demo)`
+   - Document ID: `zHJ3c9gsixazGoYZiPf0F7ADlWx1`
    - Campos:
      ```
-     email: "demo@ferracini.com"
+     email: "demo@lojacrm.com"
      workspaceId: "demo"
      displayName: "Usuário Demo"
      createdAt: "2025-01-26T10:00:00.000Z"

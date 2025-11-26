@@ -8,8 +8,10 @@ import { WorkflowCard } from '@/components/dashboard';
 import { ArchiveModal } from '@/components/modals';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { archiveCustomer, moveToReadyForPickup } from '@/services/customerActionService';
+import { useAuth } from '@/hooks'; // ← NOVO IMPORT
 
 function SearchCustomers() {
+  const { workspaceId } = useAuth(); // ← NOVO: buscar workspaceId
   const [searchTerm, setSearchTerm] = useState('');
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
@@ -24,13 +26,19 @@ function SearchCustomers() {
       return;
     }
 
+    // ← NOVO: Verificar se tem workspaceId
+    if (!workspaceId) {
+      toast.error('Erro: Workspace não identificado. Faça login novamente.');
+      return;
+    }
+
     try {
       const valorBuscado = value.trim();
 
       // Busca por referência e modelo usando repository
       const [refResults, modelResults] = await Promise.all([
-        findCustomersByReference(valorBuscado),
-        findCustomersByModel(valorBuscado),
+        findCustomersByReference(valorBuscado, workspaceId), // ← NOVO: passar workspaceId
+        findCustomersByModel(valorBuscado, workspaceId), // ← NOVO: passar workspaceId
       ]);
 
       const results: Customer[] = [];

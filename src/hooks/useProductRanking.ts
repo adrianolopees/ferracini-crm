@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllCustomers } from '@/repositories';
+import useAuth from './useAuth'; // ← NOVO IMPORT
 
 interface ProductCount {
   name: string;
@@ -14,6 +15,7 @@ interface ProductRankingData {
 }
 
 function useProductRanking(limit: number = 10): ProductRankingData {
+  const { workspaceId } = useAuth(); // ← NOVO: buscar workspaceId
   const [products, setProducts] = useState<ProductCount[]>([]);
   const [totalReserves, setTotalReserves] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -25,9 +27,15 @@ function useProductRanking(limit: number = 10): ProductRankingData {
 
   useEffect(() => {
     const fetchProductRanking = async () => {
+      // ← NOVO: só carrega se tiver workspaceId
+      if (!workspaceId) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       try {
-        const allCustomers = await getAllCustomers();
+        const allCustomers = await getAllCustomers(workspaceId); // ← NOVO: passar workspaceId
 
         const modeloCounts: Record<string, number> = {};
 
@@ -53,7 +61,7 @@ function useProductRanking(limit: number = 10): ProductRankingData {
       }
     };
     fetchProductRanking();
-  }, [limit, refreshTrigger]);
+  }, [limit, refreshTrigger, workspaceId]); // ← NOVO: adicionar workspaceId nas dependências
   return { products, totalReserves, loading, refresh };
 }
 

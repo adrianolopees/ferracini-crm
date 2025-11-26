@@ -1,0 +1,73 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+
+    // Verifica se o usuário está autenticado
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Busca o workspaceId do usuário logado
+    function getUserWorkspace() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.workspaceId;
+    }
+
+    // ============================================
+    // COLEÇÃO: users
+    // ============================================
+
+    match /users/{userId} {
+      // Usuários podem ler apenas seus próprios dados
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+
+      // Ninguém pode criar/atualizar users pelo client
+      // (só via Admin SDK ou Firebase Console)
+      allow write: if false;
+    }
+
+    // ============================================
+    // COLEÇÃO: customers (COM MULTI-TENANT)
+    // ============================================
+
+    match /customers/{customerId} {
+      // Permite leitura se:
+      // 1. Usuário está autenticado
+      // 2. O workspaceId do documento == workspaceId do usuário
+      allow read: if isAuthenticated()
+                  && resource.data.workspaceId == getUserWorkspace();
+
+      // Permite criação se:
+      // 1. Usuário está autenticado
+      // 2. Está criando no próprio workspace
+      allow create: if isAuthenticated()
+                    && request.resource.data.workspaceId == getUserWorkspace();
+
+      // Permite atualização/deleção se:
+      // 1. Usuário está autenticado
+      // 2. O documento pertence ao workspace do usuário
+      // 3. Não está tentando mudar o workspaceId
+      allow update, delete: if isAuthenticated()
+                            && resource.data.workspaceId == getUserWorkspace()
+                            && request.resource.data.workspaceId == resource.data.workspaceId;
+    }
+
+    // ============================================
+    // COLEÇÕES ANTIGAS (TEMPORÁRIO - para não quebrar)
+    // ============================================
+
+    // Coleção antiga "clientes" (se ainda existir)
+    match /clientes/{clienteId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Coleção "contacted"
+    match /contacted/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

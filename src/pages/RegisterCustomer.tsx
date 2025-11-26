@@ -7,8 +7,10 @@ import { getCurrentTimestamp, getFirebaseErrorMessage, maskPhone } from '@/utils
 import toast from 'react-hot-toast';
 import { Input, Select, Button, Spinner, PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
+import { useAuth } from '@/hooks'; // ← NOVO IMPORT
 
 function RegisterCustomer() {
+  const { workspaceId } = useAuth(); // ← NOVO: buscar workspaceId
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -36,16 +38,26 @@ function RegisterCustomer() {
     setIsLoading(true);
     setErrorMessage('');
 
+    // ← NOVO: Verificar se tem workspaceId
+    if (!workspaceId) {
+      setErrorMessage('Erro: Workspace não identificado. Faça login novamente.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await toast.promise(
-        createCustomer({
-          ...data,
-          reference: data.reference.toLowerCase(),
-          model: data.model.toLowerCase(),
-          createdAt: getCurrentTimestamp(),
-          archived: false,
-          status: 'pending',
-        }),
+        createCustomer(
+          {
+            ...data,
+            reference: data.reference.toLowerCase(),
+            model: data.model.toLowerCase(),
+            createdAt: getCurrentTimestamp(),
+            archived: false,
+            status: 'pending',
+          },
+          workspaceId // ← NOVO: passar workspaceId como 2º parâmetro
+        ),
         {
           loading: 'Salvando cliente...',
           success: 'Cliente registrado!',
