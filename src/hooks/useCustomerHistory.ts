@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting, sortCustomerLists } from '@/utils';
 import { findCompletedCustomers, findArchivedCustomers, getAllCustomers } from '@/repositories';
+import useAuth from './useAuth';
 
 interface CustomerHistory {
   lists: {
@@ -15,14 +16,15 @@ interface CustomerHistory {
 }
 
 function useCustomerHistory(): CustomerHistory {
-  const [loading, setLoading] = useState(true);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { workspaceId } = useAuth();
   const [lists, setLists] = useState<CustomerHistory['lists']>({
     finalized: [],
     transfer: [],
     archived: [],
     longWait: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
@@ -30,12 +32,16 @@ function useCustomerHistory(): CustomerHistory {
 
   useEffect(() => {
     const fetchCustomerHistory = async () => {
-      setLoading(true);
+      if (!workspaceId) {
+        setLoading(false);
+        return;
+      }
       try {
+        setLoading(true);
         const [completed, archived, allCustomers] = await Promise.all([
-          findCompletedCustomers(),
-          findArchivedCustomers(),
-          getAllCustomers(),
+          findCompletedCustomers(workspaceId),
+          findArchivedCustomers(workspaceId),
+          getAllCustomers(workspaceId),
         ]);
 
         const LONG_WAIT_DAYS = 30;
@@ -72,7 +78,7 @@ function useCustomerHistory(): CustomerHistory {
     };
 
     fetchCustomerHistory();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, workspaceId]);
 
   return {
     lists,
