@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getAllCustomers } from '@/repositories';
 import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting, sortCustomerLists } from '@/utils';
+import useAuth from './useAuth';
 
 interface CustomerDashboard {
   metrics: {
@@ -28,8 +29,7 @@ interface CustomerDashboard {
 type AccumuladorType = Pick<CustomerDashboard, 'metrics' | 'lists'> & { totalDays: number };
 
 function useCustomerDashboard(): CustomerDashboard {
-  const [loading, setLoading] = useState(true);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const { workspaceId } = useAuth();
   const [data, setData] = useState<Omit<CustomerDashboard, 'loading' | 'refresh'>>({
     metrics: {
       totalActive: 0,
@@ -50,6 +50,8 @@ function useCustomerDashboard(): CustomerDashboard {
       archived: [],
     },
   });
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
@@ -57,9 +59,13 @@ function useCustomerDashboard(): CustomerDashboard {
 
   useEffect(() => {
     const fetchCustomerDashboard = async () => {
-      setLoading(true);
+      if (!workspaceId) {
+        setLoading(false);
+        return;
+      }
       try {
-        const allCustomers = await getAllCustomers();
+        setLoading(true);
+        const allCustomers = await getAllCustomers(workspaceId);
 
         const LONG_WAIT_DAYS = 30;
         const URGENT_DAYS = 14;
@@ -156,7 +162,7 @@ function useCustomerDashboard(): CustomerDashboard {
       }
     };
     fetchCustomerDashboard();
-  }, [refreshTrigger]);
+  }, [refreshTrigger, workspaceId]);
 
   return {
     ...data,

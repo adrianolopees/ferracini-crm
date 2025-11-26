@@ -11,6 +11,7 @@ Guia completo com explicações para implementar multi-tenancy no projeto salvar
 **Multi-tenancy** = **Múltiplos inquilinos** (tenants) compartilhando a mesma aplicação.
 
 **Analogia simples:**
+
 ```
 🏢 Prédio = Sua aplicação
 🚪 Apartamentos = Workspaces
@@ -22,6 +23,7 @@ Guia completo com explicações para implementar multi-tenancy no projeto salvar
 ```
 
 **No seu caso:**
+
 - **Workspace "real"** → Dados reais da loja Ferracini
 - **Workspace "demo"** → Dados fictícios para recrutadores
 
@@ -29,13 +31,14 @@ Guia completo com explicações para implementar multi-tenancy no projeto salvar
 
 **Estratégias comuns:**
 
-| Estratégia | Como funciona | Prós | Contras |
-|-----------|---------------|------|---------|
-| **Database por tenant** | Cada workspace tem seu próprio banco | Isolamento máximo | Caro, difícil de gerenciar |
-| **Schema por tenant** | Tabelas separadas no mesmo banco | Bom isolamento | Complexo com NoSQL |
+| Estratégia                | Como funciona                         | Prós               | Contras                        |
+| ------------------------- | ------------------------------------- | ------------------ | ------------------------------ |
+| **Database por tenant**   | Cada workspace tem seu próprio banco  | Isolamento máximo  | Caro, difícil de gerenciar     |
+| **Schema por tenant**     | Tabelas separadas no mesmo banco      | Bom isolamento     | Complexo com NoSQL             |
 | **Coluna discriminadora** | Campo `workspaceId` em cada documento | Simples, eficiente | Precisa de regras de segurança |
 
 **Vamos usar a 3ª** (coluna discriminadora) porque:
+
 - ✅ Firestore não tem schemas/tabelas
 - ✅ Mais simples de implementar
 - ✅ Melhor custo-benefício
@@ -82,7 +85,7 @@ import { z } from 'zod';
 export const WorkspaceSchema = z.enum(['real', 'demo']);
 
 export const UserSchema = z.object({
-  uid: z.string(),           // UID vem do Firebase Auth
+  uid: z.string(), // UID vem do Firebase Auth
   email: z.string().email(), // Email do usuário
   workspaceId: WorkspaceSchema, // ← A CHAVE DO MULTI-TENANT
   displayName: z.string().optional(),
@@ -96,6 +99,7 @@ export type WorkspaceId = z.infer<typeof WorkspaceSchema>;
 ```
 
 **💡 Explicação:**
+
 - `WorkspaceSchema`: Define os workspaces permitidos ('real' ou 'demo')
 - `UserSchema`: Define como um usuário é armazenado
 - `workspaceId`: O campo mágico que separa os ambientes
@@ -138,6 +142,7 @@ export const CustomerSchema = z.object({
 ```
 
 **💡 Explicação:**
+
 - Agora TODOS os customers têm um `workspaceId`
 - Quando você buscar customers, vai filtrar por esse campo
 - Isso garante que cada workspace veja apenas seus próprios dados
@@ -214,11 +219,13 @@ export async function getUserWorkspace(uid: string): Promise<WorkspaceId | null>
 ```
 
 **💡 Explicação:**
+
 - `getUserById`: Busca os dados completos do usuário
 - `getUserWorkspace`: Versão otimizada que retorna só o workspaceId
 - `createUser`: Você vai usar isso no console do Firebase para criar usuários
 
 **Por que não criar users via interface de cadastro?**
+
 - Por enquanto, você vai criar usuários manualmente no Firebase Console
 - Em produção, a empresa controlaria quem pode criar contas
 - Para o portfólio, você só precisa de 2 usuários: um real e um demo
@@ -307,6 +314,7 @@ export { AuthContext };
 ```typescript
 const [workspaceId, setWorkspaceId] = useState<WorkspaceId | null>(null);
 ```
+
 - Novo estado para armazenar o workspace do usuário logado
 - Disponível para TODA a aplicação via Context
 
@@ -316,6 +324,7 @@ if (user) {
   setWorkspaceId(workspace);
 }
 ```
+
 - Quando o Firebase Auth detecta um usuário logado
 - Busca o workspaceId dele no Firestore
 - Armazena no estado global
@@ -323,6 +332,7 @@ if (user) {
 ```typescript
 setWorkspaceId(null);
 ```
+
 - Ao deslogar, limpa o workspace
 - Garante que a próxima pessoa que logar não veja dados do anterior
 
@@ -364,7 +374,7 @@ export async function getAllCustomers(workspaceId: WorkspaceId): Promise<Custome
   // ← MUDOU: agora precisa receber workspaceId como parâmetro
   const q = query(
     collection(db, COLLECTION_NAME),
-    where("workspaceId", "==", workspaceId) // ← NOVO FILTRO
+    where('workspaceId', '==', workspaceId) // ← NOVO FILTRO
   );
 
   const snapshot = await getDocs(q);
@@ -520,17 +530,20 @@ export async function restoreCustomerById(id: string, status: Customer['status']
 **💡 Explicação do padrão:**
 
 **ANTES (sem multi-tenant):**
+
 ```typescript
-getAllCustomers() // Retorna TODOS os customers
+getAllCustomers(); // Retorna TODOS os customers
 ```
 
 **DEPOIS (com multi-tenant):**
+
 ```typescript
-getAllCustomers(workspaceId) // Retorna só os do workspace
+getAllCustomers(workspaceId); // Retorna só os do workspace
 // onde("workspaceId", "==", workspaceId)
 ```
 
 **Por que isso funciona?**
+
 1. Usuário loga → AuthContext busca seu workspaceId
 2. Componente chama `getAllCustomers(workspaceId)`
 3. Query filtra apenas customers daquele workspace
@@ -545,11 +558,13 @@ getAllCustomers(workspaceId) // Retorna só os do workspace
 ### 4.1 Padrão a seguir em TODOS os lugares
 
 **ANTES:**
+
 ```typescript
 const customers = await getAllCustomers();
 ```
 
 **DEPOIS:**
+
 ```typescript
 const { workspaceId } = useAuth();
 const customers = await getAllCustomers(workspaceId);
@@ -604,6 +619,7 @@ export function useCustomerDashboard() {
 ```
 
 **💡 Explicação:**
+
 - `const { workspaceId } = useAuth()`: Busca o workspace do contexto
 - `if (!workspaceId)`: Não tenta carregar sem workspace (evita erro)
 - `getAllCustomers(workspaceId)`: Passa o workspace para o repository
@@ -623,6 +639,7 @@ Você precisa fazer a mesma mudança em:
 8. ✅ `src/components/dashboard/WorkflowCard.tsx`
 
 **Padrão sempre o mesmo:**
+
 ```typescript
 // No topo do arquivo
 import { useAuth } from '@/hooks/useAuth';
@@ -731,6 +748,7 @@ function getUserWorkspace() {
   return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.workspaceId;
 }
 ```
+
 - `get(...)`: Busca um documento no Firestore
 - `/users/$(request.auth.uid)`: Documento do usuário atual
 - `.data.workspaceId`: Pega o campo workspaceId
@@ -740,6 +758,7 @@ function getUserWorkspace() {
 allow read: if isAuthenticated()
             && resource.data.workspaceId == getUserWorkspace();
 ```
+
 - `isAuthenticated()`: Usuário está logado?
 - `resource.data`: Dados do documento que está tentando ler
 - `getUserWorkspace()`: Workspace do usuário logado
@@ -749,12 +768,14 @@ allow read: if isAuthenticated()
 allow create: if isAuthenticated()
               && request.resource.data.workspaceId == getUserWorkspace();
 ```
+
 - `request.resource.data`: Dados que o usuário está tentando criar
 - Garante que o usuário está criando no próprio workspace
 
 ```javascript
 && request.resource.data.workspaceId == resource.data.workspaceId;
 ```
+
 - Impede que alguém atualize um customer e mude o workspace dele
 - Ex: não pode pegar um customer "demo" e mover para "real"
 
@@ -767,6 +788,7 @@ allow create: if isAuthenticated()
 3. Teste cenários:
 
 **Teste 1: Leitura autorizada**
+
 ```
 Location: /customers/abc123
 Read: true
@@ -777,6 +799,7 @@ Resultado: ✅ Permitido (workspace bate)
 ```
 
 **Teste 2: Leitura negada**
+
 ```
 Location: /customers/xyz789
 Read: true
@@ -919,6 +942,7 @@ populateDemoData();
 5. Aperte Enter
 
 **Alternativa manual:**
+
 - Ir no Firestore Console
 - Adicionar documentos manualmente na coleção `customers`
 - Sempre colocar `workspaceId: "demo"`
@@ -971,6 +995,7 @@ export function App() {
 ```
 
 **💡 Explicação:**
+
 - Badge só aparece quando `workspaceId === 'demo'`
 - Recrutadores vão ver claramente que é ambiente de demonstração
 - Não interfere na experiência do usuário real
@@ -984,9 +1009,9 @@ export function App() {
 ### 8.1 Por que índices são necessários?
 
 Quando você faz queries como:
+
 ```typescript
-where("workspaceId", "==", "demo")
-  .where("status", "==", "pending")
+where('workspaceId', '==', 'demo').where('status', '==', 'pending');
 ```
 
 O Firestore precisa de um **índice composto** (combinação de campos).
@@ -994,12 +1019,14 @@ O Firestore precisa de um **índice composto** (combinação de campos).
 ### 8.2 Como criar índices
 
 **Método 1: Automático (recomendado)**
+
 1. Rode a aplicação
 2. Faça uma query que precisa de índice
 3. O Firestore vai mostrar erro no console com um LINK
 4. Clique no link → índice criado automaticamente
 
 **Método 2: Manual**
+
 1. Firebase Console → Firestore → **Indexes** → **Composite**
 2. Clique em **Create Index**
 3. Coleção: `customers`
@@ -1011,13 +1038,13 @@ O Firestore precisa de um **índice composto** (combinação de campos).
 
 **Índices recomendados para seu projeto:**
 
-| Coleção | Campos | Por quê |
-|---------|--------|---------|
-| customers | workspaceId + status | Dashboard filtra por status |
-| customers | workspaceId + archived | Página History |
-| customers | workspaceId + reference | Busca por referência |
-| customers | workspaceId + model | Busca por modelo |
-| customers | workspaceId + createdAt | Ordenar por data |
+| Coleção   | Campos                  | Por quê                     |
+| --------- | ----------------------- | --------------------------- |
+| customers | workspaceId + status    | Dashboard filtra por status |
+| customers | workspaceId + archived  | Página History              |
+| customers | workspaceId + reference | Busca por referência        |
+| customers | workspaceId + model     | Busca por modelo            |
+| customers | workspaceId + createdAt | Ordenar por data            |
 
 ---
 
@@ -1032,6 +1059,7 @@ O Firestore precisa de um **índice composto** (combinação de campos).
 ### 9.1 Testes funcionais
 
 **✅ Teste 1: Isolamento de dados**
+
 ```
 1. Logue com conta REAL
 2. Crie 3 customers
@@ -1045,6 +1073,7 @@ O Firestore precisa de um **índice composto** (combinação de campos).
 ```
 
 **✅ Teste 2: Todas as queries**
+
 ```
 1. Logue com conta DEMO
 2. Teste cada funcionalidade:
@@ -1056,6 +1085,7 @@ O Firestore precisa de um **índice composto** (combinação de campos).
 ```
 
 **✅ Teste 3: Firestore Rules**
+
 ```
 1. Abra DevTools (F12) → Network
 2. Logue com conta DEMO
@@ -1078,13 +1108,11 @@ O Firestore precisa de um **índice composto** (combinação de campos).
 ### 9.2 Testes de segurança
 
 **🔒 Teste 1: Tentativa de burlar pelo front**
+
 ```javascript
 // No console do navegador, tente:
 const fakeWorkspace = 'real'; // Usuário demo tentando acessar dados reais
-const q = query(
-  collection(db, 'customers'),
-  where('workspaceId', '==', fakeWorkspace)
-);
+const q = query(collection(db, 'customers'), where('workspaceId', '==', fakeWorkspace));
 const result = await getDocs(q);
 
 // RESULTADO ESPERADO: Erro de permissão
@@ -1092,6 +1120,7 @@ const result = await getDocs(q);
 ```
 
 **🔒 Teste 2: Tentativa de criar em outro workspace**
+
 ```javascript
 // Logado como demo, tente criar no workspace real:
 await addDoc(collection(db, 'customers'), {
@@ -1105,10 +1134,11 @@ await addDoc(collection(db, 'customers'), {
 ```
 
 **🔒 Teste 3: Tentativa de mudar workspace**
+
 ```javascript
 // Tente atualizar um customer demo para workspace real:
 await updateDoc(doc(db, 'customers', 'demoCustomerId'), {
-  workspaceId: 'real' // Tentando mover para outro workspace
+  workspaceId: 'real', // Tentando mover para outro workspace
 });
 
 // RESULTADO ESPERADO: Erro de permissão
@@ -1128,17 +1158,20 @@ await updateDoc(doc(db, 'customers', 'demoCustomerId'), {
 **O que é?** Armazenar o workspaceId no TOKEN JWT do usuário.
 
 **Vantagens:**
+
 - ✅ Firestore Rules mais rápidas (não precisa fazer `get(...)` na coleção users)
 - ✅ WorkspaceId disponível sem buscar no Firestore
 - ✅ Mais seguro (impossível falsificar)
 
 **Desvantagens:**
+
 - ❌ Requer Firebase Admin SDK (não funciona no client)
 - ❌ Precisa de Cloud Functions ou backend Node.js
 
 **Como implementar (resumo):**
 
 1. Criar Cloud Function:
+
 ```typescript
 // functions/src/index.ts
 import * as functions from 'firebase-functions';
@@ -1158,6 +1191,7 @@ export const setUserClaims = functions.auth.user().onCreate(async (user) => {
 ```
 
 2. Atualizar Firestore Rules:
+
 ```javascript
 function getUserWorkspace() {
   return request.auth.token.workspaceId; // Agora vem direto do token
@@ -1175,6 +1209,7 @@ function getUserWorkspace() {
 **Mudanças necessárias:**
 
 1. Atualizar schema:
+
 ```typescript
 export const WorkspaceSchema = z.enum(['real', 'demo', 'staging']);
 ```
@@ -1186,13 +1221,14 @@ export const WorkspaceSchema = z.enum(['real', 'demo', 'staging']);
 **Escalando para multi-empresa:**
 
 Se cada empresa tivesse seu workspace:
+
 ```typescript
 export const WorkspaceSchema = z.string(); // Aceita qualquer string
 
 // Exemplos:
-workspaceId: "empresa-abc"
-workspaceId: "empresa-xyz"
-workspaceId: "loja-campinas"
+workspaceId: 'empresa-abc';
+workspaceId: 'empresa-xyz';
+workspaceId: 'loja-campinas';
 ```
 
 ---
@@ -1213,6 +1249,7 @@ function AdminPanel() {
 ```
 
 **Firestore Rules:**
+
 ```javascript
 match /users/{userId} {
   allow read, write: if request.auth.token.role == 'admin';
@@ -1322,14 +1359,16 @@ Use esta lista para acompanhar o progresso:
 ### 1. E se eu esquecer de passar workspaceId em alguma query?
 
 **R:** TypeScript vai reclamar! As funções agora exigem o parâmetro:
+
 ```typescript
-getAllCustomers() // ❌ ERRO: Expected 1 argument
-getAllCustomers(workspaceId) // ✅ OK
+getAllCustomers(); // ❌ ERRO: Expected 1 argument
+getAllCustomers(workspaceId); // ✅ OK
 ```
 
 ### 2. As Firestore Rules consomem leituras do plano gratuito?
 
 **R:** Sim. Cada `get(/databases/.../users/...)` conta como 1 leitura. Mas:
+
 - Plano gratuito: 50.000 leituras/dia
 - Para 100 usuários com 20 queries/dia = 2.000 leituras/dia
 - Muito abaixo do limite
@@ -1337,6 +1376,7 @@ getAllCustomers(workspaceId) // ✅ OK
 ### 3. Posso ter 3+ workspaces?
 
 **R:** Sim! Basta:
+
 1. Adicionar no `WorkspaceSchema`
 2. Criar usuários com o novo workspaceId
 3. Código funciona automaticamente
@@ -1350,7 +1390,7 @@ getAllCustomers(workspaceId) // ✅ OK
 const batch = writeBatch(db);
 const snapshot = await getDocs(collection(db, 'customers'));
 
-snapshot.docs.forEach(doc => {
+snapshot.docs.forEach((doc) => {
   batch.update(doc.ref, { workspaceId: 'real' });
 });
 
@@ -1360,6 +1400,7 @@ await batch.commit();
 ### 5. Preciso duplicar Firestore Rules para cada coleção?
 
 **R:** Sim, mas pode criar funções helper:
+
 ```javascript
 function canAccessWorkspace(workspace) {
   return getUserWorkspace() == workspace;
