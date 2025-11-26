@@ -17,7 +17,6 @@ function TopProductsChart() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Paleta de cores para as barras
   const COLORS = [
     '#1E3A8A', // blue-900
     '#1E40AF', // blue-800
@@ -55,7 +54,7 @@ function TopProductsChart() {
       {/* Título */}
       <h3 className="text-base text-center font-semibold text-gray-700 mb-4 flex items-center justify-center gap-2">
         <i className="fa-solid fa-fire text-orange-500"></i>
-        Produtos Mais Procurados
+        Top 10 Produtos Mais Procurados
       </h3>
 
       {/* Lista com Ranking para Mobile */}
@@ -63,7 +62,6 @@ function TopProductsChart() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="space-y-3">
             {products.slice(0, 5).map((product, index) => {
-              // Definir medalhas e emojis
               const medals = ['🥇', '🥈', '🥉'];
               const numberEmojis = ['4️⃣', '5️⃣'];
               const icon = index < 3 ? medals[index] : numberEmojis[index - 3];
