@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { WorkspaceSchema } from './userSchema';
 
 export const CustomerStatusSchema = z.enum(['pending', 'awaitingTransfer', 'readyForPickup', 'completed']);
 
@@ -19,6 +20,7 @@ export const CustomerSchema = z.object({
   reference: z.string(),
   size: z.string(),
   color: z.string(),
+  workspaceId: WorkspaceSchema,
   salesperson: z.string().optional(),
   createdAt: z.string(),
   status: CustomerStatusSchema.optional(),
