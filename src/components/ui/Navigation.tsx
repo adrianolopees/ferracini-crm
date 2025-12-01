@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks';
 function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, isLoggingOut } = useAuth();
+  const { logout, isLoggingOut, displayName, workspaceId } = useAuth();
 
   const isDashboard = location.pathname === '/dashboard';
   const isRegister = location.pathname === '/register';
@@ -19,7 +19,7 @@ function Navigation() {
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900 ">
-                Ferracini <span className="text-blue-600">CRM</span>
+                Ferracini <span className={workspaceId === 'demo' ? 'text-amber-600' : 'text-blue-600'}>{displayName}</span>
               </h2>
             </div>
           </div>

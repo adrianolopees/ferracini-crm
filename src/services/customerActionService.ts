@@ -33,12 +33,12 @@ export async function moveToReadyForPickup(customer: Customer): Promise<void> {
 
 export async function resetToInitial(customer: Customer): Promise<void> {
   await updateCustomer(customer.id, {
-    consultingStore: null,
+    consultingStore: undefined,
     storeHasStock: false,
     status: 'pending',
-    sourceStore: null,
-    transferredAt: null,
-    contactedAt: null,
+    sourceStore: undefined,
+    transferredAt: undefined,
+    contactedAt: undefined,
   });
 }
 
@@ -69,7 +69,7 @@ export async function confirmStoreStock(customer: Customer): Promise<void> {
 
 export async function rejectStoreStock(customer: Customer): Promise<void> {
   await updateCustomer(customer.id, {
-    consultingStore: null,
+    consultingStore: undefined, // Remove campo ao invés de setar null
     storeHasStock: false,
   });
 }
@@ -77,14 +77,14 @@ export async function rejectStoreStock(customer: Customer): Promise<void> {
 export async function acceptTransfer(customer: Customer): Promise<void> {
   await moveToAwaitingTransfer(customer, customer.consultingStore!);
   await updateCustomer(customer.id, {
-    consultingStore: null,
+    consultingStore: undefined, // Remove campo ao invés de setar null
     storeHasStock: false,
   });
 }
 
 export async function declineTransfer(customer: Customer, reason: ArchiveReason, notes?: string): Promise<void> {
   await updateCustomer(customer.id, {
-    consultingStore: null,
+    consultingStore: undefined, // Remove campo ao invés de setar null
     storeHasStock: false,
   });
 
