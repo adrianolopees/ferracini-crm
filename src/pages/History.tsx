@@ -79,7 +79,6 @@ function History() {
   }, [activeTab]);
 
   const filteredCustomers = useMemo(() => {
-    // Selecionar a lista base
     const customersByTab: Record<TabType, Customer[]> = {
       finalized: lists.finalized,
       transfers: lists.transfer,
@@ -88,17 +87,14 @@ function History() {
     };
     let customers = customersByTab[activeTab] || [];
 
-    // Aplicar filtro de transferências
     if (activeTab === 'transfers' && transferFilter !== 'all') {
       customers = customers.filter((customer) => customer.sourceStore === transferFilter);
     }
 
-    // Aplicar busca
     if (searchTerm.trim() === '') {
       return customers;
     }
 
-    // Filtrar por termo de busca
     const term = searchTerm.toLowerCase();
     return customers.filter(
       (customer) =>

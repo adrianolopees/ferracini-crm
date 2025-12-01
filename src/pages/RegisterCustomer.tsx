@@ -38,7 +38,6 @@ function RegisterCustomer() {
     setIsLoading(true);
     setErrorMessage('');
 
-    // ← NOVO: Verificar se tem workspaceId
     if (!workspaceId) {
       setErrorMessage('Erro: Workspace não identificado. Faça login novamente.');
       setIsLoading(false);
@@ -56,7 +55,7 @@ function RegisterCustomer() {
             archived: false,
             status: 'pending',
           },
-          workspaceId // ← NOVO: passar workspaceId como 2º parâmetro
+          workspaceId
         ),
         {
           loading: 'Salvando cliente...',
@@ -182,7 +181,7 @@ function RegisterCustomer() {
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2 ">
-                  <i className="fa-solid fa-bookmark"></i> {/* Adicione ícone */}
+                  <i className="fa-solid fa-bookmark"></i>
                   Registrar
                 </span>
               )}

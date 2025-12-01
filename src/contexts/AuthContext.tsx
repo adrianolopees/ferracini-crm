@@ -11,7 +11,7 @@ interface AuthProviderProps {
 export interface AuthContextType {
   user: User | null;
   workspaceId: WorkspaceId | null;
-  displayName: string | null; // Nome para exibir na UI
+  displayName: string | null;
   login: (email: string, password: string) => Promise<UserCredential>;
   logout: () => Promise<void>;
   loading: boolean;

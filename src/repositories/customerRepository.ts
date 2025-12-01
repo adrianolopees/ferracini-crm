@@ -65,13 +65,10 @@ export async function deleteCustomerById(id: string): Promise<void> {
 //  QUERIES ESPECÍFICAS
 // ==========================================
 
-export async function findCustomersByReference(
-  reference: string,
-  workspaceId: WorkspaceId // ← NOVO parâmetro
-): Promise<Customer[]> {
+export async function findCustomersByReference(reference: string, workspaceId: WorkspaceId): Promise<Customer[]> {
   const q = query(
     collection(db, COLLECTION_NAME),
-    where('workspaceId', '==', workspaceId), // ← NOVO FILTRO
+    where('workspaceId', '==', workspaceId),
     where('reference', '==', reference.toLowerCase())
   );
   const snapshot = await getDocs(q);
@@ -84,13 +81,10 @@ export async function findCustomersByReference(
     .filter((c): c is Customer => c !== null);
 }
 
-export async function findCustomersByModel(
-  model: string,
-  workspaceId: WorkspaceId // ← NOVO parâmetro
-): Promise<Customer[]> {
+export async function findCustomersByModel(model: string, workspaceId: WorkspaceId): Promise<Customer[]> {
   const q = query(
     collection(db, COLLECTION_NAME),
-    where('workspaceId', '==', workspaceId), // ← NOVO FILTRO
+    where('workspaceId', '==', workspaceId),
     where('model', '==', model.toLowerCase())
   );
   const snapshot = await getDocs(q);
@@ -103,12 +97,10 @@ export async function findCustomersByModel(
     .filter((c): c is Customer => c !== null);
 }
 
-export async function findArchivedCustomers(
-  workspaceId: WorkspaceId // ← NOVO parâmetro
-): Promise<Customer[]> {
+export async function findArchivedCustomers(workspaceId: WorkspaceId): Promise<Customer[]> {
   const q = query(
     collection(db, COLLECTION_NAME),
-    where('workspaceId', '==', workspaceId), // ← NOVO FILTRO
+    where('workspaceId', '==', workspaceId),
     where('archived', '==', true)
   );
   const snapshot = await getDocs(q);
@@ -121,12 +113,10 @@ export async function findArchivedCustomers(
     .filter((c): c is Customer => c !== null);
 }
 
-export async function findCompletedCustomers(
-  workspaceId: WorkspaceId // ← NOVO parâmetro
-): Promise<Customer[]> {
+export async function findCompletedCustomers(workspaceId: WorkspaceId): Promise<Customer[]> {
   const q = query(
     collection(db, COLLECTION_NAME),
-    where('workspaceId', '==', workspaceId), // ← NOVO FILTRO
+    where('workspaceId', '==', workspaceId),
     where('status', '==', 'completed')
   );
   const snapshot = await getDocs(q);

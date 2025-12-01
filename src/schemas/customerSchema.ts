@@ -16,76 +16,57 @@ export const ArchiveReasonSchema = z.enum([
   'exceeded_wait_time',
 ]);
 
-export const CustomerSchema = z.object({
-  // ==========================================
-  // IDENTIFICAÇÃO (gerados automaticamente)
-  // ==========================================
-  id: z.string().min(1),
-  workspaceId: WorkspaceSchema,
+export const CustomerSchema = z
+  .object({
+    id: z.string().min(1),
+    workspaceId: WorkspaceSchema,
 
-  // ==========================================
-  // INFORMAÇÕES BÁSICAS (obrigatórias no registro)
-  // ==========================================
-  name: z.string().min(1, 'Nome é obrigatório').trim(),
-  phone: z.string().min(1, 'Telefone é obrigatório').trim(),
-  model: z.string().min(1, 'Modelo é obrigatório').trim(),
-  reference: z.string().min(1, 'Referência é obrigatória').trim(),
-  size: z.string().min(1, 'Tamanho é obrigatório').trim(),
-  color: z.string().min(1, 'Cor é obrigatória').trim(),
-  salesperson: z.string().min(1, 'Vendedor é obrigatório').trim(),
+    name: z.string().min(1, 'Nome é obrigatório').trim(),
+    phone: z.string().min(1, 'Telefone é obrigatório').trim(),
+    model: z.string().min(1, 'Modelo é obrigatório').trim(),
+    reference: z.string().min(1, 'Referência é obrigatória').trim(),
+    size: z.string().min(1, 'Tamanho é obrigatório').trim(),
+    color: z.string().min(1, 'Cor é obrigatória').trim(),
+    salesperson: z.string().min(1, 'Vendedor é obrigatório').trim(),
 
-  // ==========================================
-  // DATAS (só createdAt é obrigatória)
-  // ==========================================
-  createdAt: z.string(),
-  contactedAt: z.string().optional(),     // Existe quando cliente é contatado
-  transferredAt: z.string().optional(),   // Existe quando entra em transferência
-  completedAt: z.string().optional(),     // Existe quando venda é finalizada
+    createdAt: z.string(),
+    contactedAt: z.string().optional(),
+    transferredAt: z.string().optional(),
+    completedAt: z.string().optional(),
 
-  // ==========================================
-  // STATUS E FLUXO
-  // ==========================================
-  status: CustomerStatusSchema.default('pending'),
+    status: CustomerStatusSchema.default('pending'),
 
-  // sourceStore: define origem do produto
-  // - undefined: ainda não definido (pending inicial)
-  // - 'Campinas'/'Dom Pedro': transferência aceita
-  // - 'Jundiaí': reposição local
-  sourceStore: SourceStoreSchema.optional(),
+    // sourceStore: define origem do produto
+    // - undefined: ainda não definido (pending inicial)
+    // - 'Campinas'/'Dom Pedro': transferência aceita
+    // - 'Jundiaí': reposição local
+    sourceStore: SourceStoreSchema.optional(),
 
-  // ==========================================
-  // CONSULTA TEMPORÁRIA (durante workflow)
-  // ==========================================
-  consultingStore: ConsultingStoreSchema.optional(), // Loja sendo consultada
-  storeHasStock: z.boolean().optional(),             // Loja tem estoque?
+    // ==========================================
+    // CONSULTA TEMPORÁRIA (durante workflow)
+    // ==========================================
+    consultingStore: ConsultingStoreSchema.optional(),
+    storeHasStock: z.boolean().optional(),
 
-  // ==========================================
-  // ARQUIVAMENTO
-  // ==========================================
-  archived: z.boolean().default(false),
-  archiveReason: ArchiveReasonSchema.optional(), // Obrigatório se archived=true
-  archivedAt: z.string().optional(),             // Obrigatório se archived=true
-  notes: z.string().trim().optional(),           // Sempre opcional
-})
-.refine(
-  (data) => {
-    // Validação: Se arquivado, deve ter motivo e data
-    if (data.archived) {
-      return !!data.archiveReason && !!data.archivedAt;
+    archived: z.boolean().default(false),
+    archiveReason: ArchiveReasonSchema.optional(),
+    archivedAt: z.string().optional(),
+    notes: z.string().trim().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.archived) {
+        return !!data.archiveReason && !!data.archivedAt;
+      }
+      return true;
+    },
+    {
+      message: 'Cliente arquivado deve ter motivo e data de arquivamento',
+      path: ['archiveReason'],
     }
-    return true;
-  },
-  {
-    message: 'Cliente arquivado deve ter motivo e data de arquivamento',
-    path: ['archiveReason'],
-  }
-);
+  );
 
 export const FirebaseCustomerSchema = CustomerSchema.omit({ id: true });
-
-// ==========================================
-// TYPES
-// ==========================================
 
 export type Customer = z.infer<typeof CustomerSchema>;
 export type CustomerStatus = z.infer<typeof CustomerStatusSchema>;

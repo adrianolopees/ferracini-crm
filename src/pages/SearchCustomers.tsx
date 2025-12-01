@@ -8,10 +8,10 @@ import { WorkflowCard } from '@/components/dashboard';
 import { ArchiveModal } from '@/components/modals';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { archiveCustomer, moveToReadyForPickup } from '@/services/customerActionService';
-import { useAuth } from '@/hooks'; // ← NOVO IMPORT
+import { useAuth } from '@/hooks';
 
 function SearchCustomers() {
-  const { workspaceId } = useAuth(); // ← NOVO: buscar workspaceId
+  const { workspaceId } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
@@ -26,7 +26,6 @@ function SearchCustomers() {
       return;
     }
 
-    // ← NOVO: Verificar se tem workspaceId
     if (!workspaceId) {
       toast.error('Erro: Workspace não identificado. Faça login novamente.');
       return;
@@ -34,23 +33,19 @@ function SearchCustomers() {
 
     try {
       const valorBuscado = value.trim();
-
-      // Busca por referência e modelo usando repository
       const [refResults, modelResults] = await Promise.all([
-        findCustomersByReference(valorBuscado, workspaceId), // ← NOVO: passar workspaceId
-        findCustomersByModel(valorBuscado, workspaceId), // ← NOVO: passar workspaceId
+        findCustomersByReference(valorBuscado, workspaceId),
+        findCustomersByModel(valorBuscado, workspaceId),
       ]);
 
       const results: Customer[] = [];
 
-      // Adiciona resultados por referência
       refResults.forEach((customer) => {
         if (!customer.archived && (!customer.status || customer.status === 'pending') && !customer.consultingStore) {
           results.push(customer);
         }
       });
 
-      // Adiciona resultados por modelo (sem duplicar)
       modelResults.forEach((customer) => {
         if (
           !results.some((c) => c.id === customer.id) &&
