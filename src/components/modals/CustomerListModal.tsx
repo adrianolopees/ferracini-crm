@@ -2,6 +2,7 @@ import { DialogModal } from '@/components/modals';
 import { Customer } from '@/schemas/customerSchema';
 import { AnimatedListItem } from '@/components/animations';
 import { WorkflowCard } from '@/components/dashboard';
+import { WorkflowSkeleton } from '../skeletons';
 
 interface CustomerListModalProps {
   isOpen: boolean;
@@ -46,8 +47,10 @@ function CustomerListModal({
     <DialogModal isOpen={isOpen} onClose={onClose} title={title}>
       <div className="max-h-[60vh] overflow-y-auto">
         {loading ? (
-          <div className="flex justify-center items-center py-12">
-            <i className="fa-solid fa-spinner fa-spin text-blue-500 text-3xl"></i>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <WorkflowSkeleton key={i} />
+            ))}
           </div>
         ) : customers.length === 0 ? (
           <div className="text-center py-12">

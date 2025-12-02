@@ -1,3 +1,5 @@
+import { Spinner } from '../ui';
+
 interface ActionCardProps {
   title: string;
   value: number;
@@ -41,7 +43,7 @@ function ActionCard({ title, value, subtitle, icon, colorScheme, loading, onClic
         <div>
           <p className="text-sm font-medium text-gray-600 mb-1 whitespace-nowrap ">{title}</p>
           <p className="text-3xl font-bold text-gray-900">
-            {loading ? <i className={`fa-solid fa-spinner fa-spin ${colors.spinner}`} /> : value}
+            {loading ? <Spinner size="md" color={colorScheme} /> : value}
           </p>
         </div>
         <div className={`${colors.bg} rounded-full p-4`}>

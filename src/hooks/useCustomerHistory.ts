@@ -38,6 +38,8 @@ function useCustomerHistory(): CustomerHistory {
       }
       try {
         setLoading(true);
+        // 👇 ADICIONE ESTE DELAY TEMPORÁRIO
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // 3 segundos
         const [completed, archived, allCustomers] = await Promise.all([
           findCompletedCustomers(workspaceId),
           findArchivedCustomers(workspaceId),

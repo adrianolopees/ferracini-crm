@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useProductRanking } from '@/hooks';
+import { Spinner } from '../ui';
 
 function TopProductsChart() {
   const { products, totalReserves, loading } = useProductRanking(10);
@@ -34,7 +35,7 @@ function TopProductsChart() {
     return (
       <div className="bg-white rounded-lg shadow-md p-6 mt-8">
         <div className="flex items-center justify-center h-64">
-          <i className="fa-solid fa-spinner fa-spin text-4xl text-blue-500"></i>
+          <Spinner size="lg" color="blue" />
         </div>
       </div>
     );

@@ -15,6 +15,7 @@ import {
 } from '@/services/customerActionService';
 import { useCustomerHistory } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
+import { WorkflowSkeleton } from '@/components/skeletons';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
 
@@ -302,9 +303,10 @@ function History() {
             {/* Lista de clientes */}
             <div className="mt-6 space-y-4">
               {loading ? (
-                <div className="text-center py-12">
-                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                  <p className="text-gray-600 mt-4">Carregando...</p>
+                <div className="mt-6 space-y-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <WorkflowSkeleton key={i} />
+                  ))}
                 </div>
               ) : filteredCustomers.length === 0 ? (
                 <div className="text-center py-12">
