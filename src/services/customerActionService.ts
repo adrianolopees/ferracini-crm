@@ -5,29 +5,24 @@ import {
   sendStoreCampinas,
   sendStoreDomPedro,
 } from '@/services/whatsappService';
-import { updateCustomerStatus } from '@/services/customerStatusService';
-import { updateCustomer, archiveCustomerById, restoreCustomerById, deleteCustomerById } from '@/repositories';
+import { archiveCustomerById, updateCustomer } from '@/repositories';
 import { getCurrentTimestamp } from '@/utils';
 
 // ============================================
-//  FUNÇÕES GENÉRICAS (Low-level)
+//  FUNÇÕES DE MUDANÇA DE STATUS
 // ============================================
-export async function archiveCustomer(customer: Customer, reason: ArchiveReason, notes?: string): Promise<void> {
-  await archiveCustomerById(customer.id, reason, notes);
-}
-
-export async function restoreFromArchive(customer: Customer): Promise<void> {
-  await restoreCustomerById(customer.id);
-}
-
-export async function deleteCustomer(customer: Customer): Promise<void> {
-  await deleteCustomerById(customer.id);
-}
 
 export async function moveToReadyForPickup(customer: Customer): Promise<void> {
   await updateCustomer(customer.id, {
     status: 'readyForPickup',
     contactedAt: getCurrentTimestamp(),
+  });
+}
+
+export async function moveToFinished(customer: Customer): Promise<void> {
+  await updateCustomer(customer.id, {
+    status: 'completed',
+    completedAt: getCurrentTimestamp(),
   });
 }
 
@@ -43,7 +38,7 @@ export async function resetToInitial(customer: Customer): Promise<void> {
 }
 
 // ============================================
-//  FUNÇÕES DE NEGÓCIO (High-level)
+//  FUNÇÕES DE NEGÓCIO (Workflow)
 // ============================================
 
 export async function checkStoreCampinas(customer: Customer): Promise<void> {
@@ -69,26 +64,28 @@ export async function confirmStoreStock(customer: Customer): Promise<void> {
 
 export async function rejectStoreStock(customer: Customer): Promise<void> {
   await updateCustomer(customer.id, {
-    consultingStore: undefined, // Remove campo ao invés de setar null
+    consultingStore: undefined,
     storeHasStock: false,
   });
 }
 
 export async function acceptTransfer(customer: Customer): Promise<void> {
-  await moveToAwaitingTransfer(customer, customer.consultingStore!);
   await updateCustomer(customer.id, {
-    consultingStore: undefined, // Remove campo ao invés de setar null
+    status: 'awaitingTransfer',
+    sourceStore: customer.consultingStore!,
+    transferredAt: getCurrentTimestamp(),
+    consultingStore: undefined,
     storeHasStock: false,
   });
 }
 
 export async function declineTransfer(customer: Customer, reason: ArchiveReason, notes?: string): Promise<void> {
   await updateCustomer(customer.id, {
-    consultingStore: undefined, // Remove campo ao invés de setar null
+    consultingStore: undefined,
     storeHasStock: false,
   });
 
-  await archiveCustomer(customer, reason, notes);
+  await archiveCustomerById(customer.id, reason, notes);
 }
 
 export async function productArrived(customer: Customer): Promise<void> {
@@ -98,17 +95,4 @@ export async function productArrived(customer: Customer): Promise<void> {
 
 export async function completeOrder(customer: Customer): Promise<void> {
   await moveToFinished(customer);
-}
-
-export async function moveToAwaitingTransfer(
-  customer: Customer,
-  sourceStore: 'Campinas' | 'Dom Pedro' | 'Jundiaí'
-): Promise<void> {
-  await updateCustomerStatus(customer.id, 'awaitingTransfer', {
-    sourceStore,
-  });
-}
-
-export async function moveToFinished(customer: Customer): Promise<void> {
-  await updateCustomerStatus(customer.id, 'completed');
 }

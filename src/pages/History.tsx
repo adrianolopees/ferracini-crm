@@ -7,15 +7,11 @@ import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { ConfirmModal, ArchiveModal } from '@/components/modals';
 import { TransferCard, ArchivedCard, FinalizedCard, LongWaitCard } from '@/components/history';
 import { AnimatePresence } from 'framer-motion';
-import {
-  restoreFromArchive,
-  moveToReadyForPickup,
-  archiveCustomer,
-  deleteCustomer,
-} from '@/services/customerActionService';
+import { moveToReadyForPickup } from '@/services/customerActionService';
 import { useCustomerHistory } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 import { WorkflowSkeleton } from '@/components/skeletons';
+import { archiveCustomerById, deleteCustomerById, restoreCustomerById } from '@/repositories';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
 
@@ -108,7 +104,7 @@ function History() {
 
   const handleRestore = async (customer: Customer) => {
     try {
-      await restoreFromArchive(customer);
+      await restoreCustomerById(customer.id);
       toast.success(`${customer.name} restaurado para clientes ativos!`);
       refresh();
     } catch (error) {
@@ -126,7 +122,7 @@ function History() {
     if (!customerToDelete) return;
 
     try {
-      await deleteCustomer(customerToDelete);
+      await deleteCustomerById(customerToDelete.id);
       toast.success(`${customerToDelete.name} excluído permanentemente!`);
       setDeleteModalOpen(false);
       setCustomerToDelete(null);
@@ -162,7 +158,7 @@ function History() {
     if (!customerToArchive) return;
 
     try {
-      await archiveCustomer(customerToArchive, reason, notes || '');
+      await archiveCustomerById(customerToArchive.id, reason, notes || '');
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);

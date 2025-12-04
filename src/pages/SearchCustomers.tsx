@@ -1,13 +1,13 @@
 import { useState, ChangeEvent } from 'react';
 import toast from 'react-hot-toast';
-import { findCustomersByReference, findCustomersByModel, updateCustomer } from '@/repositories';
+import { findCustomersByReference, findCustomersByModel, updateCustomer, archiveCustomerById } from '@/repositories';
 import { notifyProductArrived } from '@/services/whatsappService';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { Input, PageLayout } from '@/components/ui';
 import { WorkflowCard } from '@/components/dashboard';
 import { ArchiveModal } from '@/components/modals';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
-import { archiveCustomer, moveToReadyForPickup } from '@/services/customerActionService';
+import { moveToReadyForPickup } from '@/services/customerActionService';
 import { useAuth } from '@/hooks';
 
 function SearchCustomers() {
@@ -84,7 +84,7 @@ function SearchCustomers() {
   const handleArchiveCustomer = async (reason: ArchiveReason, notes?: string) => {
     if (!customerToArchive) return;
     try {
-      await archiveCustomer(customerToArchive, reason, notes);
+      await archiveCustomerById(customerToArchive.id, reason, notes);
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
