@@ -1,32 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllCustomers } from '@/repositories';
-import { Customer } from '@/schemas/customerSchema';
-import { getDaysWaiting, sortCustomerLists } from '@/utils';
+import { processCustomersForDashboard } from '@/services/customerMetricsService';
+import { sortCustomerLists } from '@/utils';
 import useAuth from './useAuth';
+import type { CustomerMetrics, CustomerLists } from '@/services/customerMetricsService';
 
 interface CustomerDashboard {
-  metrics: {
-    totalActive: number;
-    totalReadyForPickup: number;
-    totalAwaitingTransfer: number;
-    totalFinished: number;
-    averageWaitTime: number;
-    urgentCount: number;
-    longWaitCount: number;
-  };
-  lists: {
-    awaiting: Customer[];
-    awaitingTransfer: Customer[];
-    readyForPickup: Customer[];
-    longWait: Customer[];
-    transfer: Customer[];
-    finalized: Customer[];
-    archived: Customer[];
-  };
+  metrics: CustomerMetrics;
+  lists: CustomerLists;
   loading: boolean;
   refresh: () => void;
 }
-type AccumuladorType = Pick<CustomerDashboard, 'metrics' | 'lists'> & { totalDays: number };
 
 function useCustomerDashboard(): CustomerDashboard {
   const { workspaceId } = useAuth();
@@ -65,94 +49,19 @@ function useCustomerDashboard(): CustomerDashboard {
       }
       try {
         setLoading(true);
+
+        // 1. Busca dados (responsabilidade do hook)
         const allCustomers = await getAllCustomers(workspaceId);
 
-        const LONG_WAIT_DAYS = 30;
-        const URGENT_DAYS = 14;
+        // 2. Processa dados (delegado ao service)
+        const { metrics, lists } = processCustomersForDashboard(allCustomers);
 
-        const processed = allCustomers.reduce<AccumuladorType>(
-          (acc, customer) => {
-            const isTransferred = customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro';
-            if (isTransferred) {
-              acc.lists.transfer.push(customer);
-            }
+        // 3. Ordena listas
+        const sortedLists = sortCustomerLists(lists);
 
-            if (customer.status === 'awaitingTransfer' && !customer.archived) {
-              acc.metrics.totalAwaitingTransfer++;
-              acc.lists.awaitingTransfer.push(customer);
-            }
-
-            if (customer.archived) {
-              acc.lists.archived.push(customer);
-              return acc;
-            }
-
-            const status = customer.status || 'pending';
-            switch (status) {
-              case 'pending': {
-                const daysWaiting = getDaysWaiting(customer.createdAt);
-
-                if (daysWaiting < LONG_WAIT_DAYS) {
-                  acc.metrics.totalActive++;
-                  acc.lists.awaiting.push(customer);
-                  acc.totalDays += daysWaiting;
-
-                  if (daysWaiting >= URGENT_DAYS) {
-                    acc.metrics.urgentCount++;
-                  }
-                } else {
-                  acc.metrics.longWaitCount++;
-                  acc.lists.longWait.push(customer);
-                }
-                break;
-              }
-
-              case 'readyForPickup':
-                acc.metrics.totalReadyForPickup++;
-                acc.lists.readyForPickup.push(customer);
-                break;
-
-              case 'completed':
-                acc.metrics.totalFinished++;
-                acc.lists.finalized.push(customer);
-                break;
-            }
-
-            return acc;
-          },
-          {
-            metrics: {
-              totalActive: 0,
-              totalReadyForPickup: 0,
-              totalAwaitingTransfer: 0,
-              totalFinished: 0,
-              averageWaitTime: 0,
-              urgentCount: 0,
-              longWaitCount: 0,
-            },
-            lists: {
-              awaiting: [],
-              awaitingTransfer: [],
-              readyForPickup: [],
-              longWait: [],
-              transfer: [],
-              finalized: [],
-              archived: [],
-            },
-            totalDays: 0,
-          }
-        );
-
-        const averageWaitTime =
-          processed.metrics.totalActive > 0 ? Math.round(processed.totalDays / processed.metrics.totalActive) : 0;
-
-        const sortedLists = sortCustomerLists(processed.lists);
-
+        // 4. Atualiza estado
         setData({
-          metrics: {
-            ...processed.metrics,
-            averageWaitTime,
-          },
+          metrics,
           lists: sortedLists,
         });
       } catch (error) {

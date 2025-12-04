@@ -19,13 +19,6 @@ export async function moveToReadyForPickup(customer: Customer): Promise<void> {
   });
 }
 
-export async function moveToFinished(customer: Customer): Promise<void> {
-  await updateCustomer(customer.id, {
-    status: 'completed',
-    completedAt: getCurrentTimestamp(),
-  });
-}
-
 export async function resetToInitial(customer: Customer): Promise<void> {
   await updateCustomer(customer.id, {
     consultingStore: undefined,
@@ -94,5 +87,8 @@ export async function productArrived(customer: Customer): Promise<void> {
 }
 
 export async function completeOrder(customer: Customer): Promise<void> {
-  await moveToFinished(customer);
+  await updateCustomer(customer.id, {
+    status: 'completed',
+    completedAt: getCurrentTimestamp(),
+  });
 }

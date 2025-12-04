@@ -1,23 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Customer } from '@/schemas/customerSchema';
-import { getDaysWaiting, sortCustomerLists } from '@/utils';
+import { sortCustomerLists } from '@/utils';
 import { findCompletedCustomers, findArchivedCustomers, getAllCustomers } from '@/repositories';
+import { processCustomersForHistory, CustomerHistoryLists } from '@/services/customerMetricsService';
 import useAuth from './useAuth';
 
 interface CustomerHistory {
-  lists: {
-    finalized: Customer[];
-    transfer: Customer[];
-    archived: Customer[];
-    longWait: Customer[];
-  };
+  lists: CustomerHistoryLists;
   loading: boolean;
   refresh: () => void;
 }
 
 function useCustomerHistory(): CustomerHistory {
   const { workspaceId } = useAuth();
-  const [lists, setLists] = useState<CustomerHistory['lists']>({
+  const [lists, setLists] = useState<CustomerHistoryLists>({
     finalized: [],
     transfer: [],
     archived: [],
@@ -38,42 +33,21 @@ function useCustomerHistory(): CustomerHistory {
       }
       try {
         setLoading(true);
+
+        // 1. Busca dados (responsabilidade do hook)
         const [completed, archived, allCustomers] = await Promise.all([
           findCompletedCustomers(workspaceId),
           findArchivedCustomers(workspaceId),
           getAllCustomers(workspaceId),
         ]);
 
-        const LONG_WAIT_DAYS = 30;
+        // 2. Processa dados (delegado ao service)
+        const processed = processCustomersForHistory(allCustomers, completed, archived);
 
-        const processed = allCustomers.reduce<CustomerHistory['lists']>(
-          (acc, customer) => {
-            // Só adiciona aos transferidos se o produto JÁ CHEGOU na loja (não está mais aguardando transferência)
-            const isTransferred =
-              (customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro') &&
-              customer.status !== 'awaitingTransfer';
-
-            if (isTransferred) {
-              acc.transfer.push(customer);
-            }
-
-            if (!customer.archived && customer.status !== 'completed') {
-              const daysWaiting = getDaysWaiting(customer.createdAt);
-              if (daysWaiting >= LONG_WAIT_DAYS) {
-                acc.longWait.push(customer);
-              }
-            }
-            return acc;
-          },
-          {
-            finalized: completed,
-            transfer: [],
-            archived: archived,
-            longWait: [],
-          }
-        );
-
+        // 3. Ordena listas
         const sortedLists = sortCustomerLists(processed);
+
+        // 4. Atualiza estado
         setLists(sortedLists);
       } catch (error) {
         console.error('Erro ao buscar dados do histórico:', error);

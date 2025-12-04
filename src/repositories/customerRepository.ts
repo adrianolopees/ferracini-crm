@@ -56,7 +56,7 @@ export async function updateCustomer(id: string, data: Partial<Customer>): Promi
   const validated = FirebaseCustomerSchema.partial().parse(dataWithoutIdAndWorkspace);
 
   // Converte undefined para deleteField() para Firebase aceitar a remoção de campos
-  const firebaseData: Record<string, any> = {};
+  const firebaseData: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(validated)) {
     firebaseData[key] = value === undefined ? deleteField() : value;
   }
