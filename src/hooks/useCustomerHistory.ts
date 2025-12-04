@@ -48,7 +48,12 @@ function useCustomerHistory(): CustomerHistory {
 
         const processed = allCustomers.reduce<CustomerHistory['lists']>(
           (acc, customer) => {
-            if (customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro') {
+            // Só adiciona aos transferidos se o produto JÁ CHEGOU na loja (não está mais aguardando transferência)
+            const isTransferred =
+              (customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro') &&
+              customer.status !== 'awaitingTransfer';
+
+            if (isTransferred) {
               acc.transfer.push(customer);
             }
 

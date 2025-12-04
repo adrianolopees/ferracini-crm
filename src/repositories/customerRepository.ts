@@ -1,4 +1,4 @@
-import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, query, where } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, query, where, deleteField } from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { CustomerSchema, FirebaseCustomerSchema, Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { WorkspaceId } from '@/schemas/userSchema';
@@ -54,7 +54,14 @@ export async function createCustomer(
 export async function updateCustomer(id: string, data: Partial<Customer>): Promise<void> {
   const { id: _, workspaceId: __, ...dataWithoutIdAndWorkspace } = data;
   const validated = FirebaseCustomerSchema.partial().parse(dataWithoutIdAndWorkspace);
-  await updateDoc(doc(db, COLLECTION_NAME, id), validated);
+
+  // Converte undefined para deleteField() para Firebase aceitar a remoção de campos
+  const firebaseData: Record<string, any> = {};
+  for (const [key, value] of Object.entries(validated)) {
+    firebaseData[key] = value === undefined ? deleteField() : value;
+  }
+
+  await updateDoc(doc(db, COLLECTION_NAME, id), firebaseData);
 }
 
 export async function deleteCustomerById(id: string): Promise<void> {

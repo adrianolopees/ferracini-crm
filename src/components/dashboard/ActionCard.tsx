@@ -42,9 +42,9 @@ function ActionCard({ title, value, subtitle, icon, colorScheme, loading, onClic
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600 mb-1 whitespace-nowrap ">{title}</p>
-          <p className="text-3xl font-bold text-gray-900">
+          <div className="text-3xl font-bold text-gray-900">
             {loading ? <Spinner size="md" color={colorScheme} /> : value}
-          </p>
+          </div>
         </div>
         <div className={`${colors.bg} rounded-full p-4`}>
           <i className={`${icon} text-2xl ${colors.icon}`} />

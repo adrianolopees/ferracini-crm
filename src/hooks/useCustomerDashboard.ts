@@ -65,6 +65,7 @@ function useCustomerDashboard(): CustomerDashboard {
       }
       try {
         setLoading(true);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const allCustomers = await getAllCustomers(workspaceId);
 
         const LONG_WAIT_DAYS = 30;
