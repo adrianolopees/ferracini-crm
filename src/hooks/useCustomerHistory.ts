@@ -34,20 +34,16 @@ function useCustomerHistory(): CustomerHistory {
       try {
         setLoading(true);
 
-        // 1. Busca dados (responsabilidade do hook)
         const [completed, archived, allCustomers] = await Promise.all([
           findCompletedCustomers(workspaceId),
           findArchivedCustomers(workspaceId),
           getAllCustomers(workspaceId),
         ]);
 
-        // 2. Processa dados (delegado ao service)
         const processed = processCustomersForHistory(allCustomers, completed, archived);
 
-        // 3. Ordena listas
         const sortedLists = sortCustomerLists(processed);
 
-        // 4. Atualiza estado
         setLists(sortedLists);
       } catch (error) {
         console.error('Erro ao buscar dados do histórico:', error);

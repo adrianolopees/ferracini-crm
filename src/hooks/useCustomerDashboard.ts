@@ -50,16 +50,12 @@ function useCustomerDashboard(): CustomerDashboard {
       try {
         setLoading(true);
 
-        // 1. Busca dados (responsabilidade do hook)
         const allCustomers = await getAllCustomers(workspaceId);
 
-        // 2. Processa dados (delegado ao service)
         const { metrics, lists } = processCustomersForDashboard(allCustomers);
 
-        // 3. Ordena listas
         const sortedLists = sortCustomerLists(lists);
 
-        // 4. Atualiza estado
         setData({
           metrics,
           lists: sortedLists,

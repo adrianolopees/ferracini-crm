@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllCustomers } from '@/repositories';
-import useAuth from './useAuth'; // ← NOVO IMPORT
+import useAuth from './useAuth';
 
 interface ProductCount {
   name: string;
