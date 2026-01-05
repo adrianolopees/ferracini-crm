@@ -68,9 +68,9 @@ function MetricCard({ title, value, subtitle, icon, colorScheme, loading = false
         <i className={`${icon} ${colors.icon}`} />
         <p className={`text-xs font-medium ${colors.text}`}>{title}</p>
       </div>
-      <p className={`text-3xl font-bold ${colors.number}`}>
+      <div className={`text-3xl font-bold ${colors.number}`}>
         {loading ? <Spinner size="md" color={colorScheme} /> : value}
-      </p>
+      </div>
       <p className={`text-xs ${colors.subtitle} mt-1`}>{subtitle}</p>
     </div>
   );

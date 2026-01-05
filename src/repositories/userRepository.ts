@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '@/services/firebase';
-import { UserShcema, FirebaseUserSchema, User, WorkspaceId } from '@/schemas/userSchema';
+import { UserSchema, FirebaseUserSchema, User, WorkspaceId } from '@/schemas/userSchema';
 import { getCurrentTimestamp } from '@/utils';
 
 const COLLECTION_NAME = 'users';
@@ -22,7 +22,7 @@ export async function getUserById(uid: string): Promise<User | null> {
     return null;
   }
 
-  const result = UserShcema.safeParse({ uid: docSnap.id, ...docSnap.data() });
+  const result = UserSchema.safeParse({ uid: docSnap.id, ...docSnap.data() });
   return result.success ? result.data : null;
 }
 

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-export const WorkspaceSchema = z.enum(['real', 'demo']);
+export const WorkspaceSchema = z.enum(['maxi', 'demo']);
 
-export const UserShcema = z.object({
+export const UserSchema = z.object({
   uid: z.string(),
   email: z.email(),
   workspaceId: WorkspaceSchema,
@@ -10,7 +10,7 @@ export const UserShcema = z.object({
   createdAt: z.string(),
 });
 
-export const FirebaseUserSchema = UserShcema.omit({ uid: true });
+export const FirebaseUserSchema = UserSchema.omit({ uid: true });
 
-export type User = z.infer<typeof UserShcema>;
+export type User = z.infer<typeof UserSchema>;
 export type WorkspaceId = z.infer<typeof WorkspaceSchema>;
