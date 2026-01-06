@@ -4,7 +4,7 @@ import { WorkspaceSchema } from './userSchema';
 export const StoreSchema = z.object({
   id: z.string(),
   name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres'),
-  phone: z.string().regex(/^\(?[1-9]{2}\)?\s?9[0-9]{4}-?[0-9]{4}$/, 'Formato inválido'),
+  phone: z.string().regex(/^\([1-9]{2}\)\s9[0-9]{4}-[0-9]{4}$/, 'Telefone deve estar no formato (11) 98888-8888'),
   color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Cor deve ser hexadecimal'),
 });
 
@@ -14,7 +14,7 @@ export const StoreSettingsSchema = z.object({
   workspaceId: WorkspaceSchema,
   defaultStoreId: z.string(),
   stores: z.array(StoreSchema).min(1, 'Deve ter pelo menos 1 loja'),
-  updatedAt: z.string,
+  updatedAt: z.string(),
   updatedBy: z.email(),
 });
 

@@ -1,15 +1,18 @@
 # 📅 Plano Semanal FINAL: Configurações Dinâmicas de Lojas
 
 ## 🎯 Meta da Semana
+
 Transformar configurações hardcoded (nomes e telefones das lojas) em configurações dinâmicas editáveis via Settings page.
 
 **Problema atual:**
+
 - ❌ Telefones das lojas hardcoded no código
 - ❌ Nomes das lojas hardcoded
 - ❌ Workspace demo usa mesmos dados
 - ❌ Adicionar nova loja = alterar código
 
 **Resultado esperado:**
+
 - ✅ Configurações editáveis (nome, telefone, cor)
 - ✅ Workspace maxi com suas lojas configuradas
 - ✅ Workspace demo com dados de teste
@@ -70,6 +73,7 @@ customers/
 ## 📅 SEGUNDA-FEIRA: Schemas e Fundação
 
 ### ⏰ Tempo: 2-3 horas
+
 ### 🎓 Aprendizado: Zod schemas, validações, TypeScript types
 
 ### ✅ Tarefas:
@@ -99,6 +103,7 @@ export type WorkspaceId = z.infer<typeof WorkspaceSchema>;
 ```
 
 **📚 O que você aprende:**
+
 - `z.enum()` limita valores possíveis
 - `z.infer<>` cria TypeScript type do schema
 - Type safety em compile time
@@ -117,10 +122,7 @@ import { WorkspaceSchema } from './userSchema';
 export const StoreSchema = z.object({
   id: z.string(),
   name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres'),
-  phone: z.string().regex(
-    /^\(?[1-9]{2}\)?\s?9[0-9]{4}-?[0-9]{4}$/,
-    'Formato inválido. Use: (11) 98765-4321'
-  ),
+  phone: z.string().regex(/^\(?[1-9]{2}\)?\s?9[0-9]{4}-?[0-9]{4}$/, 'Formato inválido. Use: (11) 98765-4321'),
   color: z.string().regex(/^#[0-9A-F]{6}$/i, 'Cor deve ser hexadecimal'),
 });
 
@@ -129,7 +131,7 @@ export type Store = z.infer<typeof StoreSchema>;
 // Schema para configurações do workspace
 export const StoreSettingsSchema = z.object({
   workspaceId: WorkspaceSchema,
-  defaultStoreId: z.string(),  // ← Loja principal do workspace
+  defaultStoreId: z.string(), // ← Loja principal do workspace
   stores: z.array(StoreSchema).min(1, 'Deve ter pelo menos 1 loja'),
   updatedAt: z.string(),
   updatedBy: z.email(),
@@ -147,6 +149,7 @@ export type UpdateStore = z.infer<typeof UpdateStoreSchema>;
 ```
 
 **📚 O que você aprende:**
+
 - `.regex()` para validação customizada
 - `.min()` / `.max()` para limites
 - `.omit()` remove campos
@@ -168,7 +171,7 @@ const validStore = {
   id: 'maxi',
   name: 'Maxi Shopping',
   phone: '(11) 98765-4321',
-  color: '#F59E0B'
+  color: '#F59E0B',
 };
 console.log(StoreSchema.parse(validStore));
 
@@ -176,19 +179,19 @@ console.log(StoreSchema.parse(validStore));
 const invalidPhone = {
   id: 'maxi',
   name: 'Maxi',
-  phone: '11987654321',  // Sem formatação
-  color: '#F59E0B'
+  phone: '11987654321', // Sem formatação
+  color: '#F59E0B',
 };
 const result = StoreSchema.safeParse(invalidPhone);
-console.log(result.success);  // false
-console.log(result.error.errors);  // Array de erros
+console.log(result.success); // false
+console.log(result.error.errors); // Array de erros
 
 // ❌ Teste 3: Cor inválida
 const invalidColor = {
   id: 'maxi',
   name: 'Maxi',
   phone: '(11) 98765-4321',
-  color: 'blue'  // Não é hexadecimal
+  color: 'blue', // Não é hexadecimal
 };
 console.log(StoreSchema.safeParse(invalidColor));
 
@@ -198,6 +201,7 @@ console.log(UpdateStoreSchema.parse(partialUpdate));
 ```
 
 **📚 O que você aprende:**
+
 - `.parse()` vs `.safeParse()`
 - Como capturar erros de validação
 - Testar regex patterns
@@ -215,17 +219,20 @@ Crie arquivo `APRENDIZADOS.md`:
 ## Conceitos aprendidos:
 
 ### 1. Zod Schemas
+
 - Schema = contrato de dados
 - Valida em runtime (não só compile time)
 - Gera tipos TypeScript automaticamente
 
 ### 2. Validações
+
 - `.regex()` - expressões regulares
 - `.min()` / `.max()` - limites
 - `.email()` - email válido
 - Mensagens de erro customizadas
 
 ### 3. Regex Patterns
+
 - Telefone: /^\(?[1-9]{2}\)?\s?9[0-9]{4}-?[0-9]{4}$/
   - \(? = parêntese opcional
   - [1-9]{2} = DDD (11, 19, etc)
@@ -239,16 +246,19 @@ Crie arquivo `APRENDIZADOS.md`:
   - i = case insensitive
 
 ### 4. TypeScript Inference
+
 - z.infer<typeof Schema> gera type
 - Type safety automático
 - Autocomplete no VSCode
 
 ## Dúvidas que surgiram:
+
 - [ ] Por que usar .safeParse() ao invés de .parse()?
-  Resposta: safeParse não lança erro, retorna {success, data/error}
+      Resposta: safeParse não lança erro, retorna {success, data/error}
 ```
 
 **📚 O que você aprende:**
+
 - Documentar aprendizados
 - Revisão ativa
 - Criar referência futura
@@ -256,18 +266,20 @@ Crie arquivo `APRENDIZADOS.md`:
 ---
 
 ### 📦 Checklist do Dia 1:
-- [ ] WorkspaceSchema atualizado
-- [ ] StoreSettingsSchema criado
-- [ ] Todos os testes passando no console
-- [ ] APRENDIZADOS.md criado com suas anotações
-- [ ] Entendeu diferença entre parse e safeParse
-- [ ] Entendeu os regex patterns
+
+- [x] WorkspaceSchema atualizado
+- [x] StoreSettingsSchema criado
+- [x] Todos os testes passando no console
+- [x] APRENDIZADOS.md criado com suas anotações
+- [x] Entendeu diferença entre parse e safeParse
+- [x] Entendeu os regex patterns
 
 ---
 
 ## 📅 TERÇA-FEIRA: Repository Layer (Firestore)
 
 ### ⏰ Tempo: 3-4 horas
+
 ### 🎓 Aprendizado: Firestore CRUD, Timestamps, Real-time listeners
 
 ### ✅ Tarefas:
@@ -279,20 +291,12 @@ Crie arquivo `APRENDIZADOS.md`:
 
 import { db } from '../services/firebase';
 import { doc, getDoc, updateDoc, onSnapshot, Timestamp } from 'firebase/firestore';
-import {
-  StoreSettings,
-  Store,
-  StoreSettingsSchema,
-  UpdateStore,
-  CreateStore,
-} from '../schemas/storeSettingsSchema';
+import { StoreSettings, Store, StoreSettingsSchema, UpdateStore, CreateStore } from '../schemas/storeSettingsSchema';
 
 /**
  * Busca configurações de um workspace
  */
-export async function getStoreSettings(
-  workspaceId: string
-): Promise<StoreSettings | null> {
+export async function getStoreSettings(workspaceId: string): Promise<StoreSettings | null> {
   try {
     const docRef = doc(db, 'workspace_settings', workspaceId);
     const docSnap = await getDoc(docRef);
@@ -333,7 +337,7 @@ export async function updateStore(
     }
 
     // Encontrar índice da loja
-    const storeIndex = currentSettings.stores.findIndex(s => s.id === storeId);
+    const storeIndex = currentSettings.stores.findIndex((s) => s.id === storeId);
     if (storeIndex === -1) {
       throw new Error(`Loja ${storeId} não encontrada`);
     }
@@ -366,11 +370,7 @@ export async function updateStore(
 /**
  * Adiciona nova loja ao workspace
  */
-export async function addStore(
-  workspaceId: string,
-  newStore: CreateStore,
-  userEmail: string
-): Promise<Store> {
+export async function addStore(workspaceId: string, newStore: CreateStore, userEmail: string): Promise<Store> {
   try {
     const currentSettings = await getStoreSettings(workspaceId);
     if (!currentSettings) {
@@ -407,11 +407,7 @@ export async function addStore(
 /**
  * Remove loja do workspace
  */
-export async function removeStore(
-  workspaceId: string,
-  storeId: string,
-  userEmail: string
-): Promise<void> {
+export async function removeStore(workspaceId: string, storeId: string, userEmail: string): Promise<void> {
   try {
     const currentSettings = await getStoreSettings(workspaceId);
     if (!currentSettings) {
@@ -424,7 +420,7 @@ export async function removeStore(
     }
 
     // Filtrar loja removida
-    const updatedStores = currentSettings.stores.filter(s => s.id !== storeId);
+    const updatedStores = currentSettings.stores.filter((s) => s.id !== storeId);
 
     if (updatedStores.length === 0) {
       throw new Error('Deve ter pelo menos 1 loja');
@@ -485,6 +481,7 @@ export function onStoreSettingsChange(
 ```
 
 **📚 O que você aprende:**
+
 - CRUD no Firestore (Create, Read, Update, Delete)
 - `getDoc` vs `getDocs`
 - `updateDoc` vs `setDoc`
@@ -514,19 +511,19 @@ async function seedStoreSettings() {
       stores: [
         {
           id: 'maxi',
-          name: 'Maxi',  // ⚠️ Manter nome igual aos dados existentes!
-          phone: '(11) 99999-9999',  // TODO: Substituir pelo real
+          name: 'Maxi', // ⚠️ Manter nome igual aos dados existentes!
+          phone: '(11) 99999-9999', // TODO: Substituir pelo real
           color: '#F59E0B',
         },
         {
           id: 'campinas',
-          name: 'Campinas',  // ⚠️ Igual ao sourceStore nos customers
+          name: 'Campinas', // ⚠️ Igual ao sourceStore nos customers
           phone: '(19) 98221-5561',
           color: '#3B82F6',
         },
         {
           id: 'dompedro',
-          name: 'Dom Pedro',  // ⚠️ Igual ao sourceStore nos customers
+          name: 'Dom Pedro', // ⚠️ Igual ao sourceStore nos customers
           phone: '(19) 99682-1710',
           color: '#10B981',
         },
@@ -571,9 +568,9 @@ async function seedStoreSettings() {
       await setDoc(doc(db, 'workspace_settings', ws.workspaceId), settings);
 
       console.log(`✅ Workspace "${ws.workspaceId}" configurado`);
-      console.log(`   🏪 Loja principal: ${ws.stores.find(s => s.id === ws.defaultStoreId)?.name}`);
+      console.log(`   🏪 Loja principal: ${ws.stores.find((s) => s.id === ws.defaultStoreId)?.name}`);
       console.log(`   📋 Total de lojas: ${ws.stores.length}`);
-      ws.stores.forEach(store => {
+      ws.stores.forEach((store) => {
         console.log(`      - ${store.name} (${store.phone})`);
       });
       console.log('');
@@ -593,6 +590,7 @@ seedStoreSettings();
 ```
 
 **📚 O que você aprende:**
+
 - `setDoc` para criar documentos
 - `Timestamp.now()` do Firestore
 - Seed patterns
@@ -603,11 +601,13 @@ seedStoreSettings();
 #### 3. Executar Seed (30min)
 
 **Opção 1: Via console do navegador**
+
 1. Copie todo o código do seed
 2. Cole no DevTools Console
 3. Execute
 
 **Opção 2: Via script npm**
+
 ```json
 // package.json
 "scripts": {
@@ -639,41 +639,48 @@ yarn seed:stores
 ## Conceitos aprendidos:
 
 ### 1. Firestore Operations
+
 - getDoc() - busca 1 documento
 - updateDoc() - atualiza campos específicos
 - setDoc() - cria/substitui documento completo
 - onSnapshot() - listener real-time
 
 ### 2. Timestamps
+
 - Firestore.Timestamp != JavaScript Date
 - Conversão: timestamp.toDate().toISOString()
 - Sempre usar Timestamp.now() ao salvar
 
 ### 3. Real-time Listeners
+
 - onSnapshot retorna função de cleanup (unsubscribe)
 - Callback executa quando dados mudam
 - Importante fazer cleanup no useEffect
 
 ### 4. Array Operations
+
 - findIndex() - encontra posição
 - filter() - remove itens
 - spread [...array] - copia array
 - Firestore substitui array inteiro (não faz merge)
 
 ### 5. Validações de Negócio
+
 - Não remover loja principal
 - Manter pelo menos 1 loja
 - Validar antes de salvar
 
 ## Dúvidas:
+
 - [ ] Por que usar updateDoc ao invés de setDoc?
-  Resposta: updateDoc atualiza campos específicos,
-  setDoc substitui documento inteiro
+      Resposta: updateDoc atualiza campos específicos,
+      setDoc substitui documento inteiro
 ```
 
 ---
 
 ### 📦 Checklist do Dia 2:
+
 - [ ] Repository criado com CRUD completo
 - [ ] Script de seed executado
 - [ ] Dados no Firebase Console (maxi + demo)
@@ -686,6 +693,7 @@ yarn seed:stores
 ## 📅 QUARTA-FEIRA: Hook e Settings UI
 
 ### ⏰ Tempo: 4-5 horas
+
 ### 🎓 Aprendizado: Custom hooks, useEffect, Formulários React
 
 ### ✅ Tarefas:
@@ -697,12 +705,7 @@ yarn seed:stores
 
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
-import {
-  StoreSettings,
-  Store,
-  UpdateStore,
-  CreateStore,
-} from '../schemas/storeSettingsSchema';
+import { StoreSettings, Store, UpdateStore, CreateStore } from '../schemas/storeSettingsSchema';
 import {
   updateStore as updateStoreRepo,
   addStore as addStoreRepo,
@@ -741,8 +744,8 @@ export function useStoreSettings() {
 
   // Derivar dados
   const allStores = settings?.stores || [];
-  const defaultStore = allStores.find(s => s.id === settings?.defaultStoreId) || null;
-  const transferStores = allStores.filter(s => s.id !== settings?.defaultStoreId);
+  const defaultStore = allStores.find((s) => s.id === settings?.defaultStoreId) || null;
+  const transferStores = allStores.filter((s) => s.id !== settings?.defaultStoreId);
 
   // Mutation: Atualizar loja
   const updateStore = async (storeId: string, updates: UpdateStore) => {
@@ -796,14 +799,14 @@ export function useStoreSettings() {
 
   // Utility: Buscar loja por nome (compatibilidade com sourceStore)
   const getStoreByName = (name: string) => {
-    return allStores.find(s => s.name === name);
+    return allStores.find((s) => s.name === name);
   };
 
   return {
     settings,
-    defaultStore,      // Sua loja principal
-    transferStores,    // Lojas de origem de transferência
-    allStores,         // Todas as lojas
+    defaultStore, // Sua loja principal
+    transferStores, // Lojas de origem de transferência
+    allStores, // Todas as lojas
     loading,
     error,
     updateStore,
@@ -815,6 +818,7 @@ export function useStoreSettings() {
 ```
 
 **📚 O que você aprende:**
+
 - Custom hooks pattern
 - useEffect dependencies
 - Cleanup functions (return)
@@ -959,6 +963,7 @@ export default function Settings() {
 ```
 
 **📚 O que você aprende:**
+
 - Composição de componentes
 - Conditional rendering
 - Event handlers
@@ -1069,6 +1074,7 @@ export default function StoreCard({
 ```
 
 **📚 O que você aprende:**
+
 - Component props typing
 - Conditional rendering (isEditing)
 - Inline styles (backgroundColor)
@@ -1224,6 +1230,7 @@ export default function StoreForm({
 ```
 
 **📚 O que você aprende:**
+
 - Controlled components
 - Form handling
 - Validação on submit
@@ -1249,40 +1256,48 @@ import Settings from './pages/Settings';
 
 #### 6. Atualizar APRENDIZADOS.md (15min)
 
-```markdown
+````markdown
 # Dia 3: Hook e UI
 
 ## Conceitos aprendidos:
 
 ### 1. Custom Hooks
+
 - Padrão: use + Nome
 - Encapsular lógica reutilizável
 - Pode usar outros hooks
 - Return object com estado e funções
 
 ### 2. useEffect Cleanup
+
 ```typescript
 useEffect(() => {
   const unsubscribe = onSnapshot(...);
   return () => unsubscribe();  // ← Cleanup!
 }, [deps]);
 ```
+````
+
 - Executado quando componente desmonta
 - Ou quando dependencies mudam
 - Importante para evitar memory leaks
 
 ### 3. State Derivation
+
 - Derivar dados de state existente
 - Não criar state duplicado
 - Melhor performance
+
 ```typescript
 const defaultStore = stores.find(...);  // ← Derivado
 ```
 
 ### 4. Formulários Controlados
+
 - value + onChange
 - React controla o valor
 - Single source of truth
+
 ```typescript
 <input
   value={formData.name}
@@ -1291,27 +1306,32 @@ const defaultStore = stores.find(...);  // ← Derivado
 ```
 
 ### 5. Color Picker
+
 - `<input type="color">` nativo
 - Retorna hex em lowercase
 - .toUpperCase() para padronizar
 
 ### 6. Validação on Submit
+
 - Usar schema.safeParse()
 - Converter erros para objeto
 - Exibir erros por campo
+
 ```typescript
 if (!result.success) {
   const errors = {};
-  result.error.errors.forEach(err => {
+  result.error.errors.forEach((err) => {
     errors[err.path[0]] = err.message;
   });
 }
 ```
 
 ## Dúvidas:
+
 - [ ] Por que não usar useState para cada campo do form?
-  Resposta: Um objeto é mais fácil de passar e validar
-```
+      Resposta: Um objeto é mais fácil de passar e validar
+
+````
 
 ---
 
@@ -1394,9 +1414,10 @@ export function sendCustomerMessage(
   const message = `Oi ${customer.name}! ${store.name} aqui!\n\n${customMessage}`;
   openWhatsApp(customer.phone, message);
 }
-```
+````
 
 **📚 O que você aprende:**
+
 - Passar objetos em vez de valores primitivos
 - Template strings multi-line
 - Função pura (não depende de estado global)
@@ -1452,6 +1473,7 @@ export default function WorkflowCard({ customer }: WorkflowCardProps) {
 ```
 
 **📚 O que você aprende:**
+
 - Usar hook em componentes
 - Array.map() para renderizar botões
 - Inline styles dinâmicos
@@ -1500,6 +1522,7 @@ export default function History() {
 ```
 
 **📚 O que você aprende:**
+
 - Backward compatibility
 - Graceful degradation
 - Conditional rendering
@@ -1509,6 +1532,7 @@ export default function History() {
 #### 4. Testar integração completa (30min)
 
 **Checklist de testes:**
+
 - [ ] Editar telefone de Campinas
 - [ ] Criar novo cliente
 - [ ] Clicar "Consultar Campinas"
@@ -1528,27 +1552,32 @@ export default function History() {
 ## Conceitos aprendidos:
 
 ### 1. Refatoração
+
 - Passar Store ao invés de phone separado
 - Facilita mudanças futuras
 - Menos parâmetros = código mais limpo
 
 ### 2. Integração de Sistemas
+
 - Hook provê dados
 - Componentes consomem
 - Serviços usam os dados
 - Fluxo unidirecional
 
 ### 3. Backward Compatibility
+
 - Dados antigos continuam funcionando
 - Buscar por nome (sourceStore)
 - Graceful degradation se não achar
 
 ### 4. Dynamic Rendering
+
 - .map() para criar botões
 - Cores dinâmicas via style
 - Número de botões = número de lojas
 
 ## Fluxo completo:
+
 1. Settings: Edita telefone
 2. Firestore: Salva
 3. onSnapshot: Detecta mudança
@@ -1558,12 +1587,14 @@ export default function History() {
 7. WhatsApp: Abre com número atualizado
 
 ## Dúvidas:
+
 - Nenhuma! Tudo funcionando! 🎉
 ```
 
 ---
 
 ### 📦 Checklist do Dia 4:
+
 - [ ] WhatsApp service refatorado
 - [ ] Componentes atualizados
 - [ ] Botões dinâmicos renderizando
@@ -1577,6 +1608,7 @@ export default function History() {
 ## 📅 SEXTA-FEIRA: Testes, Polish e Preparação
 
 ### ⏰ Tempo: 3-4 horas
+
 ### 🎓 Aprendizado: QA, UX polish, Documentação
 
 ### ✅ Tarefas:
@@ -1631,11 +1663,13 @@ service cloud.firestore {
 ```
 
 **Deploy:**
+
 ```bash
 firebase deploy --only firestore:rules
 ```
 
 **📚 O que você aprende:**
+
 - Firestore Security Rules
 - Função helper
 - Multi-tenancy security
@@ -1648,6 +1682,7 @@ firebase deploy --only firestore:rules
 **Melhorias importantes:**
 
 **Loading states melhores:**
+
 ```typescript
 if (loading) {
   return (
@@ -1660,6 +1695,7 @@ if (loading) {
 ```
 
 **Empty states:**
+
 ```typescript
 {transferStores.length === 0 && (
   <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
@@ -1674,6 +1710,7 @@ if (loading) {
 ```
 
 **Toast messages:**
+
 ```typescript
 toast.success('✅ Loja atualizada com sucesso!');
 toast.error('❌ Erro ao atualizar loja');
@@ -1682,6 +1719,7 @@ toast.success('🗑️ Loja removida');
 ```
 
 **Confirmações:**
+
 ```typescript
 const handleRemove = async () => {
   if (!confirm(`Tem certeza que deseja remover a loja "${store.name}"?`)) {
@@ -1692,6 +1730,7 @@ const handleRemove = async () => {
 ```
 
 **📚 O que você aprende:**
+
 - Loading spinners CSS
 - Empty states UX
 - Toast best practices
@@ -1702,6 +1741,7 @@ const handleRemove = async () => {
 #### 3. Testes Completos (1h)
 
 **Workspace maxi:**
+
 - [ ] Login
 - [ ] Ver 3 lojas (Maxi, Campinas, Dom Pedro)
 - [ ] Editar telefone do Maxi
@@ -1724,6 +1764,7 @@ const handleRemove = async () => {
 - [ ] Botão "Consultar Itu" desaparece ✅
 
 **Workspace demo:**
+
 - [ ] Logout
 - [ ] Login com demo
 - [ ] Ver lojas demo (3 lojas)
@@ -1731,11 +1772,13 @@ const handleRemove = async () => {
 - [ ] Verificar isolamento (não vê dados do maxi) ✅
 
 **Real-time:**
+
 - [ ] Abrir em 2 abas
 - [ ] Editar em aba 1
 - [ ] Ver atualização em aba 2 ✅
 
 **📚 O que você aprende:**
+
 - QA systematic testing
 - Regression testing
 - Multi-tab testing
@@ -1764,6 +1807,7 @@ Sistema de CRM multi-tenant para gestão de clientes e transferências entre loj
 ## 🎯 Como Testar (Recrutadores)
 
 ### Login Demo:
+
 - Email: `demo@teste.com`
 - Password: `******`
 
@@ -1792,6 +1836,7 @@ Sistema de CRM multi-tenant para gestão de clientes e transferências entre loj
 ## 🏗️ Arquitetura
 
 ### Stack:
+
 - React + TypeScript
 - Firebase (Firestore + Auth)
 - Zod para validações
@@ -1799,17 +1844,20 @@ Sistema de CRM multi-tenant para gestão de clientes e transferências entre loj
 
 ### Estrutura:
 ```
+
 src/
-├── schemas/          # Zod schemas (validação)
-├── repositories/     # Firestore CRUD
-├── hooks/            # Custom hooks
-├── services/         # WhatsApp, etc
-├── pages/            # Settings, Dashboard, History
-└── components/       # Reutilizáveis
+├── schemas/ # Zod schemas (validação)
+├── repositories/ # Firestore CRUD
+├── hooks/ # Custom hooks
+├── services/ # WhatsApp, etc
+├── pages/ # Settings, Dashboard, History
+└── components/ # Reutilizáveis
+
 ```
 
 ### Firestore:
 ```
+
 workspace_settings/{workspaceId}
 ├─ defaultStoreId
 └─ stores: [...]
@@ -1817,6 +1865,7 @@ workspace_settings/{workspaceId}
 customers/{customerId}
 ├─ workspaceId
 └─ sourceStore (nome da loja de origem)
+
 ```
 
 ## 🚀 Diferenciais Técnicos
@@ -1886,30 +1935,35 @@ Transformei configurações hardcoded em sistema dinâmico e escalável.
 ## 📅 Cronologia de Aprendizados
 
 ### Dia 1: Schemas e Validações
+
 - Zod schemas
 - Regex patterns
 - Type inference
 - Runtime validation
 
 ### Dia 2: Repository e Firestore
+
 - CRUD operations
 - Timestamps
 - Real-time listeners
 - Array manipulations
 
 ### Dia 3: Hook e UI
+
 - Custom hooks
 - useEffect cleanup
 - Controlled forms
 - Component composition
 
 ### Dia 4: Integração
+
 - Refatoração
 - Backward compatibility
 - Dynamic rendering
 - Integration testing
 
 ### Dia 5: Polish e QA
+
 - Security Rules
 - UX polish
 - Systematic testing
@@ -1918,25 +1972,31 @@ Transformei configurações hardcoded em sistema dinâmico e escalável.
 ## 💡 Insights Importantes
 
 ### 1. Type Safety é poder
+
 Zod + TypeScript = menos bugs, mais confiança
 
 ### 2. Real-time é mágico
+
 onSnapshot torna app responsivo sem esforço
 
 ### 3. Cleanup é essencial
+
 Sempre retornar cleanup no useEffect
 
 ### 4. Validação em camadas
+
 - Schema (estrutura)
 - Regex (formato)
 - Business rules (lógica)
 
 ### 5. Componentes pequenos
+
 Fácil testar, fácil reutilizar
 
 ## 🚀 Habilidades Desenvolvidas
 
 ### Técnicas:
+
 - [x] Zod schemas avançados
 - [x] Firestore real-time
 - [x] Custom hooks
@@ -1944,6 +2004,7 @@ Fácil testar, fácil reutilizar
 - [x] Security Rules
 
 ### Soft:
+
 - [x] Planejamento semanal
 - [x] Documentação clara
 - [x] Testes sistemáticos
@@ -1961,12 +2022,14 @@ Fácil testar, fácil reutilizar
 ## 🎓 Para Próximos Projetos
 
 ### O que fazer:
+
 - ✅ Planejar antes de codar
 - ✅ Documentar enquanto aprende
 - ✅ Testar incrementalmente
 - ✅ Commits pequenos e frequentes
 
 ### O que evitar:
+
 - ❌ Hardcode
 - ❌ State duplicado
 - ❌ Componentes grandes
@@ -1997,6 +2060,7 @@ Próximo desafio: [definir próxima feature]
 ### 📦 Checklist FINAL da Semana:
 
 #### Código:
+
 - [ ] WorkspaceSchema (maxi, demo)
 - [ ] StoreSettingsSchema completo
 - [ ] Repository com CRUD
@@ -2007,12 +2071,14 @@ Próximo desafio: [definir próxima feature]
 - [ ] Componentes integrados
 
 #### Firestore:
+
 - [ ] Seed executado
 - [ ] Rules deployadas
 - [ ] Dados maxi configurados
 - [ ] Dados demo configurados
 
 #### Testes:
+
 - [ ] Editar loja funciona
 - [ ] Adicionar loja funciona
 - [ ] Remover loja funciona
@@ -2023,6 +2089,7 @@ Próximo desafio: [definir próxima feature]
 - [ ] Compatibilidade dados antigos
 
 #### Documentação:
+
 - [ ] README.md completo
 - [ ] APRENDIZADOS.md detalhado
 - [ ] Comentários no código
@@ -2081,6 +2148,7 @@ Ao final da semana você terá:
 ## 🎯 Próxima Semana
 
 Agora que você domina:
+
 - Schemas e validações
 - Firestore real-time
 - Custom hooks
@@ -2088,6 +2156,7 @@ Agora que você domina:
 - Multi-tenancy
 
 Pode partir para:
+
 - [ ] Dashboard de métricas
 - [ ] Sistema de roles
 - [ ] Exportar relatórios
