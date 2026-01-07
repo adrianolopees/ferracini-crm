@@ -290,8 +290,9 @@ Crie arquivo `APRENDIZADOS.md`:
 // src/repositories/storeSettingsRepository.ts
 
 import { db } from '../services/firebase';
-import { doc, getDoc, updateDoc, onSnapshot, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { StoreSettings, Store, StoreSettingsSchema, UpdateStore, CreateStore } from '../schemas/storeSettingsSchema';
+import { getCurrentTimestamp } from '@/utils/dateUtils';
 
 /**
  * Busca configurações de um workspace
@@ -307,12 +308,7 @@ export async function getStoreSettings(workspaceId: string): Promise<StoreSettin
     }
 
     const data = docSnap.data();
-
-    // Converter Timestamp → ISO string
-    const parsed = StoreSettingsSchema.parse({
-      ...data,
-      updatedAt: data.updatedAt?.toDate().toISOString(),
-    });
+    const parsed = StoreSettingsSchema.parse(data);
 
     return parsed;
   } catch (error) {
@@ -356,7 +352,7 @@ export async function updateStore(
     const docRef = doc(db, 'workspace_settings', workspaceId);
     await updateDoc(docRef, {
       stores: updatedStores,
-      updatedAt: Timestamp.now(),
+      updatedAt: getCurrentTimestamp(),
       updatedBy: userEmail,
     });
 
@@ -392,7 +388,7 @@ export async function addStore(workspaceId: string, newStore: CreateStore, userE
     const docRef = doc(db, 'workspace_settings', workspaceId);
     await updateDoc(docRef, {
       stores: updatedStores,
-      updatedAt: Timestamp.now(),
+      updatedAt: getCurrentTimestamp(),
       updatedBy: userEmail,
     });
 
@@ -430,7 +426,7 @@ export async function removeStore(workspaceId: string, storeId: string, userEmai
     const docRef = doc(db, 'workspace_settings', workspaceId);
     await updateDoc(docRef, {
       stores: updatedStores,
-      updatedAt: Timestamp.now(),
+      updatedAt: getCurrentTimestamp(),
       updatedBy: userEmail,
     });
 
@@ -460,10 +456,7 @@ export function onStoreSettingsChange(
 
       try {
         const data = snapshot.data();
-        const parsed = StoreSettingsSchema.parse({
-          ...data,
-          updatedAt: data.updatedAt?.toDate().toISOString(),
-        });
+        const parsed = StoreSettingsSchema.parse(data);
         callback(parsed);
       } catch (error) {
         console.error('Error parsing store settings:', error);
