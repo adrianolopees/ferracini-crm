@@ -12,10 +12,8 @@ export type Store = z.infer<typeof StoreSchema>;
 
 export const StoreSettingsSchema = z.object({
   workspaceId: WorkspaceSchema,
-  defaultStoreId: z.string(),
   stores: z.array(StoreSchema).min(1, 'Deve ter pelo menos 1 loja'),
   updatedAt: z.string(),
-  updatedBy: z.email(),
 });
 
 export type StoreSettings = z.infer<typeof StoreSettingsSchema>;
