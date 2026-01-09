@@ -1,6 +1,14 @@
 import { db } from '@/services/firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { StoreSettings, Store, StoreSettingsSchema, UpdateStore, CreateStore } from '@/schemas/storeSettingsSchema';
+import {
+  StoreSettings,
+  Store,
+  StoreSettingsSchema,
+  UpdateStore,
+  CreateStore,
+  CreateStoreSchema,
+  UpdateStoreSchema,
+} from '@/schemas/storeSettingsSchema';
 import { getCurrentTimestamp } from '@/utils';
 
 const COLLECTION_NAME = 'workspace_settings';
@@ -18,33 +26,9 @@ export async function getStoreSettings(workspaceId: string): Promise<StoreSettin
   return result.success ? result.data : null;
 }
 
-export async function updateStore(workspaceId: string, storeId: string, updates: UpdateStore): Promise<void> {
-  const currentSettings = await getStoreSettings(workspaceId);
-  if (!currentSettings) {
-    throw new Error('Workspace settings not found');
-  }
-
-  const storeIndex = currentSettings.stores.findIndex((s) => s.id === storeId);
-  if (storeIndex === -1) {
-    throw new Error(`Store ${storeId} not found`);
-  }
-
-  const updatedStore: Store = {
-    ...currentSettings.stores[storeIndex],
-    ...updates,
-  };
-
-  const updatedStores = [...currentSettings.stores];
-  updatedStores[storeIndex] = updatedStore;
-
-  const docRef = doc(db, COLLECTION_NAME, workspaceId);
-  await updateDoc(docRef, {
-    stores: updatedStores,
-    updatedAt: getCurrentTimestamp(),
-  });
-}
-
 export async function addStore(workspaceId: string, newStore: CreateStore): Promise<Store> {
+  const validatedStore = CreateStoreSchema.parse(newStore);
+
   const currentSettings = await getStoreSettings(workspaceId);
   if (!currentSettings) {
     throw new Error('Workspace settings not found');
@@ -53,7 +37,7 @@ export async function addStore(workspaceId: string, newStore: CreateStore): Prom
   const storeId = `store-${crypto.randomUUID()}`;
 
   const store: Store = {
-    ...newStore,
+    ...validatedStore,
     id: storeId,
   };
 
@@ -67,10 +51,49 @@ export async function addStore(workspaceId: string, newStore: CreateStore): Prom
   return store;
 }
 
-/* export async function removeStore(workspaceId: string, storeId: string) {
+export async function updateStore(workspaceId: string, storeId: string, updates: UpdateStore): Promise<void> {
+  const validatedUpdates = UpdateStoreSchema.parse(updates);
+
+  const currentSettings = await getStoreSettings(workspaceId);
+  if (!currentSettings) {
+    throw new Error('Workspace settings not found');
+  }
+
+  const storeIndex = currentSettings.stores.findIndex((s) => s.id === storeId);
+  if (storeIndex === -1) {
+    throw new Error(`Store ${storeId} not found`);
+  }
+
+  const updatedStore: Store = {
+    ...currentSettings.stores[storeIndex],
+    ...validatedUpdates,
+  };
+
+  const updatedStores = [...currentSettings.stores];
+  updatedStores[storeIndex] = updatedStore;
+
+  const docRef = doc(db, COLLECTION_NAME, workspaceId);
+  await updateDoc(docRef, {
+    stores: updatedStores,
+    updatedAt: getCurrentTimestamp(),
+  });
+}
+
+export async function removeStore(workspaceId: string, storeId: string) {
   const currentSettings = await getStoreSettings(workspaceId);
   if (!currentSettings) {
     return null;
   }
 
-} */
+  const updatedStores = currentSettings.stores.filter((s) => s.id !== storeId);
+
+  if (updatedStores.length === 0) {
+    throw new Error('Must have at least one store');
+  }
+
+  const docRef = doc(db, COLLECTION_NAME, workspaceId);
+  await updateDoc(docRef, {
+    stores: updatedStores,
+    updatedAt: getCurrentTimestamp(),
+  });
+}

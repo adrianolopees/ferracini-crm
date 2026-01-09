@@ -1,4 +1,11 @@
-/* import {  StoreSchema,  StoreSettingsSchema } from '../schemas/storeSettingsSchema'; */
+const dados1 = { nome: 'João', idade: 25 };
+const dados2 = { cidade: 'SP', idade: 30 };
+const mesclado = { ...dados1, ...dados2 };
+console.log(mesclado);
+/* import { UpdateStoreSchema } from '../schemas/storeSettingsSchema';
+
+const partialUpdate = { phone: '(11)99999-9999' };
+console.log(UpdateStoreSchema.safeParse(partialUpdate)); */
 
 /* const validStore = {
   id: 'maxi',
