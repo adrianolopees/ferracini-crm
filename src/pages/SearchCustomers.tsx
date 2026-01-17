@@ -1,66 +1,64 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useEffect, useMemo } from 'react';
 import toast from 'react-hot-toast';
-import { findCustomersByReference, findCustomersByModel, updateCustomer, archiveCustomerById } from '@/repositories';
+import { updateCustomer, getAllCustomers } from '@/repositories';
 import { notifyProductArrived } from '@/services/whatsappService';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { Input, PageLayout } from '@/components/ui';
 import { WorkflowCard } from '@/components/dashboard';
 import { ArchiveModal } from '@/components/modals';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
+import { WorkflowSkeleton } from '@/components/skeletons';
 import { useAuth } from '@/hooks';
 import { getCurrentTimestamp } from '@/utils';
 
 function SearchCustomers() {
   const { workspaceId } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
 
-  const handleSearch = async (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
+  useEffect(() => {
+    const fetchCustomersSearch = async () => {
+      if (!workspaceId) {
+        setLoading(false);
+        return;
+      }
 
-    if (value.trim() === '') {
-      setCustomers([]);
-      return;
-    }
+      try {
+        const allCustomers = await getAllCustomers(workspaceId);
+        setAllCustomers(allCustomers);
+      } catch (error) {
+        console.error('Erro ao buscar dados:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (!workspaceId) {
-      toast.error('Erro: Workspace não identificado. Faça login novamente.');
-      return;
-    }
+    fetchCustomersSearch();
+  }, [workspaceId]);
 
-    try {
-      const valorBuscado = value.trim();
-      const [refResults, modelResults] = await Promise.all([
-        findCustomersByReference(valorBuscado, workspaceId),
-        findCustomersByModel(valorBuscado, workspaceId),
-      ]);
+  const filteredCustomers = useMemo(() => {
+    if (searchTerm.trim() === '') return [];
 
-      const results: Customer[] = [];
+    const term = searchTerm.toLowerCase();
 
-      refResults.forEach((customer) => {
-        if (!customer.archived && (!customer.status || customer.status === 'pending') && !customer.consultingStore) {
-          results.push(customer);
-        }
-      });
+    return allCustomers.filter((customer) => {
+      const matchesRules =
+        !customer.archived && (!customer.status || customer.status === 'pending') && !customer.consultingStore;
 
-      modelResults.forEach((customer) => {
-        if (
-          !results.some((c) => c.id === customer.id) &&
-          !customer.archived &&
-          (!customer.status || customer.status === 'pending') &&
-          !customer.consultingStore
-        ) {
-          results.push(customer);
-        }
-      });
+      const matchesSearch =
+        customer.name.toLowerCase().includes(term) ||
+        customer.model.toLowerCase().includes(term) ||
+        customer.reference.toLowerCase().includes(term);
 
-      setCustomers(results);
-    } catch (error) {
-      console.error('Erro ao buscar clientes:', error);
-    }
+      return matchesRules && matchesSearch;
+    });
+  }, [searchTerm, allCustomers]);
+
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleWhatsApp = async (customer: Customer) => {
@@ -71,8 +69,8 @@ function SearchCustomers() {
         sourceStore: 'Jundiaí',
       });
       notifyProductArrived(customer);
-      toast.success(`${customer.name} movido para "Pronto para Retirada"!`);
-      setCustomers(customers.filter((c) => c.id !== customer.id));
+      toast.success(`${customer.name} movido para "Pronto para Retirada"`);
+      setAllCustomers(allCustomers.filter((c) => c.id !== customer.id));
     } catch (error) {
       console.error('Erro ao processar contato:', error);
       toast.error('Erro ao atualizar status. Tente novamente.');
@@ -87,8 +85,15 @@ function SearchCustomers() {
   const handleArchiveCustomer = async (reason: ArchiveReason, notes?: string) => {
     if (!customerToArchive) return;
     try {
-      await archiveCustomerById(customerToArchive.id, reason, notes);
+      await updateCustomer(customerToArchive.id, {
+        archived: true,
+        archiveReason: reason,
+        archivedAt: getCurrentTimestamp(),
+        notes: notes || '',
+      });
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
+      setAllCustomers(allCustomers.filter((c) => c.id !== customerToArchive.id));
+      setArchiveModalOpen(false);
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
       toast.error('Erro ao arquivar cliente');
@@ -115,7 +120,15 @@ function SearchCustomers() {
 
           {/* Resultados */}
           <div className="mt-6 space-y-4">
-            {customers.length === 0 && searchTerm && (
+            {loading ? (
+              // Mostra skeleton enquanto carrega
+              <>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <WorkflowSkeleton key={i} />
+                ))}
+              </>
+            ) : filteredCustomers.length === 0 && searchTerm ? (
+              // Nenhum resultado encontrado
               <div className="text-center py-12">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
                   <i className="fa-solid fa-magnifying-glass text-gray-400 text-2xl"></i>
@@ -123,13 +136,14 @@ function SearchCustomers() {
                 <p className="text-gray-600 font-medium">Nenhum cliente encontrado</p>
                 <p className="text-gray-500 text-sm mt-1">Tente buscar por outro modelo ou referência</p>
               </div>
+            ) : (
+              // Lista de clientes filtrados
+              filteredCustomers.map((customer, index) => (
+                <AnimatedListItem key={customer.id} index={index}>
+                  <WorkflowCard customer={customer} onSendMessage={handleWhatsApp} onArchive={handleArchiveClick} />
+                </AnimatedListItem>
+              ))
             )}
-
-            {customers.map((customer, index) => (
-              <AnimatedListItem key={customer.id} index={index}>
-                <WorkflowCard customer={customer} onSendMessage={handleWhatsApp} onArchive={handleArchiveClick} />
-              </AnimatedListItem>
-            ))}
           </div>
         </div>
       </AnimatedContainer>
