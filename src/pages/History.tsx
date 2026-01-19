@@ -7,11 +7,11 @@ import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { ConfirmModal, ArchiveModal } from '@/components/modals';
 import { TransferCard, ArchivedCard, FinalizedCard, LongWaitCard } from '@/components/history';
 import { AnimatePresence } from 'framer-motion';
-import { moveToReadyForPickup } from '@/services/customerActionService';
 import { useCustomerHistory } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 import { WorkflowSkeleton } from '@/components/skeletons';
-import { archiveCustomerById, deleteCustomerById, restoreCustomerById } from '@/repositories';
+import { archiveCustomerById, deleteCustomerById, restoreCustomerById, updateCustomer } from '@/repositories';
+import { getCurrentTimestamp } from '@/utils';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
 
@@ -140,7 +140,10 @@ function History() {
 
   const handleReadyForPickup = async (customer: Customer) => {
     try {
-      await moveToReadyForPickup(customer);
+      await updateCustomer(customer.id, {
+        status: 'readyForPickup',
+        contactedAt: getCurrentTimestamp(),
+      });
       toast.success(`${customer.name} movido para Pronto para Retirada!`);
       refresh();
     } catch (error) {

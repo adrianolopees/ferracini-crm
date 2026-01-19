@@ -5,20 +5,17 @@ import { PageLayout } from '@/components/ui';
 import { AnimatedContainer } from '@/components/animations';
 import { ActionCard, MetricCard, LongWaitAlert, TopProductsChart } from '@/components/dashboard';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';
-import {
-  checkStoreCampinas,
-  checkStoreDomPedro,
-  confirmStoreStock,
-  acceptTransfer,
-  rejectStoreStock,
-  productArrived,
-  declineTransfer,
-  completeOrder,
-  resetToInitial,
-} from '@/services/customerActionService';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
-import { sendGenericMessage } from '@/services/whatsappService';
+import {
+  notifyOtherStore,
+  notifyProductArrived,
+  sendGenericMessage,
+  sendStoreCampinas,
+  sendStoreDomPedro,
+} from '@/services/whatsappService';
 import { useCustomerDashboard } from '@/hooks';
+import { updateCustomer } from '@/repositories';
+import { getCurrentTimestamp } from '@/utils';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -27,6 +24,19 @@ function Dashboard() {
   const [modalType, setModalType] = useState<'awaiting' | 'awaitingTransfer' | 'readyForPickup' | null>(null);
   const [highlightedCustomerId, setHighlightedCustomerId] = useState<string | null>(null);
   const { metrics, lists, loading, refresh } = useCustomerDashboard();
+
+  const executeAction = async (action: () => Promise<void>, successMessage: string, customerId: string) => {
+    try {
+      await action();
+      toast.success(successMessage);
+      setHighlightedCustomerId(customerId);
+      refresh();
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
+    } catch (error) {
+      console.error('Erro na operação:', error);
+      toast.error('Error ao processar ação');
+    }
+  };
 
   const getCustomersByModalType = () => {
     if (!modalType) return [];
@@ -39,69 +49,64 @@ function Dashboard() {
   };
 
   const customers = getCustomersByModalType();
+
   const handleCheckStoreCampinas = async (customer: Customer) => {
-    try {
-      await checkStoreCampinas(customer);
-      toast('WhatsApp enviado para Loja Campinas');
-      setHighlightedCustomerId(customer.id);
-      refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
-    } catch (error) {
-      console.error('Erro ao atualizar cliente:', error);
-      toast.error('Erro ao consultar loja');
-    }
+    executeAction(
+      async () => {
+        await updateCustomer(customer.id, { consultingStore: 'Dom Pedro' });
+        sendStoreDomPedro(customer);
+      },
+      'WhatsApp enviado para Loja Dom Pedro',
+      customer.id
+    );
   };
 
   const handleCheckStoreDomPedro = async (customer: Customer) => {
-    try {
-      await checkStoreDomPedro(customer);
-      toast('WhatsApp enviado para Loja Dom Pedro');
-      setHighlightedCustomerId(customer.id);
-      refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
-    } catch (error) {
-      console.error('Erro ao atualizar cliente:', error);
-      toast.error('Erro ao consultar loja');
-    }
+    executeAction(
+      async () => {
+        await updateCustomer(customer.id, { consultingStore: 'Campinas' });
+        sendStoreCampinas(customer);
+      },
+      'WhatsApp enviado para Loja Campinas',
+      customer.id
+    );
   };
 
   const handleConfirmStoreStock = async (customer: Customer) => {
-    try {
-      await confirmStoreStock(customer);
-      setHighlightedCustomerId(customer.id);
-      refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
-    } catch (error) {
-      console.error('Erro ao atualizar cliente:', error);
-      toast.error('Erro ao notificar cliente');
-    }
+    executeAction(
+      async () => {
+        await updateCustomer(customer.id, { storeHasStock: true });
+        notifyOtherStore(customer);
+      },
+      'Cliente notificado sobre disponibilidade',
+      customer.id
+    );
   };
 
-  const handleRejectStoreStock = async (customer: Customer) => {
-    try {
-      await rejectStoreStock(customer);
-      toast('Produto não disponível. Pode consultar outra loja.');
-      setHighlightedCustomerId(customer.id);
-      refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
-    } catch (error) {
-      console.error('Erro ao atualizar cliente:', error);
-      toast.error('Erro ao atualizar status');
-    }
-  };
+  const handleRejectStoreStock = (customer: Customer) =>
+    executeAction(
+      () =>
+        updateCustomer(customer.id, {
+          consultingStore: undefined,
+          storeHasStock: false,
+        }),
+      'Produto não disponível. Pode consultar outra loja.',
+      customer.id
+    );
 
-  const handleAcceptTransfer = async (customer: Customer) => {
-    try {
-      await acceptTransfer(customer);
-      toast.success(`Transferência confirmada de ${customer.consultingStore}!`);
-      setHighlightedCustomerId(customer.id);
-      refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
-    } catch (error) {
-      console.error('Erro ao atualizar status:', error);
-      toast.error('Erro ao confirmar transferência');
-    }
-  };
+  const handleAcceptTransfer = (customer: Customer) =>
+    executeAction(
+      () =>
+        updateCustomer(customer.id, {
+          status: 'awaitingTransfer',
+          sourceStore: customer.consultingStore!,
+          transferredAt: getCurrentTimestamp(),
+          consultingStore: undefined,
+          storeHasStock: false,
+        }),
+      `Transferência confirmada de ${customer.consultingStore}!`,
+      customer.id
+    );
 
   const handleDeclineTransfer = (customer: Customer) => {
     setModalType(null);
@@ -113,7 +118,14 @@ function Dashboard() {
     if (!customerToArchive) return;
 
     try {
-      await declineTransfer(customerToArchive, reason, notes || '');
+      await updateCustomer(customerToArchive.id, {
+        consultingStore: undefined,
+        storeHasStock: false,
+        archived: true,
+        archiveReason: reason,
+        archivedAt: getCurrentTimestamp(),
+        notes: notes || '',
+      });
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
@@ -125,48 +137,51 @@ function Dashboard() {
   };
 
   const handleProductArrived = async (customer: Customer) => {
-    try {
-      await productArrived(customer);
-      setHighlightedCustomerId(customer.id);
-      refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
-    } catch (error) {
-      console.error('Erro ao atualizar status:', error);
-      toast.error('Erro ao atualizar status');
-    }
+    executeAction(
+      async () => {
+        await updateCustomer(customer.id, {
+          status: 'readyForPickup',
+          contactedAt: getCurrentTimestamp(),
+        });
+        notifyProductArrived(customer);
+      },
+      'Cliente notificado - produto chegou!',
+      customer.id
+    );
   };
 
   const handleCompleteOrder = async (customer: Customer) => {
-    try {
-      await completeOrder(customer);
-      toast.success(`Venda de ${customer.name} finalizada!`);
-      setHighlightedCustomerId(customer.id);
-      refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
-    } catch (error) {
-      console.error('Erro ao finalizar venda:', error);
-      toast.error('Erro ao finalizar venda');
-    }
+    executeAction(
+      () =>
+        updateCustomer(customer.id, {
+          status: 'completed',
+          completedAt: getCurrentTimestamp(),
+        }),
+      `Venda de ${customer.name} finalizada!`,
+      customer.id
+    );
   };
 
   const handleArchive = (customer: Customer) => {
     setModalType(null);
     setCustomerToArchive(customer);
     setArchiveModalOpen(true);
-    refresh();
   };
 
   const handleResetToInitial = async (customer: Customer) => {
-    try {
-      await resetToInitial(customer);
-      toast.success(`Cliente ${customer.name} voltou ao status inicial.`);
-      setHighlightedCustomerId(customer.id);
-      refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
-    } catch (error) {
-      console.error('Erro ao resetar cliente:', error);
-      toast.error('Erro ao resetar cliente');
-    }
+    executeAction(
+      () =>
+        updateCustomer(customer.id, {
+          consultingStore: undefined,
+          storeHasStock: false,
+          status: 'pending',
+          sourceStore: undefined,
+          transferredAt: undefined,
+          contactedAt: undefined,
+        }),
+      `Cliente ${customer.name} voltou ao status inicial.`,
+      customer.id
+    );
   };
 
   const handleViewLongWait = () => {
