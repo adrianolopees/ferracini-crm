@@ -34,7 +34,7 @@ function Dashboard() {
       setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro na operação:', error);
-      toast.error('Error ao processar ação');
+      toast.error('Erro ao processar ação');
     }
   };
 
@@ -50,18 +50,7 @@ function Dashboard() {
 
   const customers = getCustomersByModalType();
 
-  const handleCheckStoreCampinas = async (customer: Customer) => {
-    executeAction(
-      async () => {
-        await updateCustomer(customer.id, { consultingStore: 'Dom Pedro' });
-        sendStoreDomPedro(customer);
-      },
-      'WhatsApp enviado para Loja Dom Pedro',
-      customer.id
-    );
-  };
-
-  const handleCheckStoreDomPedro = async (customer: Customer) => {
+  const handleCheckStoreCampinas = (customer: Customer) => {
     executeAction(
       async () => {
         await updateCustomer(customer.id, { consultingStore: 'Campinas' });
@@ -72,7 +61,18 @@ function Dashboard() {
     );
   };
 
-  const handleConfirmStoreStock = async (customer: Customer) => {
+  const handleCheckStoreDomPedro = (customer: Customer) => {
+    executeAction(
+      async () => {
+        await updateCustomer(customer.id, { consultingStore: 'Dom Pedro' });
+        sendStoreDomPedro(customer);
+      },
+      'WhatsApp enviado para Loja Dom Pedro',
+      customer.id
+    );
+  };
+
+  const handleConfirmStoreStock = (customer: Customer) =>
     executeAction(
       async () => {
         await updateCustomer(customer.id, { storeHasStock: true });
@@ -81,7 +81,6 @@ function Dashboard() {
       'Cliente notificado sobre disponibilidade',
       customer.id
     );
-  };
 
   const handleRejectStoreStock = (customer: Customer) =>
     executeAction(
@@ -136,7 +135,7 @@ function Dashboard() {
     }
   };
 
-  const handleProductArrived = async (customer: Customer) => {
+  const handleProductArrived = (customer: Customer) =>
     executeAction(
       async () => {
         await updateCustomer(customer.id, {
@@ -148,9 +147,8 @@ function Dashboard() {
       'Cliente notificado - produto chegou!',
       customer.id
     );
-  };
 
-  const handleCompleteOrder = async (customer: Customer) => {
+  const handleCompleteOrder = (customer: Customer) =>
     executeAction(
       () =>
         updateCustomer(customer.id, {
@@ -160,7 +158,6 @@ function Dashboard() {
       `Venda de ${customer.name} finalizada!`,
       customer.id
     );
-  };
 
   const handleArchive = (customer: Customer) => {
     setModalType(null);
@@ -168,7 +165,7 @@ function Dashboard() {
     setArchiveModalOpen(true);
   };
 
-  const handleResetToInitial = async (customer: Customer) => {
+  const handleResetToInitial = (customer: Customer) =>
     executeAction(
       () =>
         updateCustomer(customer.id, {
@@ -182,7 +179,6 @@ function Dashboard() {
       `Cliente ${customer.name} voltou ao status inicial.`,
       customer.id
     );
-  };
 
   const handleViewLongWait = () => {
     navigate('/history?tab=long_wait');

@@ -10,7 +10,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useCustomerHistory } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 import { WorkflowSkeleton } from '@/components/skeletons';
-import { archiveCustomerById, deleteCustomerById, restoreCustomerById, updateCustomer } from '@/repositories';
+import { deleteCustomerById, updateCustomer } from '@/repositories';
 import { getCurrentTimestamp } from '@/utils';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
@@ -104,7 +104,14 @@ function History() {
 
   const handleRestore = async (customer: Customer) => {
     try {
-      await restoreCustomerById(customer.id);
+      await updateCustomer(customer.id, {
+        archived: false,
+        archiveReason: undefined,
+        archivedAt: undefined,
+        notes: undefined,
+        status: 'readyForPickup',
+        contactedAt: getCurrentTimestamp(),
+      });
       toast.success(`${customer.name} restaurado para clientes ativos!`);
       refresh();
     } catch (error) {
@@ -161,7 +168,12 @@ function History() {
     if (!customerToArchive) return;
 
     try {
-      await archiveCustomerById(customerToArchive.id, reason, notes || '');
+      await updateCustomer(customerToArchive.id, {
+        archived: true,
+        archiveReason: reason,
+        archivedAt: getCurrentTimestamp(),
+        notes: notes || '',
+      });
       toast.success(`${customerToArchive.name} arquivado com sucesso!`);
       setArchiveModalOpen(false);
       setCustomerToArchive(null);
