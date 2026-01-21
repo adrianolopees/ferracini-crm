@@ -36,15 +36,8 @@ export const CustomerSchema = z
 
     status: CustomerStatusSchema.default('pending'),
 
-    // sourceStore: define origem do produto
-    // - undefined: ainda não definido (pending inicial)
-    // - 'Campinas'/'Dom Pedro': transferência aceita
-    // - 'Jundiaí': reposição local
     sourceStore: SourceStoreSchema.optional(),
 
-    // ==========================================
-    // CONSULTA TEMPORÁRIA (durante workflow)
-    // ==========================================
     consultingStore: ConsultingStoreSchema.optional(),
     storeHasStock: z.boolean().optional(),
 

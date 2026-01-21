@@ -1,7 +1,6 @@
 import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting } from '@/utils';
 
-// Constantes de negócio centralizadas
 export const LONG_WAIT_DAYS = 30;
 export const URGENT_DAYS = 14;
 
