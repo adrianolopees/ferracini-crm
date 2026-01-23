@@ -26,7 +26,7 @@ export async function getStoreSettings(workspaceId: string): Promise<StoreSettin
   return result.success ? result.data : null;
 }
 
-export async function addStore(workspaceId: string, newStore: CreateStore): Promise<Store> {
+export async function createStore(workspaceId: string, newStore: CreateStore): Promise<Store> {
   const validatedStore = CreateStoreSchema.parse(newStore);
 
   const currentSettings = await getStoreSettings(workspaceId);
@@ -51,7 +51,7 @@ export async function addStore(workspaceId: string, newStore: CreateStore): Prom
   return store;
 }
 
-export async function updateStore(workspaceId: string, storeId: string, updates: UpdateStore): Promise<void> {
+export async function saveStore(workspaceId: string, storeId: string, updates: UpdateStore): Promise<void> {
   const validatedUpdates = UpdateStoreSchema.parse(updates);
 
   const currentSettings = await getStoreSettings(workspaceId);
@@ -79,7 +79,7 @@ export async function updateStore(workspaceId: string, storeId: string, updates:
   });
 }
 
-export async function removeStore(workspaceId: string, storeId: string) {
+export async function deleteStore(workspaceId: string, storeId: string) {
   const currentSettings = await getStoreSettings(workspaceId);
   if (!currentSettings) {
     return null;
