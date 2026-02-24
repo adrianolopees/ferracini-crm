@@ -1,5 +1,5 @@
 import { db } from '@/services/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import {
   StoreSettings,
   Store,
@@ -12,6 +12,30 @@ import {
 import { getCurrentTimestamp } from '@/utils';
 
 const COLLECTION_NAME = 'workspace_settings';
+
+/**
+ * Listener em tempo real para mudanças nas configurações
+ * Retorna função de unsubscribe
+ */
+export function onStoreSettingsChange(
+  workspaceId: string,
+  callback: (settings: StoreSettings | null) => void
+): () => void {
+  const docRef = doc(db, COLLECTION_NAME, workspaceId);
+
+  const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    if (!docSnap.exists()) {
+      callback(null);
+      return;
+    }
+
+    const data = docSnap.data();
+    const result = StoreSettingsSchema.safeParse(data);
+    callback(result.success ? result.data : null);
+  });
+
+  return unsubscribe;
+}
 
 export async function getStoreSettings(workspaceId: string): Promise<StoreSettings | null> {
   const docRef = doc(db, COLLECTION_NAME, workspaceId);

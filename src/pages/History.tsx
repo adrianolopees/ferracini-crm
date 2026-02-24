@@ -7,7 +7,7 @@ import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { ConfirmModal, ArchiveModal } from '@/components/modals';
 import { TransferCard, ArchivedCard, FinalizedCard, LongWaitCard } from '@/components/history';
 import { AnimatePresence } from 'framer-motion';
-import { useCustomerHistory } from '@/hooks';
+import { useCustomerHistory, useStoreSettings } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 import { WorkflowSkeleton } from '@/components/skeletons';
 import { deleteCustomerById, updateCustomer } from '@/repositories';
@@ -21,30 +21,25 @@ type FilterButtonProps = {
   count: number;
   isActive: boolean;
   onClick: () => void;
-  colorScheme: {
-    active: string;
-    inactive: string;
-    icon: string;
-    text: string;
-  };
+  color: string;
 };
 
-function FilterButton({ label, icon, count, isActive, onClick, colorScheme }: FilterButtonProps) {
+function FilterButton({ label, icon, count, isActive, onClick, color }: FilterButtonProps) {
   return (
     <button
       onClick={onClick}
+      style={isActive ? { backgroundColor: color, borderColor: color } : { borderColor: `${color}40` }}
       className={`rounded-lg p-2 sm:p-2.5 border shadow-sm transition-all cursor-pointer ${
-        isActive
-          ? `${colorScheme.active} shadow-md scale-105`
-          : `bg-white ${colorScheme.inactive} hover:border-${colorScheme.text.split('-')[1]}-400`
+        isActive ? 'shadow-md scale-105' : 'bg-white hover:opacity-80'
       }`}
     >
       <div className="flex items-center justify-center sm:justify-start gap-1.5 mb-1">
-        <i className={`${icon} text-xs ${isActive ? 'text-white' : colorScheme.icon}`}></i>
+        <i className={`${icon} text-xs`} style={{ color: isActive ? 'white' : color }}></i>
         <span className={`text-xs font-medium truncate ${isActive ? 'text-white' : 'text-gray-600'}`}>{label}</span>
       </div>
       <div
-        className={`text-lg sm:text-xl font-bold text-center sm:text-left ${isActive ? 'text-white' : colorScheme.text}`}
+        className="text-lg sm:text-xl font-bold text-center sm:text-left"
+        style={{ color: isActive ? 'white' : color }}
       >
         {count}
       </div>
@@ -57,7 +52,7 @@ function History() {
   const tabParam = searchParams.get('tab') as TabType | null;
   const [activeTab, setActiveTab] = useState<TabType>(tabParam || 'transfers');
   const [searchTerm, setSearchTerm] = useState('');
-  const [transferFilter, setTransferFilter] = useState<'all' | 'Campinas' | 'Dom Pedro'>('all');
+  const [transferFilter, setTransferFilter] = useState<string>('all');
 
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
@@ -65,6 +60,7 @@ function History() {
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
   const { lists, refresh, loading } = useCustomerHistory();
+  const { defaultStore, transferStores } = useStoreSettings();
 
   useEffect(() => {
     refresh();
@@ -141,7 +137,7 @@ function History() {
   };
 
   const handleContact = (customer: Customer) => {
-    sendGenericMessage(customer);
+    sendGenericMessage(customer, defaultStore?.name || 'Loja');
     toast.success(`WhatsApp aberto para ${customer.name}`);
   };
 
@@ -211,44 +207,26 @@ function History() {
     },
   ];
 
-  const filterButtons = [
-    {
-      value: 'all' as const,
-      label: 'Total',
-      icon: 'fa-solid fa-chart-line',
-      count: lists.transfer.length,
-      colorScheme: {
-        active: 'bg-emerald-500 border-emerald-600',
-        inactive: 'border-emerald-200',
-        icon: 'text-emerald-500',
-        text: 'text-emerald-600',
+  // Gera filtros dinâmicos baseado nas lojas configuradas
+  const filterButtons = useMemo(() => {
+    const buttons = [
+      {
+        value: 'all',
+        label: 'Total',
+        icon: 'fa-solid fa-chart-line',
+        count: lists.transfer.length,
+        color: '#10b981', // emerald-500
       },
-    },
-    {
-      value: 'Campinas' as const,
-      label: 'Campinas',
-      icon: 'fa-solid fa-store',
-      count: lists.transfer.filter((c) => c.sourceStore === 'Campinas').length,
-      colorScheme: {
-        active: 'bg-blue-500 border-blue-600',
-        inactive: 'border-blue-200',
-        icon: 'text-blue-500',
-        text: 'text-blue-600',
-      },
-    },
-    {
-      value: 'Dom Pedro' as const,
-      label: 'Dom Pedro',
-      icon: 'fa-solid fa-store',
-      count: lists.transfer.filter((c) => c.sourceStore === 'Dom Pedro').length,
-      colorScheme: {
-        active: 'bg-purple-500 border-purple-600',
-        inactive: 'border-purple-200',
-        icon: 'text-purple-500',
-        text: 'text-purple-600',
-      },
-    },
-  ];
+      ...transferStores.map((store) => ({
+        value: store.name,
+        label: store.name,
+        icon: 'fa-solid fa-store',
+        count: lists.transfer.filter((c) => c.sourceStore === store.name).length,
+        color: store.color,
+      })),
+    ];
+    return buttons;
+  }, [lists.transfer, transferStores]);
 
   const emptyStateConfig: Record<TabType, { icon: string; message: string }> = {
     finalized: {
@@ -298,11 +276,17 @@ function History() {
                   <h3 className="text-sm font-semibold text-gray-800">Filtros de Transferências</h3>
                 </div>
 
-                <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                <div
+                  className="grid gap-2 sm:gap-3"
+                  style={{ gridTemplateColumns: `repeat(${Math.min(filterButtons.length, 4)}, 1fr)` }}
+                >
                   {filterButtons.map((filter) => (
                     <FilterButton
                       key={filter.value}
-                      {...filter}
+                      label={filter.label}
+                      icon={filter.icon}
+                      count={filter.count}
+                      color={filter.color}
                       isActive={transferFilter === filter.value}
                       onClick={() => setTransferFilter(filter.value)}
                     />

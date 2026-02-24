@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Customer } from '@/schemas/customerSchema';
+import { Store } from '@/schemas/storeSettingsSchema';
 import { getTimeAgo } from '@/utils';
 import { getCustomerStatus } from '@/utils';
 import { Button } from '@/components/ui';
@@ -10,12 +11,14 @@ interface WorkflowCardProps {
   showActions?: boolean;
   isHighlighted?: boolean;
 
+  // Lojas de transferência (dinâmicas)
+  transferStores?: Store[];
+  onCheckStore?: (customer: Customer, store: Store) => void;
+
   onSendMessage?: (customer: Customer) => void;
   onArchive?: (customer: Customer) => void;
   onResetToInitial?: (customer: Customer) => void;
 
-  checkStoreCampinas?: (customer: Customer) => void;
-  checkStoreDomPedro?: (customer: Customer) => void;
   productArrived?: (customer: Customer) => void;
   completeOrder?: (customer: Customer) => void;
   confirmStoreStock?: (customer: Customer) => void;
@@ -28,11 +31,11 @@ function WorkflowCard({
   customer,
   showActions = true,
   isHighlighted = false,
+  transferStores = [],
+  onCheckStore,
   onSendMessage,
   onArchive,
   onResetToInitial,
-  checkStoreCampinas,
-  checkStoreDomPedro,
   productArrived,
   completeOrder,
   confirmStoreStock,
@@ -207,34 +210,22 @@ function WorkflowCard({
         {/* STATE 1: Initial - Choose Store */}
         {(!customer.status || customer.status === 'pending') &&
           !customer.consultingStore &&
-          !customer.storeHasStock && (
-            <>
-              {checkStoreCampinas && (
-                <Button
-                  onClick={() => checkStoreCampinas(customer)}
-                  variant="blue"
-                  size="xs"
-                  withRing={false}
-                  title="Consultar disponibilidade no Campinas Shopping"
-                >
-                  <i className="fa-solid fa-store pr-1.5"></i>
-                  <span>Campinas</span>
-                </Button>
-              )}
-              {checkStoreDomPedro && (
-                <Button
-                  onClick={() => checkStoreDomPedro(customer)}
-                  variant="purple"
-                  size="xs"
-                  withRing={false}
-                  title="Consultar disponibilidade no Dom Pedro"
-                >
-                  <i className="fa-solid fa-store pr-1.5"></i>
-                  <span>Dom Pedro</span>
-                </Button>
-              )}
-            </>
-          )}
+          !customer.storeHasStock &&
+          onCheckStore &&
+          transferStores.map((store) => (
+            <Button
+              key={store.id}
+              onClick={() => onCheckStore(customer, store)}
+              size="xs"
+              withRing={false}
+              title={`Consultar disponibilidade em ${store.name}`}
+              style={{ backgroundColor: store.color }}
+              className="text-white hover:opacity-90"
+            >
+              <i className="fa-solid fa-store pr-1.5"></i>
+              <span>{store.name}</span>
+            </Button>
+          ))}
 
         {/* STATE 2: Waiting for Store Response */}
         {(!customer.status || customer.status === 'pending') && customer.consultingStore && !customer.storeHasStock && (

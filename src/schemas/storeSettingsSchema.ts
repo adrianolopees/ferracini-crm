@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { WorkspaceSchema } from './userSchema';
 import { Timestamp } from 'firebase/firestore';
 
-const SP_PHONE_REGEX = /^\(1[1-9]\)\s?9[0-9]{4}-[0-9]{4}$/;
+const BR_PHONE_REGEX = /^\([1-9][0-9]\)\s?9[0-9]{4}-[0-9]{4}$/;
 const HEX_COLOR_REGEX = /^#[0-9A-Fa-f]{6}$/;
 
 export const StoreSchema = z.object({
@@ -31,7 +31,7 @@ export type StoreSettings = z.infer<typeof StoreSettingsSchema>;
 
 export const StoreInputSchema = z.object({
   name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres'),
-  phone: z.string().regex(SP_PHONE_REGEX, 'Telefone deve estar no formato (11) 98888-8888'),
+  phone: z.string().regex(BR_PHONE_REGEX, 'Telefone deve estar no formato (XX) 9XXXX-XXXX'),
   color: z.string().regex(HEX_COLOR_REGEX, 'Cor deve ser hexadecimal'),
 });
 export type StoreInput = z.infer<typeof StoreInputSchema>;

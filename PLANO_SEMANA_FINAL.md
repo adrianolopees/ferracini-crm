@@ -650,11 +650,34 @@ yarn seed:stores
 
 ---
 
-## 📅 QUARTA-FEIRA: Hook e Settings UI
+## 📅 QUARTA-FEIRA: Hook e Settings Modal
 
 ### ⏰ Tempo: 4-5 horas
 
-### 🎓 Aprendizado: Custom hooks, useEffect, Formulários React
+### 🎓 Aprendizado: Custom hooks, useEffect, Reutilização de componentes, State lifting
+
+### 🎯 Mudança de Abordagem
+
+**Antes (página separada):**
+- Criar `/settings` como nova página
+- Adicionar rota no App.tsx
+- Usuário precisa navegar para outra tela
+
+**Agora (modal reutilizável):**
+- Reaproveitar `DialogModal` que já existe
+- Adicionar ícone de engrenagem no Navbar
+- Modal abre sobreposto à tela atual
+- Mais simples e melhor UX!
+
+**Vantagens:**
+| Aspecto | Página | Modal |
+|---------|--------|-------|
+| Código | Nova rota + página | Reutiliza DialogModal |
+| UX | Sai do contexto | Fica sobreposto |
+| Acesso | Precisa navegar | Sempre visível |
+| Complexidade | Maior | Menor |
+
+---
 
 ### ✅ Tarefas:
 
@@ -674,7 +697,7 @@ import {
 } from '../repositories/storeSettingsRepository';
 
 export function useStoreSettings() {
-  const { workspaceId, user } = useAuth();
+  const { workspaceId } = useAuth();
   const [settings, setSettings] = useState<StoreSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -690,34 +713,31 @@ export function useStoreSettings() {
     setLoading(true);
     setError(null);
 
-    // Listener
+    // Listener - atualiza automaticamente quando dados mudam
     const unsubscribe = onStoreSettingsChange(workspaceId, (newSettings) => {
       setSettings(newSettings);
       setLoading(false);
     });
 
-    // Cleanup (IMPORTANTE!)
+    // Cleanup (IMPORTANTE!) - executa quando componente desmonta
     return () => {
       unsubscribe();
     };
   }, [workspaceId]);
 
-  // Derivar dados
+  // Derivar dados do state (não criar state duplicado!)
   const allStores = settings?.stores || [];
-  // Loja principal é identificada pelo workspaceId
   const defaultStore = allStores.find((s) => s.id === workspaceId) || null;
   const transferStores = allStores.filter((s) => s.id !== workspaceId);
 
   // Mutation: Atualizar loja
   const updateStore = async (storeId: string, updates: UpdateStore) => {
-    if (!workspaceId) {
-      throw new Error('Usuário não autenticado');
-    }
+    if (!workspaceId) throw new Error('Usuário não autenticado');
 
     try {
       setError(null);
       await updateStoreRepo(workspaceId, storeId, updates);
-      // onSnapshot atualiza automaticamente
+      // onSnapshot atualiza automaticamente - não precisa setSettings manual!
     } catch (err) {
       const error = err as Error;
       setError(error);
@@ -727,14 +747,11 @@ export function useStoreSettings() {
 
   // Mutation: Adicionar loja
   const addStore = async (newStore: CreateStore) => {
-    if (!workspaceId) {
-      throw new Error('Usuário não autenticado');
-    }
+    if (!workspaceId) throw new Error('Usuário não autenticado');
 
     try {
       setError(null);
-      const store = await addStoreRepo(workspaceId, newStore);
-      return store;
+      return await addStoreRepo(workspaceId, newStore);
     } catch (err) {
       const error = err as Error;
       setError(error);
@@ -744,9 +761,7 @@ export function useStoreSettings() {
 
   // Mutation: Remover loja
   const removeStore = async (storeId: string) => {
-    if (!workspaceId) {
-      throw new Error('Usuário não autenticado');
-    }
+    if (!workspaceId) throw new Error('Usuário não autenticado');
 
     try {
       setError(null);
@@ -758,16 +773,16 @@ export function useStoreSettings() {
     }
   };
 
-  // Utility: Buscar loja por nome (compatibilidade com sourceStore)
+  // Utility: Buscar loja por nome (compatibilidade com sourceStore existente)
   const getStoreByName = (name: string) => {
     return allStores.find((s) => s.name === name);
   };
 
   return {
     settings,
-    defaultStore, // Sua loja principal (identificada por workspaceId)
-    transferStores, // Lojas de origem de transferência
-    allStores, // Todas as lojas
+    defaultStore,    // Sua loja principal
+    transferStores,  // Lojas de origem de transferência
+    allStores,       // Todas as lojas
     loading,
     error,
     updateStore,
@@ -780,28 +795,29 @@ export function useStoreSettings() {
 
 **📚 O que você aprende:**
 
-- Custom hooks pattern
-- useEffect dependencies
-- Cleanup functions (return)
-- State derivation
-- Error handling
-- Async functions em hooks
+- **Custom hooks pattern**: função que começa com `use` e pode usar outros hooks
+- **useEffect dependencies**: `[workspaceId]` - re-executa quando muda
+- **Cleanup functions**: `return () => unsubscribe()` - evita memory leaks
+- **State derivation**: `defaultStore` é derivado de `settings`, não é um state separado
+- **Async functions em hooks**: mutations que retornam Promise
 
 ---
 
-#### 2. Criar Settings Page (1h30min)
+#### 2. Criar SettingsContent Component (1h)
+
+Este componente contém o **conteúdo** do modal. Separamos do modal para poder reutilizar.
 
 ```typescript
-// src/pages/Settings.tsx
+// src/components/settings/SettingsContent.tsx
 
 import { useState } from 'react';
-import { useStoreSettings } from '../hooks/useStoreSettings';
-import StoreCard from '../components/settings/StoreCard';
-import StoreForm from '../components/settings/StoreForm';
-import { CreateStore } from '../schemas/storeSettingsSchema';
+import { useStoreSettings } from '@/hooks/useStoreSettings';
+import StoreCard from './StoreCard';
+import StoreForm from './StoreForm';
+import { CreateStore } from '@/schemas/storeSettingsSchema';
 import { toast } from 'react-hot-toast';
 
-export default function Settings() {
+export default function SettingsContent() {
   const {
     defaultStore,
     transferStores,
@@ -816,41 +832,40 @@ export default function Settings() {
   const handleAddStore = async (data: CreateStore) => {
     try {
       await addStore(data);
-      toast.success('Loja adicionada com sucesso!');
+      toast.success('Loja adicionada!');
       setShowAddForm(false);
     } catch (error) {
       toast.error('Erro ao adicionar loja');
-      console.error(error);
     }
   };
 
+  // Estado de loading
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-gray-500 text-lg">Carregando configurações...</div>
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
+        <p className="mt-4 text-gray-500">Carregando configurações...</p>
       </div>
     );
   }
 
+  // Estado de erro
   if (!defaultStore) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-red-500 text-lg">
-          Erro: Configurações não encontradas
-        </div>
+      <div className="text-center py-12">
+        <i className="fa-solid fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+        <p className="text-red-500">Configurações não encontradas</p>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-8">Configurações de Lojas</h1>
-
+    <div className="space-y-6">
       {/* Loja Principal */}
-      <section className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <h2 className="text-2xl font-semibold">Minha Loja</h2>
-          <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <h3 className="text-lg font-semibold text-gray-800">Minha Loja</h3>
+          <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">
             Principal
           </span>
         </div>
@@ -863,24 +878,28 @@ export default function Settings() {
 
       {/* Lojas de Transferência */}
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-semibold">Lojas de Origem (Transferência)</h2>
-          <button
-            onClick={() => setShowAddForm(true)}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
-          >
-            + Adicionar Loja
-          </button>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold text-gray-800">
+            Lojas de Transferência
+          </h3>
+          {!showAddForm && (
+            <button
+              onClick={() => setShowAddForm(true)}
+              className="flex items-center gap-1 bg-green-500 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-green-600 transition cursor-pointer"
+            >
+              <i className="fa-solid fa-plus"></i>
+              Adicionar
+            </button>
+          )}
         </div>
 
-        <p className="text-gray-600 mb-6">
-          Configure as lojas de onde você recebe produtos por transferência.
-          Essas lojas aparecem nos botões de consulta.
+        <p className="text-gray-500 text-sm mb-4">
+          Lojas de onde você recebe produtos. Aparecem nos botões de consulta.
         </p>
 
         {/* Formulário Adicionar */}
         {showAddForm && (
-          <div className="mb-6">
+          <div className="mb-4">
             <StoreForm
               onSubmit={handleAddStore}
               onCancel={() => setShowAddForm(false)}
@@ -889,14 +908,15 @@ export default function Settings() {
         )}
 
         {/* Lista de lojas */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {transferStores.length === 0 ? (
-            <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-              <p className="text-gray-500">
-                Nenhuma loja de transferência configurada.
+            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
+              <i className="fa-solid fa-store text-3xl text-gray-300 mb-2"></i>
+              <p className="text-gray-500 text-sm">
+                Nenhuma loja de transferência
               </p>
-              <p className="text-gray-400 text-sm mt-2">
-                Adicione as lojas de onde você recebe produtos.
+              <p className="text-gray-400 text-xs mt-1">
+                Clique em "Adicionar" acima
               </p>
             </div>
           ) : (
@@ -906,10 +926,10 @@ export default function Settings() {
                 store={store}
                 onUpdate={(updates) => updateStore(store.id, updates)}
                 onDelete={() => {
-                  if (confirm(`Remover loja ${store.name}?`)) {
+                  if (confirm(`Remover loja "${store.name}"?`)) {
                     removeStore(store.id)
                       .then(() => toast.success('Loja removida'))
-                      .catch(() => toast.error('Erro ao remover loja'));
+                      .catch(() => toast.error('Erro ao remover'));
                   }
                 }}
                 canDelete={true}
@@ -925,24 +945,60 @@ export default function Settings() {
 
 **📚 O que você aprende:**
 
-- Composição de componentes
-- Conditional rendering
-- Event handlers
-- Toast notifications
-- Loading states
-- Error states
-- Confirm dialog
+- **Separação de responsabilidades**: Conteúdo separado do container (modal)
+- **Loading states com spinner**: CSS `animate-spin` do Tailwind
+- **Empty states**: UI quando não há dados
+- **Conditional rendering**: `showAddForm &&` para mostrar/esconder form
 
 ---
 
-#### 3. Criar StoreCard Component (1h)
+#### 3. Criar SettingsModal Component (30min)
+
+Este componente **reutiliza** o `DialogModal` existente e coloca o `SettingsContent` dentro.
+
+```typescript
+// src/components/settings/SettingsModal.tsx
+
+import DialogModal from '@/components/modals/DialogModal';
+import SettingsContent from './SettingsContent';
+
+interface SettingsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
+  return (
+    <DialogModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Configurações de Lojas"
+    >
+      <SettingsContent />
+    </DialogModal>
+  );
+}
+```
+
+**📚 O que você aprende:**
+
+- **Composição de componentes**: Modal genérico + conteúdo específico
+- **Props drilling**: `isOpen` e `onClose` vêm do pai (Navigation)
+- **Reutilização**: DialogModal pode ser usado para qualquer modal!
+
+---
+
+#### 4. Criar StoreCard Component (45min)
+
+Card que exibe uma loja. Alterna entre modo **visualização** e modo **edição**.
 
 ```typescript
 // src/components/settings/StoreCard.tsx
 
 import { useState } from 'react';
-import { Store, UpdateStore } from '../../schemas/storeSettingsSchema';
+import { Store, UpdateStore } from '@/schemas/storeSettingsSchema';
 import StoreForm from './StoreForm';
+import { toast } from 'react-hot-toast';
 
 interface StoreCardProps {
   store: Store;
@@ -960,10 +1016,16 @@ export default function StoreCard({
   const [isEditing, setIsEditing] = useState(false);
 
   const handleUpdate = async (updates: UpdateStore) => {
-    await onUpdate(updates);
-    setIsEditing(false);
+    try {
+      await onUpdate(updates);
+      toast.success('Loja atualizada!');
+      setIsEditing(false);
+    } catch {
+      toast.error('Erro ao atualizar');
+    }
   };
 
+  // Modo edição: mostra formulário
   if (isEditing) {
     return (
       <StoreForm
@@ -974,60 +1036,42 @@ export default function StoreCard({
     );
   }
 
+  // Modo visualização: mostra card
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          {/* Nome */}
-          <div className="mb-4">
-            <label className="text-sm text-gray-500 block mb-1">Nome da Loja</label>
-            <div className="text-xl font-semibold">{store.name}</div>
-          </div>
-
-          {/* Telefone */}
-          <div className="mb-4">
-            <label className="text-sm text-gray-500 block mb-1">Telefone</label>
-            <div className="text-lg">{store.phone}</div>
-          </div>
-
-          {/* Cor */}
+    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="flex items-center justify-between">
+        {/* Info da loja */}
+        <div className="flex items-center gap-3">
+          {/* Cor indicator */}
+          <div
+            className="w-10 h-10 rounded-lg shadow-sm flex-shrink-0"
+            style={{ backgroundColor: store.color }}
+          />
           <div>
-            <label className="text-sm text-gray-500 block mb-1">Cor</label>
-            <div className="flex items-center gap-3">
-              <div
-                className="w-12 h-12 rounded-lg border-2 border-gray-300 shadow-sm"
-                style={{ backgroundColor: store.color }}
-              />
-              <span className="text-lg font-mono">{store.color}</span>
-            </div>
+            <h4 className="font-semibold text-gray-800">{store.name}</h4>
+            <p className="text-sm text-gray-500">{store.phone}</p>
           </div>
         </div>
 
-        {/* Preview da cor em badge */}
-        <div
-          className="px-4 py-2 rounded-full text-white font-semibold shadow-sm"
-          style={{ backgroundColor: store.color }}
-        >
-          {store.name}
-        </div>
-      </div>
-
-      {/* Ações */}
-      <div className="flex gap-3 mt-6 pt-4 border-t border-gray-200">
-        <button
-          onClick={() => setIsEditing(true)}
-          className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
-        >
-          Editar
-        </button>
-        {canDelete && onDelete && (
+        {/* Ações */}
+        <div className="flex items-center gap-2">
           <button
-            onClick={onDelete}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+            onClick={() => setIsEditing(true)}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition cursor-pointer"
+            title="Editar"
           >
-            Remover
+            <i className="fa-solid fa-pen-to-square"></i>
           </button>
-        )}
+          {canDelete && onDelete && (
+            <button
+              onClick={onDelete}
+              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
+              title="Remover"
+            >
+              <i className="fa-solid fa-trash"></i>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -1036,20 +1080,23 @@ export default function StoreCard({
 
 **📚 O que você aprende:**
 
-- Component props typing
-- Conditional rendering (isEditing)
-- Inline styles (backgroundColor)
-- Optional props (onDelete?)
+- **State toggle**: `isEditing` alterna entre dois modos de exibição
+- **Conditional rendering**: `if (isEditing) return <Form />` antes do return principal
+- **Inline styles**: `style={{ backgroundColor: store.color }}`
+- **Optional props**: `onDelete?` pode ser undefined
+- **Guard clause**: `canDelete && onDelete &&` - só renderiza se ambos existem
 
 ---
 
-#### 4. Criar StoreForm Component (1h)
+#### 5. Criar StoreForm Component (45min)
+
+Formulário para criar/editar loja com validação Zod.
 
 ```typescript
 // src/components/settings/StoreForm.tsx
 
 import { useState, FormEvent } from 'react';
-import { Store, CreateStore, CreateStoreSchema } from '../../schemas/storeSettingsSchema';
+import { Store, CreateStore, CreateStoreSchema } from '@/schemas/storeSettingsSchema';
 
 interface StoreFormProps {
   initialData?: Store;
@@ -1062,6 +1109,7 @@ export default function StoreForm({
   onSubmit,
   onCancel,
 }: StoreFormProps) {
+  // Estado do formulário (objeto, não múltiplos useState!)
   const [formData, setFormData] = useState<CreateStore>({
     name: initialData?.name || '',
     phone: initialData?.phone || '',
@@ -1072,15 +1120,15 @@ export default function StoreForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault(); // Previne reload da página
     setErrors({});
     setIsSubmitting(true);
 
-    // Validar
+    // Validar com Zod
     const result = CreateStoreSchema.safeParse(formData);
 
     if (!result.success) {
-      // Converter erros do Zod
+      // Converter erros do Zod para objeto {campo: mensagem}
       const fieldErrors: Record<string, string> = {};
       result.error.errors.forEach((err) => {
         if (err.path[0]) {
@@ -1102,50 +1150,52 @@ export default function StoreForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
-      <h3 className="text-lg font-semibold mb-4">
+    <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-lg p-4">
+      <h4 className="font-semibold text-gray-800 mb-3">
         {initialData ? 'Editar Loja' : 'Nova Loja'}
-      </h3>
+      </h4>
 
-      {/* Nome */}
-      <div className="mb-4">
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-          Nome da Loja *
-        </label>
-        <input
-          id="name"
-          type="text"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Ex: Itu Shopping"
-        />
-        {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
-      </div>
+      {/* Grid 2 colunas no desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+        {/* Nome */}
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            Nome *
+          </label>
+          <input
+            id="name"
+            type="text"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            placeholder="Ex: Itu Shopping"
+          />
+          {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+        </div>
 
-      {/* Telefone */}
-      <div className="mb-4">
-        <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-          Telefone *
-        </label>
-        <input
-          id="phone"
-          type="tel"
-          value={formData.phone}
-          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="(11) 98765-4321"
-        />
-        {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-        <p className="text-gray-500 text-xs mt-1">Formato: (XX) 9XXXX-XXXX</p>
+        {/* Telefone */}
+        <div>
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            Telefone *
+          </label>
+          <input
+            id="phone"
+            type="tel"
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            placeholder="(11) 98765-4321"
+          />
+          {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+        </div>
       </div>
 
       {/* Cor */}
-      <div className="mb-6">
+      <div className="mb-4">
         <label htmlFor="color" className="block text-sm font-medium text-gray-700 mb-1">
           Cor *
         </label>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <input
             id="color"
             type="color"
@@ -1153,26 +1203,33 @@ export default function StoreForm({
             onChange={(e) =>
               setFormData({ ...formData, color: e.target.value.toUpperCase() })
             }
-            className="w-20 h-12 rounded cursor-pointer border-2 border-gray-300"
+            className="w-12 h-10 rounded cursor-pointer border border-gray-300"
           />
           <input
             type="text"
             value={formData.color}
             onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-mono"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm"
             placeholder="#3B82F6"
             maxLength={7}
           />
+          {/* Preview badge */}
+          <span
+            className="px-3 py-1 rounded-full text-white text-sm font-medium"
+            style={{ backgroundColor: formData.color }}
+          >
+            Preview
+          </span>
         </div>
-        {errors.color && <p className="text-red-500 text-sm mt-1">{errors.color}</p>}
+        {errors.color && <p className="text-red-500 text-xs mt-1">{errors.color}</p>}
       </div>
 
       {/* Botões */}
-      <div className="flex gap-3">
+      <div className="flex gap-2">
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+          className="flex-1 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition text-sm cursor-pointer"
         >
           {isSubmitting ? 'Salvando...' : 'Salvar'}
         </button>
@@ -1180,7 +1237,7 @@ export default function StoreForm({
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="flex-1 bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed transition"
+          className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed transition text-sm cursor-pointer"
         >
           Cancelar
         </button>
@@ -1192,120 +1249,219 @@ export default function StoreForm({
 
 **📚 O que você aprende:**
 
-- Controlled components
-- Form handling
-- Validação on submit
-- Color picker nativo HTML5
-- Disabled states
-- Error display
-- Spread operator para state updates
+- **Controlled components**: `value={formData.name}` + `onChange` - React controla o input
+- **Form object state**: Um objeto `formData` em vez de múltiplos `useState` - mais fácil validar
+- **Spread operator**: `{ ...formData, name: e.target.value }` - atualiza um campo mantendo os outros
+- **Color picker HTML5**: `<input type="color">` - nativo do browser
+- **Validação Zod on submit**: `safeParse` retorna `{success, data/error}`
+- **Disabled states**: `disabled={isSubmitting}` durante submit
 
 ---
 
-#### 5. Adicionar rota (15min)
+#### 6. Adicionar Engrenagem no Navigation (30min)
+
+Agora vamos modificar o `Navigation.tsx` para adicionar a engrenagem e controlar o modal.
 
 ```typescript
-// src/App.tsx
+// src/components/ui/Navigation.tsx
 
-import Settings from './pages/Settings';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks';
+import SettingsModal from '@/components/settings/SettingsModal';
 
-// Adicione a rota
-<Route path="/settings" element={<Settings />} />
+function Navigation() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { logout, displayName, workspaceId } = useAuth();
+
+  // NOVO: Estado para controlar o modal
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const isDashboard = location.pathname === '/dashboard';
+  const isRegister = location.pathname === '/register';
+  const isSearch = location.pathname === '/search';
+  const isHistory = location.pathname === '/history';
+
+  return (
+    <>
+      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Logo/Brand/User */}
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 ">
+                  Ferracini{' '}
+                  <span className={workspaceId === 'demo' ? 'text-amber-600' : 'text-blue-600'}>
+                    {displayName}
+                  </span>
+                </h2>
+              </div>
+            </div>
+
+            {/* Tabs for Navigation */}
+            <div className="flex justify-around sm:justify-center sm:space-x-1 bg-gray-100 rounded-t-lg sm:rounded-lg px-2 sm:px-1 py-1 sm:py-1 fixed sm:sticky sm:top-0 bottom-0 right-0 left-0 z-50 border-t sm:border-0 border-gray-200 shadow-lg sm:shadow-none">
+              {/* ... botões existentes ... */}
+            </div>
+
+            {/* NOVO: Engrenagem + Sair */}
+            <div className="flex items-center gap-1">
+              {/* Botão Engrenagem */}
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                className="inline-flex items-center px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                title="Configurações de Lojas"
+              >
+                <i className="fa-solid fa-gear text-lg"></i>
+                <span className="ml-2 hidden sm:inline">Config</span>
+              </button>
+
+              {/* Botão Sair (já existia) */}
+              <button
+                onClick={() => logout()}
+                className="inline-flex items-center px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                title="Sair do sistema"
+              >
+                <i className="fa-solid fa-person-walking-arrow-right text-lg"></i>
+                <span className="ml-2 hidden sm:inline">Sair</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* NOVO: Modal de Configurações */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
+    </>
+  );
+}
+
+export default Navigation;
+```
+
+**📚 O que você aprende:**
+
+- **State lifting**: O estado `isSettingsOpen` fica no Navigation (pai) e é passado para o Modal (filho)
+- **Fragment `<>`**: Quando componente precisa retornar múltiplos elementos sem wrapper div
+- **onClick handler**: `onClick={() => setIsSettingsOpen(true)}` - função arrow para não executar imediatamente
+- **Props callback**: `onClose={() => setIsSettingsOpen(false)}` - filho chama, pai atualiza
+
+---
+
+#### 7. Criar index.ts para exports (5min)
+
+```typescript
+// src/components/settings/index.ts
+
+export { default as SettingsModal } from './SettingsModal';
+export { default as SettingsContent } from './SettingsContent';
+export { default as StoreCard } from './StoreCard';
+export { default as StoreForm } from './StoreForm';
+```
+
+**📚 O que você aprende:**
+
+- **Barrel exports**: Arquivo index que re-exporta tudo da pasta
+- **Import simplificado**: `import { SettingsModal } from '@/components/settings'`
+
+---
+
+#### 8. Exportar hook (2min)
+
+```typescript
+// src/hooks/index.ts
+
+// Adicionar ao arquivo existente:
+export { useStoreSettings } from './useStoreSettings';
 ```
 
 ---
 
-#### 6. Atualizar APRENDIZADOS.md (15min)
+#### 9. Atualizar APRENDIZADOS.md (15min)
 
-````markdown
-# Dia 3: Hook e UI
+```markdown
+# Dia 3: Hook e Settings Modal
 
 ## Conceitos aprendidos:
 
-### 1. Custom Hooks
+### 1. Reutilização de Componentes
+- DialogModal é genérico → pode ser usado para qualquer modal
+- SettingsContent separado do modal → lógica isolada
+- Composição: Modal + Content = SettingsModal
 
-- Padrão: use + Nome
-- Encapsular lógica reutilizável
-- Pode usar outros hooks
-- Return object com estado e funções
+### 2. State Lifting
+- Estado `isSettingsOpen` fica no Navigation (pai)
+- Modal recebe via props
+- Filho chama `onClose()`, pai atualiza estado
 
-### 2. useEffect Cleanup
+### 3. Custom Hooks
+- Padrão: `use` + Nome
+- Encapsula lógica de dados
+- Retorna objeto com estado e funções
+- Pode usar outros hooks internamente
 
+### 4. useEffect Cleanup
 ```typescript
 useEffect(() => {
   const unsubscribe = onSnapshot(...);
   return () => unsubscribe();  // ← Cleanup!
 }, [deps]);
 ```
-````
+- Executa quando componente desmonta
+- Evita memory leaks
+- Importante para listeners real-time
 
-- Executado quando componente desmonta
-- Ou quando dependencies mudam
-- Importante para evitar memory leaks
+### 5. Formulários Controlados
+- `value` + `onChange` = React controla input
+- Estado objeto vs múltiplos useState
+- Spread operator para updates parciais
 
-### 3. State Derivation
+### 6. Conditional Rendering
+- `if (isEditing) return <Form />` - early return
+- `{showAddForm && <Form />}` - inline
+- `{canDelete && onDelete && <Button />}` - guard
 
-- Derivar dados de state existente
-- Não criar state duplicado
-- Melhor performance
+## Arquitetura criada:
 
-```typescript
-const defaultStore = stores.find(...);  // ← Derivado
+```
+Navigation.tsx (pai)
+  └── isSettingsOpen state
+  └── SettingsModal (filho)
+        └── DialogModal (reutilizado)
+              └── SettingsContent
+                    └── useStoreSettings hook
+                    └── StoreCard[]
+                          └── StoreForm (modo edição)
 ```
 
-### 4. Formulários Controlados
+## Diferença da abordagem anterior:
 
-- value + onChange
-- React controla o valor
-- Single source of truth
-
-```typescript
-<input
-  value={formData.name}
-  onChange={e => setFormData({...formData, name: e.target.value})}
-/>
+| Página /settings | Modal via engrenagem |
+|------------------|----------------------|
+| Nova rota | Sem rota nova |
+| Sai do contexto | Sobreposto à tela |
+| Menos reutilização | Usa DialogModal existente |
 ```
-
-### 5. Color Picker
-
-- `<input type="color">` nativo
-- Retorna hex em lowercase
-- .toUpperCase() para padronizar
-
-### 6. Validação on Submit
-
-- Usar schema.safeParse()
-- Converter erros para objeto
-- Exibir erros por campo
-
-```typescript
-if (!result.success) {
-  const errors = {};
-  result.error.errors.forEach((err) => {
-    errors[err.path[0]] = err.message;
-  });
-}
-```
-
-## Dúvidas:
-
-- [ ] Por que não usar useState para cada campo do form?
-      Resposta: Um objeto é mais fácil de passar e validar
-
-````
 
 ---
 
 ### 📦 Checklist do Dia 3:
-- [ ] Hook useStoreSettings criado
-- [ ] Settings page renderizando
-- [ ] StoreCard component funcional
-- [ ] StoreForm com validações
-- [ ] Rota /settings adicionada
+
+- [ ] Hook useStoreSettings criado e exportado
+- [ ] SettingsContent renderizando lojas
+- [ ] SettingsModal usando DialogModal
+- [ ] StoreCard com modo visualização/edição
+- [ ] StoreForm com validações Zod
+- [ ] Engrenagem adicionada no Navigation
+- [ ] Modal abre ao clicar na engrenagem
 - [ ] Consegue visualizar lojas
 - [ ] Consegue editar loja
 - [ ] Consegue adicionar loja
-- [ ] Consegue remover loja
+- [ ] Consegue remover loja (exceto principal)
 - [ ] Toast de feedback funciona
 - [ ] APRENDIZADOS.md atualizado
 

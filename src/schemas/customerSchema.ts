@@ -3,9 +3,9 @@ import { WorkspaceSchema } from './userSchema';
 
 export const CustomerStatusSchema = z.enum(['pending', 'awaitingTransfer', 'readyForPickup', 'completed']);
 
-export const SourceStoreSchema = z.enum(['Campinas', 'Dom Pedro', 'Jundiaí']);
+export const SourceStoreSchema = z.string().min(1);
 
-export const ConsultingStoreSchema = z.enum(['Campinas', 'Dom Pedro']);
+export const ConsultingStoreSchema = z.string().min(1);
 
 export const ArchiveReasonSchema = z.enum([
   'gave_up',

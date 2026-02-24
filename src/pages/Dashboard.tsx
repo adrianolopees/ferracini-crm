@@ -6,14 +6,9 @@ import { AnimatedContainer } from '@/components/animations';
 import { ActionCard, MetricCard, LongWaitAlert, TopProductsChart } from '@/components/dashboard';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
-import {
-  notifyOtherStore,
-  notifyProductArrived,
-  sendGenericMessage,
-  sendStoreCampinas,
-  sendStoreDomPedro,
-} from '@/services/whatsappService';
-import { useCustomerDashboard } from '@/hooks';
+import { Store } from '@/schemas/storeSettingsSchema';
+import { notifyOtherStore, notifyProductArrived, sendGenericMessage, sendToStore } from '@/services/whatsappService';
+import { useCustomerDashboard, useStoreSettings } from '@/hooks';
 import { updateCustomer } from '@/repositories';
 import { getCurrentTimestamp } from '@/utils';
 
@@ -24,6 +19,7 @@ function Dashboard() {
   const [modalType, setModalType] = useState<'awaiting' | 'awaitingTransfer' | 'readyForPickup' | null>(null);
   const [highlightedCustomerId, setHighlightedCustomerId] = useState<string | null>(null);
   const { metrics, lists, loading, refresh } = useCustomerDashboard();
+  const { defaultStore, transferStores } = useStoreSettings();
 
   const executeAction = async (action: () => Promise<void>, successMessage: string, customerId: string) => {
     try {
@@ -34,7 +30,8 @@ function Dashboard() {
       setTimeout(() => setHighlightedCustomerId(null), 5000);
     } catch (error) {
       console.error('Erro na operação:', error);
-      toast.error('Erro ao processar ação');
+      const message = error instanceof Error ? error.message : 'Erro ao processar ação';
+      toast.error(message);
     }
   };
 
@@ -50,24 +47,13 @@ function Dashboard() {
 
   const customers = getCustomersByModalType();
 
-  const handleCheckStoreCampinas = (customer: Customer) => {
+  const handleCheckStore = (customer: Customer, store: Store) => {
     executeAction(
       async () => {
-        await updateCustomer(customer.id, { consultingStore: 'Campinas' });
-        sendStoreCampinas(customer);
+        await updateCustomer(customer.id, { consultingStore: store.name });
+        sendToStore(customer, store);
       },
-      'WhatsApp enviado para Loja Campinas',
-      customer.id
-    );
-  };
-
-  const handleCheckStoreDomPedro = (customer: Customer) => {
-    executeAction(
-      async () => {
-        await updateCustomer(customer.id, { consultingStore: 'Dom Pedro' });
-        sendStoreDomPedro(customer);
-      },
-      'WhatsApp enviado para Loja Dom Pedro',
+      `WhatsApp enviado para ${store.name}`,
       customer.id
     );
   };
@@ -76,7 +62,7 @@ function Dashboard() {
     executeAction(
       async () => {
         await updateCustomer(customer.id, { storeHasStock: true });
-        notifyOtherStore(customer);
+        notifyOtherStore(customer, defaultStore?.name || 'Loja');
       },
       'Cliente notificado sobre disponibilidade',
       customer.id
@@ -142,7 +128,7 @@ function Dashboard() {
           status: 'readyForPickup',
           contactedAt: getCurrentTimestamp(),
         });
-        notifyProductArrived(customer);
+        notifyProductArrived(customer, defaultStore?.name || 'Loja');
       },
       'Cliente notificado - produto chegou!',
       customer.id
@@ -319,11 +305,11 @@ function Dashboard() {
         customers={customers}
         loading={loading}
         highlightedCustomerId={highlightedCustomerId}
-        onSendMessage={sendGenericMessage}
+        transferStores={transferStores}
+        onCheckStore={handleCheckStore}
+        onSendMessage={(customer) => sendGenericMessage(customer, defaultStore?.name || 'Loja')}
         onArchive={handleArchive}
         onResetToInitial={handleResetToInitial}
-        checkStoreCampinas={handleCheckStoreCampinas}
-        checkStoreDomPedro={handleCheckStoreDomPedro}
         productArrived={handleProductArrived}
         completeOrder={handleCompleteOrder}
         confirmStoreStock={handleConfirmStoreStock}

@@ -1,10 +1,14 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks';
+import { useState } from 'react';
+import { SettingsModal } from '../settings';
 
 function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, displayName, workspaceId } = useAuth();
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const isDashboard = location.pathname === '/dashboard';
   const isRegister = location.pathname === '/register';
@@ -15,14 +19,19 @@ function Navigation() {
     <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo/Brand/User */}
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 ">
-                Ferracini{' '}
-                <span className={workspaceId === 'demo' ? 'text-amber-600' : 'text-blue-600'}>{displayName}</span>
-              </h2>
-            </div>
+          {/* Logo/Brand + Config */}
+          <div className="flex items-center justify-center gap-1">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+              Ferracini{' '}
+              <span className={workspaceId === 'demo' ? 'text-amber-600' : 'text-blue-600'}>{displayName}</span>
+            </h2>
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="flex items-center justify-center p-1.5 text-gray-400 hover:text-blue-600 transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+              title="Configurações de Lojas"
+            >
+              <i className="fa-solid fa-gear text-sm leading-none"></i>
+            </button>
           </div>
 
           {/* Tabs for Navigation */}
@@ -67,18 +76,22 @@ function Navigation() {
               <span className="text-[10px] sm:text-sm">Histórico</span>
             </button>
           </div>
-
-          {/* Btn exit */}
-          <button
-            onClick={() => logout()}
-            className="inline-flex items-center px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
-            title="Sair do sistema"
-          >
-            <i className="fa-solid fa-person-walking-arrow-right text-lg"></i>
-            <span className="ml-2 hidden sm:inline">Sair</span>
-          </button>
+          {/* NOVO: Engrenagem + Sair */}
+          <div className="flex items-center gap-1">
+            {/* Btn exit */}
+            <button
+              onClick={() => logout()}
+              className="inline-flex items-center px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+              title="Sair do sistema"
+            >
+              <i className="fa-solid fa-person-walking-arrow-right text-lg"></i>
+              <span className="ml-2 hidden sm:inline">Sair</span>
+            </button>
+          </div>
         </div>
       </div>
+      {/* NOVO: Modal de Configurações */}
+      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }

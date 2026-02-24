@@ -20,5 +20,6 @@ export function maskPhone(value: string): string {
 
 /** @example clearNumber('(11) 98765-4321') // "11987654321" */
 export function clearNumber(value: string): string {
+  if (!value) return '';
   return value.replace(/\D/g, '');
 }

@@ -1,5 +1,6 @@
 import { DialogModal } from '@/components/modals';
 import { Customer } from '@/schemas/customerSchema';
+import { Store } from '@/schemas/storeSettingsSchema';
 import { AnimatedListItem } from '@/components/animations';
 import { WorkflowCard } from '@/components/dashboard';
 import { WorkflowSkeleton } from '../skeletons';
@@ -11,11 +12,14 @@ interface CustomerListModalProps {
   customers: Customer[];
   loading: boolean;
   highlightedCustomerId?: string | null;
+
+  // Lojas de transferência (dinâmicas)
+  transferStores?: Store[];
+  onCheckStore?: (customer: Customer, store: Store) => void;
+
   onSendMessage: (customer: Customer) => void;
   onArchive: (customer: Customer) => void;
   onResetToInitial?: (customer: Customer) => void;
-  checkStoreCampinas?: (customer: Customer) => void;
-  checkStoreDomPedro?: (customer: Customer) => void;
   productArrived?: (customer: Customer) => void;
   completeOrder?: (customer: Customer) => void;
   confirmStoreStock?: (customer: Customer) => void;
@@ -31,11 +35,11 @@ function CustomerListModal({
   customers,
   loading,
   highlightedCustomerId,
+  transferStores = [],
+  onCheckStore,
   onArchive,
   onSendMessage,
   onResetToInitial,
-  checkStoreCampinas,
-  checkStoreDomPedro,
   productArrived,
   completeOrder,
   confirmStoreStock,
@@ -66,11 +70,11 @@ function CustomerListModal({
                 <WorkflowCard
                   customer={customer}
                   isHighlighted={highlightedCustomerId === customer.id}
+                  transferStores={transferStores}
+                  onCheckStore={onCheckStore}
                   onSendMessage={onSendMessage}
                   onArchive={onArchive}
                   onResetToInitial={onResetToInitial}
-                  checkStoreCampinas={checkStoreCampinas}
-                  checkStoreDomPedro={checkStoreDomPedro}
                   confirmStoreStock={confirmStoreStock}
                   rejectStoreStock={rejectStoreStock}
                   acceptTransfer={acceptTransfer}
