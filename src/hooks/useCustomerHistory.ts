@@ -3,6 +3,7 @@ import { sortCustomerLists } from '@/utils';
 import { findCompletedCustomers, findArchivedCustomers, getAllCustomers } from '@/repositories';
 import { processCustomersForHistory, CustomerHistoryLists } from '@/services/customerMetricsService';
 import useAuth from './useAuth';
+import useStoreSettings from './useStoreSettings';
 
 interface CustomerHistory {
   lists: CustomerHistoryLists;
@@ -12,6 +13,7 @@ interface CustomerHistory {
 
 function useCustomerHistory(): CustomerHistory {
   const { workspaceId } = useAuth();
+  const { transferStores } = useStoreSettings();
   const [lists, setLists] = useState<CustomerHistoryLists>({
     finalized: [],
     transfer: [],
@@ -40,7 +42,7 @@ function useCustomerHistory(): CustomerHistory {
           getAllCustomers(workspaceId),
         ]);
 
-        const processed = processCustomersForHistory(allCustomers, completed, archived);
+        const processed = processCustomersForHistory(allCustomers, completed, archived, transferStores.map((s) => s.name));
 
         const sortedLists = sortCustomerLists(processed);
 

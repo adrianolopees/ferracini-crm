@@ -22,7 +22,7 @@ export function sendToStore(customer: Customer, store: Store) {
 /**
  * Notifica cliente que produto chegou (usa loja principal)
  */
-export function notifyProductArrived(customer: Customer, storeName: string) {
+export function notifyProductArrived(customer: Customer, storeName?: string) {
   const message = `Oi ${customer.name}! Ferracini ${storeName} aqui! O ${customer.model} que você procurava chegou! Está separado para você no caixa!`;
   openWhatsApp(customer.phone, message);
 }

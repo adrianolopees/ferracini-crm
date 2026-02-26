@@ -1,11 +1,15 @@
 import { Customer } from '@/schemas/customerSchema';
 import { formatDateTime, getDaysBetween } from '@/utils';
+import useStoreSettings from '@/hooks/useStoreSettings';
 
 interface HistoryCardProps {
   customer: Customer;
 }
 
 function HistoryCard({ customer }: HistoryCardProps) {
+  const { defaultStore, transferStores } = useStoreSettings();
+  const isDefaultStore = customer.sourceStore === defaultStore?.name;
+  const isTransferStore = transferStores.some((s) => s.name === customer.sourceStore);
   return (
     <div className="border-l-4 border-l-emerald-500 bg-emerald-50/50 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200">
       {/* Header : Name + Badge Total time*/}
@@ -68,13 +72,13 @@ function HistoryCard({ customer }: HistoryCardProps) {
           </div>
         )}
         {/* Badge de Origem */}
-        {customer.sourceStore === 'Jundiaí' ? (
+        {isDefaultStore ? (
           // Reposição Local
           <div className="inline-flex items-center gap-1.5 text-xs bg-emerald-100 px-2 py-1 rounded-full whitespace-nowrap">
             <i className="fa-solid fa-store text-[10px] text-gray-600"></i>
             <span className="font-medium text-gray-700">{customer.sourceStore}</span>
           </div>
-        ) : customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro' ? (
+        ) : isTransferStore ? (
           // Transferência de outra loja
           <div className="inline-flex items-center gap-1.5 text-xs bg-blue-100 px-2 py-1 rounded-full whitespace-nowrap">
             <i className="fa-solid fa-truck-fast text-[10px] text-gray-600"></i>

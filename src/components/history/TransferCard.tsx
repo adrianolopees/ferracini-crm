@@ -1,35 +1,22 @@
 import { Customer } from '@/schemas/customerSchema';
 import { formatDate, getDaysBetween } from '@/utils';
+import useStoreSettings from '@/hooks/useStoreSettings';
 
-const STORE_COLORS = {
-  Campinas: {
-    border: 'border-l-blue-500',
-    bg: 'bg-blue-50/30',
-    icon: 'text-blue-500',
-    storeBadge: 'bg-blue-500 text-white',
-    timeline: 'border-blue-200',
-  },
-  'Dom Pedro': {
-    border: 'border-l-purple-500',
-    bg: 'bg-purple-50/30',
-    icon: 'text-purple-500',
-    storeBadge: 'bg-purple-500 text-white',
-    timeline: 'border-purple-200',
-  },
-} as const;
-
-const getStoreColor = (storeName?: 'Campinas' | 'Dom Pedro' | 'Jundiaí' | null) => {
-  if (storeName === 'Campinas') return STORE_COLORS.Campinas;
-  if (storeName === 'Dom Pedro') return STORE_COLORS['Dom Pedro'];
-  return STORE_COLORS.Campinas;
-};
+const COLOR_PALETTE = [
+  { border: 'border-l-blue-500', bg: 'bg-blue-50/30', icon: 'text-blue-500', storeBadge: 'bg-blue-500 text-white', timeline: 'border-blue-200' },
+  { border: 'border-l-purple-500', bg: 'bg-purple-50/30', icon: 'text-purple-500', storeBadge: 'bg-purple-500 text-white', timeline: 'border-purple-200' },
+  { border: 'border-l-green-500', bg: 'bg-green-50/30', icon: 'text-green-500', storeBadge: 'bg-green-500 text-white', timeline: 'border-green-200' },
+  { border: 'border-l-orange-500', bg: 'bg-orange-50/30', icon: 'text-orange-500', storeBadge: 'bg-orange-500 text-white', timeline: 'border-orange-200' },
+];
 
 interface TransferCardProps {
   customer: Customer;
 }
 
 function TransferCard({ customer }: TransferCardProps) {
-  const storeColor = getStoreColor(customer.sourceStore);
+  const { transferStores } = useStoreSettings();
+  const storeIndex = transferStores.findIndex((s) => s.name === customer.sourceStore);
+  const storeColor = COLOR_PALETTE[storeIndex >= 0 ? storeIndex % COLOR_PALETTE.length : 0];
 
   return (
     <div

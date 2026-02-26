@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { PageLayout } from '@/components/ui';
+import { PageLayout } from '@/components/layout';
 import { AnimatedContainer } from '@/components/animations';
 import { ActionCard, MetricCard, LongWaitAlert, TopProductsChart } from '@/components/dashboard';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';

@@ -3,6 +3,7 @@ import { getAllCustomers } from '@/repositories';
 import { processCustomersForDashboard } from '@/services/customerMetricsService';
 import { sortCustomerLists } from '@/utils';
 import useAuth from './useAuth';
+import useStoreSettings from './useStoreSettings';
 import type { CustomerMetrics, CustomerLists } from '@/services/customerMetricsService';
 
 interface CustomerDashboard {
@@ -14,6 +15,7 @@ interface CustomerDashboard {
 
 function useCustomerDashboard(): CustomerDashboard {
   const { workspaceId } = useAuth();
+  const { transferStores } = useStoreSettings();
   const [data, setData] = useState<Omit<CustomerDashboard, 'loading' | 'refresh'>>({
     metrics: {
       totalActive: 0,
@@ -52,7 +54,7 @@ function useCustomerDashboard(): CustomerDashboard {
 
         const allCustomers = await getAllCustomers(workspaceId);
 
-        const { metrics, lists } = processCustomersForDashboard(allCustomers);
+        const { metrics, lists } = processCustomersForDashboard(allCustomers, transferStores.map((s) => s.name));
 
         const sortedLists = sortCustomerLists(lists);
 

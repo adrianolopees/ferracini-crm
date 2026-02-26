@@ -34,13 +34,13 @@ export interface CustomerHistoryLists extends Record<string, Customer[]> {
 /**
  * Processa lista de clientes e calcula métricas + listas categorizadas
  */
-export function processCustomersForDashboard(customers: Customer[]): {
+export function processCustomersForDashboard(customers: Customer[], transferStoreNames: string[]): {
   metrics: CustomerMetrics;
   lists: CustomerLists;
 } {
   const processed = customers.reduce<{ metrics: CustomerMetrics; lists: CustomerLists; totalDays: number }>(
     (acc, customer) => {
-      const isTransferred = customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro';
+      const isTransferred = transferStoreNames.includes(customer.sourceStore ?? '');
       if (isTransferred) {
         acc.lists.transfer.push(customer);
       }
@@ -130,12 +130,13 @@ export function processCustomersForDashboard(customers: Customer[]): {
 export function processCustomersForHistory(
   allCustomers: Customer[],
   completed: Customer[],
-  archived: Customer[]
+  archived: Customer[],
+  transferStoreNames: string[]
 ): CustomerHistoryLists {
   const processed = allCustomers.reduce<CustomerHistoryLists>(
     (acc, customer) => {
       const isTransferred =
-        (customer.sourceStore === 'Campinas' || customer.sourceStore === 'Dom Pedro') &&
+        transferStoreNames.includes(customer.sourceStore ?? '') &&
         customer.status !== 'awaitingTransfer';
 
       if (isTransferred) {

@@ -5,12 +5,13 @@ import { createCustomer } from '@/repositories';
 import { registerCustomerSchema, FormData } from '@/schemas/registerSchema';
 import { getCurrentTimestamp, getFirebaseErrorMessage, maskPhone } from '@/utils';
 import toast from 'react-hot-toast';
-import { Input, Select, Button, Spinner, PageLayout } from '@/components/ui';
+import { Input, Select, Button, Spinner } from '@/components/ui';
+import { PageLayout } from '@/components/layout';
 import { AnimatedContainer } from '@/components/animations';
-import { useAuth } from '@/hooks'; // ← NOVO IMPORT
+import { useAuth } from '@/hooks';
 
 function RegisterCustomer() {
-  const { workspaceId } = useAuth(); // ← NOVO: buscar workspaceId
+  const { workspaceId } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
