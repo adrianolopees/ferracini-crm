@@ -3,7 +3,7 @@ import useAuth from '@/hooks/useAuth';
 import { StoreSettings, Store, UpdateStore, CreateStore } from '@/schemas/storeSettingsSchema';
 import { onStoreSettingsChange, createStore, saveStore, deleteStore } from '@/repositories/storeSettingsRepository';
 
-interface StoreSettingsContextType {
+export interface StoreSettingsContextType {
   settings: StoreSettings | null;
   defaultStore: Store | null;
   transferStores: Store[];
@@ -24,7 +24,6 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    console.log('useEffect chamado montado pro worspaceId:', workspaceId);
     if (!workspaceId) {
       setSettings(null);
       setLoading(false);
@@ -35,7 +34,6 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
     setError(null);
 
     const unsubscribe = onStoreSettingsChange(workspaceId, (newSettings) => {
-      console.log('listener acionado e configuraçoes setadas:', newSettings);
       setSettings(newSettings);
       setLoading(false);
     });

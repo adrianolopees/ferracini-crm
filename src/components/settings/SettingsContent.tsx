@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useStoreSettings } from '@/hooks/useStoreSettings';
+import useStoreSettings from '@/hooks/useStoreSettings';
 import StoreCard from './StoreCard';
 import StoreForm from './StoreForm';
 import { CreateStore } from '@/schemas/storeSettingsSchema';
