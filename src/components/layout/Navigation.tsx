@@ -25,13 +25,6 @@ function Navigation() {
               Ferracini{' '}
               <span className={workspaceId === 'demo' ? 'text-amber-600' : 'text-blue-600'}>{displayName}</span>
             </h2>
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center justify-center p-1.5 text-gray-400 hover:text-blue-600 transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
-              title="Configurações de Lojas"
-            >
-              <i className="fa-solid fa-gear text-sm leading-none"></i>
-            </button>
           </div>
 
           {/* Tabs for Navigation */}
@@ -77,15 +70,21 @@ function Navigation() {
             </button>
           </div>
           {/* NOVO: Engrenagem + Sair */}
+
           <div className="flex items-center gap-1">
-            {/* Btn exit */}
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="flex items-center justify-center p-2 text-gray-500 hover:text-blue-600 transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+              title="Configurações de Lojas"
+            >
+              <i className="fa-solid fa-gear text-base"></i>
+            </button>
             <button
               onClick={() => logout()}
-              className="inline-flex items-center px-2 sm:px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+              className="flex items-center justify-center p-2 text-gray-500 hover:text-red-600 transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
               title="Sair do sistema"
             >
-              <i className="fa-solid fa-person-walking-arrow-right text-lg"></i>
-              <span className="ml-2 hidden sm:inline">Sair</span>
+              <i className="fa-solid fa-right-from-bracket text-base"></i>
             </button>
           </div>
         </div>
