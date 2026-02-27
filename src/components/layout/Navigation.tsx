@@ -69,8 +69,8 @@ function Navigation() {
               <span className="text-[10px] sm:text-sm">Histórico</span>
             </button>
           </div>
-          {/* NOVO: Engrenagem + Sair */}
 
+          {/* Engrenagem + Sair */}
           <div className="flex items-center gap-1">
             <button
               onClick={() => setIsSettingsOpen(true)}
@@ -89,7 +89,7 @@ function Navigation() {
           </div>
         </div>
       </div>
-      {/* NOVO: Modal de Configurações */}
+      {/* Modal de Configurações */}
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );

@@ -13,11 +13,11 @@ function DialogModal({ isOpen, onClose, title, children }: DialogModalProps) {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
         <Dialog.Content
-          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 w-[90vw] max-w-3xl max-h-[85vh] overflow-hidden z-50"
+          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-xl p-6 w-[90vw] max-w-3xl max-h-[85vh] overflow-hidden z-50 flex flex-col"
           onInteractOutside={(e) => e.preventDefault()}
           aria-describedby={undefined}
         >
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4 flex-shrink-0">
             <Dialog.Title className="text-xl font-semibold text-gray-900">{title}</Dialog.Title>
             <button
               onClick={onClose}
@@ -27,7 +27,7 @@ function DialogModal({ isOpen, onClose, title, children }: DialogModalProps) {
               <i className="fa-solid fa-xmark text-2xl"></i>
             </button>
           </div>
-          <div className="overflow-y-auto">{children}</div>
+          <div className="overflow-y-auto flex-1">{children}</div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
