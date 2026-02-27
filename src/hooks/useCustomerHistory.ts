@@ -42,7 +42,12 @@ function useCustomerHistory(): CustomerHistory {
           getAllCustomers(workspaceId),
         ]);
 
-        const processed = processCustomersForHistory(allCustomers, completed, archived, transferStores.map((s) => s.name));
+        const processed = processCustomersForHistory(
+          allCustomers,
+          completed,
+          archived,
+          transferStores.map((s) => s.name)
+        );
 
         const sortedLists = sortCustomerLists(processed);
 
@@ -55,7 +60,7 @@ function useCustomerHistory(): CustomerHistory {
     };
 
     fetchCustomerHistory();
-  }, [refreshTrigger, workspaceId]);
+  }, [refreshTrigger, workspaceId, transferStores]);
 
   return {
     lists,
