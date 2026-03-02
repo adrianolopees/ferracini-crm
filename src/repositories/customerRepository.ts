@@ -1,4 +1,15 @@
-import { collection, getDocs, doc, updateDoc, deleteDoc, addDoc, query, where, deleteField } from 'firebase/firestore';
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  query,
+  where,
+  deleteField,
+  orderBy,
+} from 'firebase/firestore';
 import { db } from '@/services/firebase';
 import { CustomerSchema, FirebaseCustomerSchema, Customer } from '@/schemas/customerSchema';
 import { WorkspaceId } from '@/schemas/userSchema';
@@ -16,7 +27,11 @@ const COLLECTION_NAME = 'customers';
  * Isso garante que você NUNCA veja dados de outro workspace
  */
 export async function getAllCustomers(workspaceId: WorkspaceId): Promise<Customer[]> {
-  const q = query(collection(db, COLLECTION_NAME), where('workspaceId', '==', workspaceId));
+  const q = query(
+    collection(db, COLLECTION_NAME),
+    where('workspaceId', '==', workspaceId),
+    orderBy('createdAt', 'desc')
+  );
   const snapshot = await getDocs(q);
   return snapshot.docs
     .map((doc) => {

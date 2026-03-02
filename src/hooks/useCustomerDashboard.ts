@@ -54,7 +54,10 @@ function useCustomerDashboard(): CustomerDashboard {
 
         const allCustomers = await getAllCustomers(workspaceId);
 
-        const { metrics, lists } = processCustomersForDashboard(allCustomers, transferStores.map((s) => s.name));
+        const { metrics, lists } = processCustomersForDashboard(
+          allCustomers,
+          transferStores.map((s) => s.name)
+        );
 
         const sortedLists = sortCustomerLists(lists);
 
@@ -69,7 +72,7 @@ function useCustomerDashboard(): CustomerDashboard {
       }
     };
     fetchCustomerDashboard();
-  }, [refreshTrigger, workspaceId]);
+  }, [refreshTrigger, workspaceId, transferStores]);
 
   return {
     ...data,
