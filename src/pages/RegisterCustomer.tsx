@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createCustomer } from '@/repositories';
@@ -12,6 +13,7 @@ import { useAuth } from '@/hooks';
 
 function RegisterCustomer() {
   const { workspaceId } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
 
@@ -46,7 +48,7 @@ function RegisterCustomer() {
     }
 
     try {
-      await toast.promise(
+      const newId = await toast.promise(
         createCustomer(
           {
             ...data,
@@ -65,6 +67,7 @@ function RegisterCustomer() {
         }
       );
       reset();
+      navigate('/dashboard', { state: { openModal: 'awaiting', customerId: newId } });
     } catch (error) {
       const message = getFirebaseErrorMessage(error);
       setErrorMessage(message);
@@ -176,10 +179,7 @@ function RegisterCustomer() {
           <div className="pt-4">
             <Button type="submit" disabled={isLoading} fullWidth={true} className="flex justify-center items-center">
               {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Spinner size="sm" />
-                  Salvando...
-                </span>
+                <Spinner size="sm" color="white" />
               ) : (
                 <span className="flex items-center justify-center gap-2 ">
                   <i className="fa-solid fa-bookmark"></i>

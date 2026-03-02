@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { PageLayout } from '@/components/layout';
 import { AnimatedContainer } from '@/components/animations';
@@ -14,12 +14,22 @@ import { getCurrentTimestamp } from '@/utils';
 
 function Dashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [archiveModalOpen, setArchiveModalOpen] = useState(false);
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [modalType, setModalType] = useState<'awaiting' | 'awaitingTransfer' | 'readyForPickup' | null>(null);
   const [highlightedCustomerId, setHighlightedCustomerId] = useState<string | null>(null);
   const { metrics, lists, loading, refresh } = useCustomerDashboard();
   const { defaultStore, transferStores } = useStoreSettings();
+
+  useEffect(() => {
+    if (location.state) {
+      const { openModal, customerId } = location.state;
+      setModalType(openModal);
+      setHighlightedCustomerId(customerId);
+      setTimeout(() => setHighlightedCustomerId(null), 5000);
+    }
+  }, [location.state]);
 
   const executeAction = async (action: () => Promise<void>, successMessage: string, customerId: string) => {
     try {
