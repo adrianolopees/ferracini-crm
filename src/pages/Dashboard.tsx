@@ -27,7 +27,7 @@ function Dashboard() {
       const { openModal, customerId } = location.state;
       setModalType(openModal);
       setHighlightedCustomerId(customerId);
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
+      setTimeout(() => setHighlightedCustomerId(null), 3000);
     }
   }, [location.state]);
 
@@ -37,7 +37,7 @@ function Dashboard() {
       toast.success(successMessage);
       setHighlightedCustomerId(customerId);
       refresh();
-      setTimeout(() => setHighlightedCustomerId(null), 5000);
+      setTimeout(() => setHighlightedCustomerId(null), 3000);
     } catch (error) {
       console.error('Erro na operação:', error);
       const message = error instanceof Error ? error.message : 'Erro ao processar ação';

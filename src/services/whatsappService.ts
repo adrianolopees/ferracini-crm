@@ -15,7 +15,7 @@ export function sendToStore(customer: Customer, store: Store) {
   if (!store.phone) {
     throw new Error(`Telefone não configurado para a loja ${store.name}`);
   }
-  const message = `Oi! Tudo bem? Vocês têm o ${customer.model}, ref ${customer.reference} número ${customer.size}, ${customer.color}?`;
+  const message = `Vocês têm o ${customer.model}, ref ${customer.reference} número ${customer.size}, ${customer.color}?`;
   openWhatsApp(store.phone, message);
 }
 
@@ -23,7 +23,7 @@ export function sendToStore(customer: Customer, store: Store) {
  * Notifica cliente que produto chegou (usa loja principal)
  */
 export function notifyProductArrived(customer: Customer, storeName?: string) {
-  const message = `Oi ${customer.name}! Ferracini ${storeName} aqui! O ${customer.model} que você procurava chegou! Está separado para você no caixa!`;
+  const message = `Oi ${customer.name}! Aqui é a Ferracini ${storeName}! O modelo que você procurava chegou!Quer que a gente separe pra voce?`;
   openWhatsApp(customer.phone, message);
 }
 
