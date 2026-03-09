@@ -18,7 +18,7 @@ export function sortByDaysWaiting<T extends { createdAt: string }>(list: T[]): T
       item,
       days: getDaysWaiting(item.createdAt),
     }))
-    .sort((a, b) => b.days - a.days)
+    .sort((a, b) => new Date(b.item.createdAt).getTime() - new Date(a.item.createdAt).getTime())
     .map(({ item }) => item);
 }
 
