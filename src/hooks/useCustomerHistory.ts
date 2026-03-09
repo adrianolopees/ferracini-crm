@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import { sortCustomerLists } from '@/utils';
 import { findCompletedCustomers, findArchivedCustomers, getAllCustomers } from '@/repositories';
 import { processCustomersForHistory, CustomerHistoryLists } from '@/services/customerMetricsService';
 import useAuth from './useAuth';
@@ -49,9 +48,7 @@ function useCustomerHistory(): CustomerHistory {
           transferStores.map((s) => s.name)
         );
 
-        const sortedLists = sortCustomerLists(processed);
-
-        setLists(sortedLists);
+        setLists(processed);
       } catch (error) {
         console.error('Erro ao buscar dados do histórico:', error);
       } finally {

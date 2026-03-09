@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAllCustomers } from '@/repositories';
 import { processCustomersForDashboard } from '@/services/customerMetricsService';
-import { sortCustomerLists } from '@/utils';
 import useAuth from './useAuth';
 import useStoreSettings from './useStoreSettings';
 import type { CustomerMetrics, CustomerLists } from '@/services/customerMetricsService';
@@ -59,11 +58,9 @@ function useCustomerDashboard(): CustomerDashboard {
           transferStores.map((s) => s.name)
         );
 
-        const sortedLists = sortCustomerLists(lists);
-
         setData({
           metrics,
-          lists: sortedLists,
+          lists,
         });
       } catch (error) {
         console.error('Erro ao buscar dados:', error);

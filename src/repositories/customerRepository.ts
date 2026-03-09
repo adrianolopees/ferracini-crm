@@ -91,7 +91,8 @@ export async function findArchivedCustomers(workspaceId: WorkspaceId): Promise<C
   const q = query(
     collection(db, COLLECTION_NAME),
     where('workspaceId', '==', workspaceId),
-    where('archived', '==', true)
+    where('archived', '==', true),
+    orderBy('createdAt', 'desc')
   );
   const snapshot = await getDocs(q);
 
@@ -107,7 +108,8 @@ export async function findCompletedCustomers(workspaceId: WorkspaceId): Promise<
   const q = query(
     collection(db, COLLECTION_NAME),
     where('workspaceId', '==', workspaceId),
-    where('status', '==', 'completed')
+    where('status', '==', 'completed'),
+    orderBy('createdAt', 'desc')
   );
   const snapshot = await getDocs(q);
 
