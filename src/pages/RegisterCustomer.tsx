@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createCustomer } from '@/repositories';
 import { registerCustomerSchema, FormData } from '@/schemas/registerSchema';
 import { getCurrentTimestamp, getFirebaseErrorMessage, maskPhone } from '@/utils';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { Input, Select, Button, Spinner } from '@/components/ui';
 import { PageLayout } from '@/components/layout';
 import { AnimatedContainer } from '@/components/animations';
@@ -48,24 +48,24 @@ function RegisterCustomer() {
     }
 
     try {
-      const newId = await toast.promise(
-        createCustomer(
-          {
-            ...data,
-            reference: data.reference.toLowerCase(),
-            model: data.model.toLowerCase(),
-            createdAt: getCurrentTimestamp(),
-            archived: false,
-            status: 'pending',
-          },
-          workspaceId
-        ),
+      const promise = createCustomer(
         {
-          loading: 'Salvando cliente...',
-          success: 'Cliente registrado!',
-          error: 'Erro ao salvar!',
-        }
+          ...data,
+          reference: data.reference.toLowerCase(),
+          model: data.model.toLowerCase(),
+          createdAt: getCurrentTimestamp(),
+          archived: false,
+          status: 'pending',
+        },
+        workspaceId
       );
+      toast.promise(promise, {
+        loading: 'Salvando cliente...',
+        success: 'Cliente registrado!',
+        error: 'Erro ao salvar!',
+      });
+
+      const newId = await promise;
       reset();
       navigate('/dashboard', { state: { openModal: 'awaiting', customerId: newId } });
     } catch (error) {

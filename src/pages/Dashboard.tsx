@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { PageLayout } from '@/components/layout';
 import { AnimatedContainer } from '@/components/animations';
 import { ActionCard, MetricCard, LongWaitAlert, TopProductsChart } from '@/components/dashboard';

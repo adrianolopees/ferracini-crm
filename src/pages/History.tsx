@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { Input, Tabs } from '@/components/ui';
 import { PageLayout } from '@/components/layout';

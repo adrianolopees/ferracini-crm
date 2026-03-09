@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Store, UpdateStore } from '@/schemas/storeSettingsSchema';
 import StoreForm from './StoreForm';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface StoreCardProps {
   store: Store;

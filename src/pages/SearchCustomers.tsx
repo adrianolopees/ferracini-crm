@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, useEffect, useMemo } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { updateCustomer, getAllCustomers } from '@/repositories';
 import { notifyProductArrived } from '@/services/whatsappService';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';

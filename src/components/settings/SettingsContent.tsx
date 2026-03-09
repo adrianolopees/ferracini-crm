@@ -3,7 +3,7 @@ import useStoreSettings from '@/hooks/useStoreSettings';
 import StoreCard from './StoreCard';
 import StoreForm from './StoreForm';
 import { CreateStore } from '@/schemas/storeSettingsSchema';
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 import { Spinner, Button } from '@/components/ui';
 
 export default function SettingsContent() {
