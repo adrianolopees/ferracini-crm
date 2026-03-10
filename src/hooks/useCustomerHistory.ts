@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAllCustomers } from '@/repositories';
 import { processCustomersForHistory, CustomerHistoryLists } from '@/services/customerMetricsService';
 import useAuth from './useAuth';
@@ -13,12 +13,7 @@ interface CustomerHistory {
 function useCustomerHistory(): CustomerHistory {
   const { workspaceId } = useAuth();
   const { transferStores } = useStoreSettings();
-  const [lists, setLists] = useState<CustomerHistoryLists>({
-    finalized: [],
-    transfer: [],
-    archived: [],
-    longWait: [],
-  });
+  const [allCustomers, setAllCustomers] = useState<Awaited<ReturnType<typeof getAllCustomers>>>([]);
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
@@ -34,14 +29,8 @@ function useCustomerHistory(): CustomerHistory {
       }
       try {
         setLoading(true);
-        const allCustomers = await getAllCustomers(workspaceId);
-
-        const processedCustomer = processCustomersForHistory(
-          allCustomers,
-          transferStores.map((s) => s.name)
-        );
-
-        setLists(processedCustomer);
+        const customers = await getAllCustomers(workspaceId);
+        setAllCustomers(customers);
       } catch (error) {
         console.error('Erro ao buscar dados do histórico:', error);
       } finally {
@@ -50,7 +39,12 @@ function useCustomerHistory(): CustomerHistory {
     };
 
     fetchCustomerHistory();
-  }, [refreshTrigger, workspaceId, transferStores]);
+  }, [refreshTrigger, workspaceId]);
+
+  const lists = useMemo<CustomerHistoryLists>(
+    () => processCustomersForHistory(allCustomers, transferStores.map((s) => s.name)),
+    [allCustomers, transferStores]
+  );
 
   return {
     lists,

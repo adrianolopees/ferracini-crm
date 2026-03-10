@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { StoreSettings, Store, UpdateStore, CreateStore } from '@/schemas/storeSettingsSchema';
 import { onStoreSettingsChange, createStore, saveStore, deleteStore } from '@/repositories/storeSettingsRepository';
@@ -40,9 +40,9 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, [workspaceId]);
 
-  const allStores = settings?.stores || [];
-  const defaultStore = allStores.find((s) => s.id === workspaceId) || null;
-  const transferStores = allStores.filter((s) => s.id !== workspaceId);
+  const allStores = useMemo(() => settings?.stores || [], [settings]);
+  const defaultStore = useMemo(() => allStores.find((s) => s.id === workspaceId) || null, [allStores, workspaceId]);
+  const transferStores = useMemo(() => allStores.filter((s) => s.id !== workspaceId), [allStores, workspaceId]);
 
   const getWorkspaceId = (): string => {
     if (!workspaceId) throw new Error('Usuário não autenticado');

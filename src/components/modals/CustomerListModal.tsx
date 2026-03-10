@@ -13,7 +13,6 @@ interface CustomerListModalProps {
   loading: boolean;
   highlightedCustomerId?: string | null;
 
-  // Lojas de transferência (dinâmicas)
   transferStores?: Store[];
   onCheckStore?: (customer: Customer, store: Store) => void;
 

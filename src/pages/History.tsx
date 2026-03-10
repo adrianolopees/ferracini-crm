@@ -64,10 +64,6 @@ function History() {
   const { defaultStore, transferStores } = useStoreSettings();
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  useEffect(() => {
     setSearchTerm('');
     setTransferFilter('all');
   }, [activeTab]);
