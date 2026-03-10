@@ -31,10 +31,10 @@ export interface CustomerHistoryLists extends Record<string, Customer[]> {
   longWait: Customer[];
 }
 
-/**
- * Processa lista de clientes e calcula métricas + listas categorizadas
- */
-export function processCustomersForDashboard(customers: Customer[], transferStoreNames: string[]): {
+export function processCustomersForDashboard(
+  customers: Customer[],
+  transferStoreNames: string[]
+): {
   metrics: CustomerMetrics;
   lists: CustomerLists;
 } {
@@ -124,23 +124,25 @@ export function processCustomersForDashboard(customers: Customer[], transferStor
   };
 }
 
-/**
- * Processa clientes para histórico
- */
 export function processCustomersForHistory(
   allCustomers: Customer[],
-  completed: Customer[],
-  archived: Customer[],
   transferStoreNames: string[]
 ): CustomerHistoryLists {
-  const processed = allCustomers.reduce<CustomerHistoryLists>(
+  return allCustomers.reduce<CustomerHistoryLists>(
     (acc, customer) => {
       const isTransferred =
-        transferStoreNames.includes(customer.sourceStore ?? '') &&
-        customer.status !== 'awaitingTransfer';
+        transferStoreNames.includes(customer.sourceStore ?? '') && customer.status !== 'awaitingTransfer';
 
       if (isTransferred) {
         acc.transfer.push(customer);
+      }
+
+      if (customer.status === 'completed' && !customer.archived) {
+        acc.finalized.push(customer);
+      }
+
+      if (customer.archived) {
+        acc.archived.push(customer);
       }
 
       if (!customer.archived && customer.status !== 'completed') {
@@ -151,13 +153,6 @@ export function processCustomersForHistory(
       }
       return acc;
     },
-    {
-      finalized: completed,
-      transfer: [],
-      archived: archived,
-      longWait: [],
-    }
+    { finalized: [], transfer: [], archived: [], longWait: [] }
   );
-
-  return processed;
 }

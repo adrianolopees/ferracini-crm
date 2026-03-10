@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { findCompletedCustomers, findArchivedCustomers, getAllCustomers } from '@/repositories';
+import { getAllCustomers } from '@/repositories';
 import { processCustomersForHistory, CustomerHistoryLists } from '@/services/customerMetricsService';
 import useAuth from './useAuth';
 import useStoreSettings from './useStoreSettings';
@@ -34,21 +34,14 @@ function useCustomerHistory(): CustomerHistory {
       }
       try {
         setLoading(true);
+        const allCustomers = await getAllCustomers(workspaceId);
 
-        const [completed, archived, allCustomers] = await Promise.all([
-          findCompletedCustomers(workspaceId),
-          findArchivedCustomers(workspaceId),
-          getAllCustomers(workspaceId),
-        ]);
-
-        const processed = processCustomersForHistory(
+        const processedCustomer = processCustomersForHistory(
           allCustomers,
-          completed,
-          archived,
           transferStores.map((s) => s.name)
         );
 
-        setLists(processed);
+        setLists(processedCustomer);
       } catch (error) {
         console.error('Erro ao buscar dados do histórico:', error);
       } finally {
