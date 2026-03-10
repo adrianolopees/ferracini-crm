@@ -1,9 +1,6 @@
 import { Customer } from '@/schemas/customerSchema';
 import { getDaysWaiting } from '@/utils';
 
-export const LONG_WAIT_DAYS = 30;
-export const URGENT_DAYS = 14;
-
 export interface CustomerMetrics {
   totalActive: number;
   totalReadyForPickup: number;
@@ -29,7 +26,12 @@ export interface CustomerHistoryLists extends Record<string, Customer[]> {
   transfer: Customer[];
   archived: Customer[];
   longWait: Customer[];
+  toAutoArchive: Customer[];
 }
+
+export const LONG_WAIT_DAYS = 30;
+export const URGENT_DAYS = 14;
+export const AUTO_ARCHIVE_DAYS = 60;
 
 export function processCustomersForDashboard(
   customers: Customer[],
@@ -147,13 +149,15 @@ export function processCustomersForHistory(
 
       if (!customer.archived && customer.status !== 'completed') {
         const daysWaiting = getDaysWaiting(customer.createdAt);
-        if (daysWaiting >= LONG_WAIT_DAYS) {
+        if (daysWaiting >= AUTO_ARCHIVE_DAYS) {
+          acc.toAutoArchive.push(customer);
+        } else if (daysWaiting >= LONG_WAIT_DAYS) {
           acc.longWait.push(customer);
         }
       }
       return acc;
     },
-    { finalized: [], transfer: [], archived: [], longWait: [] }
+    { finalized: [], transfer: [], archived: [], longWait: [], toAutoArchive: [] }
   );
 
   return {
@@ -167,5 +171,9 @@ export function processCustomersForHistory(
       (a, b) => new Date(b.archivedAt ?? b.createdAt).getTime() - new Date(a.archivedAt ?? a.createdAt).getTime()
     ),
     longWait: processed.longWait,
+
+    toAutoArchive: processed.toAutoArchive.sort(
+      (a, b) => new Date(b.archivedAt ?? b.createdAt).getTime() - new Date(a.archivedAt ?? a.createdAt).getTime()
+    ),
   };
 }

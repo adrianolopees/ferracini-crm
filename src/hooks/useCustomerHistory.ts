@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { getAllCustomers } from '@/repositories';
+import { getAllCustomers, updateCustomer } from '@/repositories';
+import { getCurrentTimestamp } from '@/utils';
 import { processCustomersForHistory, CustomerHistoryLists } from '@/services/customerMetricsService';
 import useAuth from './useAuth';
 import useStoreSettings from './useStoreSettings';
@@ -41,13 +42,37 @@ function useCustomerHistory(): CustomerHistory {
     fetchCustomerHistory();
   }, [refreshTrigger, workspaceId]);
 
-  const lists = useMemo<CustomerHistoryLists>(
-    () => processCustomersForHistory(allCustomers, transferStores.map((s) => s.name)),
+  const processed = useMemo<CustomerHistoryLists>(
+    () =>
+      processCustomersForHistory(
+        allCustomers,
+        transferStores.map((s) => s.name)
+      ),
     [allCustomers, transferStores]
   );
 
+  useEffect(() => {
+    if (processed.toAutoArchive.length === 0) return;
+
+    const archiveExceeded = async () => {
+      await Promise.all(
+        processed.toAutoArchive.map((customer) =>
+          updateCustomer(customer.id, {
+            archived: true,
+            archiveReason: 'exceeded_wait_time',
+            archivedAt: getCurrentTimestamp(),
+            notes: 'Arquivado automaticamente por exceder 60 dias de espera',
+          })
+        )
+      );
+      setRefreshTrigger((prev) => prev + 1); // força nova busca com dados atualizados
+    };
+
+    archiveExceeded();
+  }, [processed.toAutoArchive]);
+
   return {
-    lists,
+    lists: processed,
     loading,
     refresh,
   };
