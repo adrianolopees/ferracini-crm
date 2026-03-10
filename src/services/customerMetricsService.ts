@@ -128,7 +128,7 @@ export function processCustomersForHistory(
   allCustomers: Customer[],
   transferStoreNames: string[]
 ): CustomerHistoryLists {
-  return allCustomers.reduce<CustomerHistoryLists>(
+  const processed = allCustomers.reduce<CustomerHistoryLists>(
     (acc, customer) => {
       const isTransferred =
         transferStoreNames.includes(customer.sourceStore ?? '') && customer.status !== 'awaitingTransfer';
@@ -155,4 +155,17 @@ export function processCustomersForHistory(
     },
     { finalized: [], transfer: [], archived: [], longWait: [] }
   );
+
+  return {
+    finalized: processed.finalized.sort(
+      (a, b) => new Date(b.completedAt ?? b.createdAt).getTime() - new Date(a.completedAt ?? a.createdAt).getTime()
+    ),
+    transfer: processed.transfer.sort(
+      (a, b) => new Date(b.transferredAt ?? b.createdAt).getTime() - new Date(a.transferredAt ?? a.createdAt).getTime()
+    ),
+    archived: processed.archived.sort(
+      (a, b) => new Date(b.archivedAt ?? b.createdAt).getTime() - new Date(a.archivedAt ?? a.createdAt).getTime()
+    ),
+    longWait: processed.longWait,
+  };
 }
