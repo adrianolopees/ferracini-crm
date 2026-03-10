@@ -29,7 +29,7 @@ function TransferCard({ customer }: TransferCardProps) {
         {/* Source Store */}
         <span className="inline-flex items-center gap-1 text-xs font-semibold bg-[var(--store-color)] text-white px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
           <i className="fa-solid fa-location-dot text-[10px]"></i>
-          {customer.sourceStore || 'N/A'}
+          {customer.sourceStore}
         </span>
       </div>
 

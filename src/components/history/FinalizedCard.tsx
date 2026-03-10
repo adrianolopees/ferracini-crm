@@ -66,24 +66,16 @@ function HistoryCard({ customer }: HistoryCardProps) {
         )}
         {/* Badge de Origem */}
         {isDefaultStore ? (
-          // Reposição Local
           <div className="inline-flex items-center gap-1.5 text-xs bg-emerald-100 px-2 py-1 rounded-full whitespace-nowrap">
             <i className="fa-solid fa-store text-[10px] text-gray-600"></i>
             <span className="font-medium text-gray-700">{customer.sourceStore}</span>
           </div>
         ) : isTransferStore ? (
-          // Transferência de outra loja
           <div className="inline-flex items-center gap-1.5 text-xs bg-blue-100 px-2 py-1 rounded-full whitespace-nowrap">
             <i className="fa-solid fa-truck-fast text-[10px] text-gray-600"></i>
             <span className="font-medium text-gray-700">{customer.sourceStore}</span>
           </div>
-        ) : (
-          // Sem origem definida (clientes antigos)
-          <div className="inline-flex items-center gap-1.5 text-xs text-amber-600">
-            <i className="fa-solid fa-triangle-exclamation text-[10px]"></i>
-            <span className="font-medium">Adicionar origem</span>
-          </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
