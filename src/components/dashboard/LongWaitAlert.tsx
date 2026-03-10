@@ -11,24 +11,24 @@ function LongWaitAlert({ count, loading, onClick }: LongWaitAlertProps) {
 
   return (
     <AnimatedContainer type="slideDown" delay={0.4}>
-      <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg shadow-md">
+      <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg shadow-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <i className="fa-solid fa-clock text-yellow-600 text-xl mr-3"></i>
+            <i className="fa-solid fa-clock text-red-600 text-xl mr-3"></i>
             <div>
-              <p className="text-sm font-medium text-yellow-800">
+              <p className="text-sm font-medium text-red-800">
                 {count} cliente{count > 1 ? 's' : ''} estão aguardando +30 dias
               </p>
-              <p className="text-xs text-yellow-700 mt-1 hidden md:flex">
+              <p className="text-xs text-red-700 mt-1 hidden md:flex">
                 {count > 1 ? 'Todos foram movidos' : 'Foi movido'} automaticamente para Histórico → +30 dias
               </p>
             </div>
           </div>
           <button
             onClick={onClick}
-            className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer"
+            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-colors cursor-pointer"
           >
-            <i className="fa-solid fa-arrow-right text-yellow-800"></i>
+            <i className="fa-solid fa-arrow-right text-red-800"></i>
           </button>
         </div>
       </div>

@@ -65,7 +65,7 @@ function LongWaitCard({ customer, onContact, onReadyForPickup, onArchive }: Long
           {onContact && (
             <button
               onClick={() => onContact(customer)}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-3 sm:py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full transition-colors border border-blue-200 cursor-pointer min-h-[44px] sm:min-h-0"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-3 sm:py-1.5 bg-green-50 hover:bg-green-100 text-green-700 text-xs sm:text-sm font-medium rounded-full transition-colors border border-green-200 cursor-pointer min-h-[44px] sm:min-h-0"
               title="Contactar via WhatsApp"
             >
               <i className="fa-brands fa-whatsapp text-[10px]"></i>
@@ -75,11 +75,11 @@ function LongWaitCard({ customer, onContact, onReadyForPickup, onArchive }: Long
           {onReadyForPickup && (
             <button
               onClick={() => onReadyForPickup(customer)}
-              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-3 sm:py-1.5 bg-green-50 hover:bg-green-100 text-green-700 text-xs sm:text-sm font-medium rounded-full transition-colors border border-green-200 cursor-pointer min-h-[44px] sm:min-h-0"
-              title="Marcar como pronto para retirada"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-3 sm:py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full transition-colors border border-blue-200 cursor-pointer min-h-[44px] sm:min-h-0"
+              title="Reativar cliente move ele para Pronto para Retirada"
             >
-              <i className="fa-solid fa-box-open text-[10px]"></i>
-              <span>Pronto</span>
+              <i className="fa-solid fa-arrow-rotate-left text-[10px]"></i>
+              <span>Reativar</span>
             </button>
           )}
           {onArchive && (

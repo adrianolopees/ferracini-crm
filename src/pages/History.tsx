@@ -105,11 +105,11 @@ function History() {
         status: 'readyForPickup',
         contactedAt: getCurrentTimestamp(),
       });
-      toast.success(`${customer.name} restaurado para clientes ativos!`);
+      toast.success(`${customer.name} reativado!`);
       refresh();
     } catch (error) {
-      console.error('Erro ao restaurar cliente:', error);
-      toast.error('Erro ao restaurar cliente');
+      console.error('Erro ao reativar cliente:', error);
+      toast.error('Erro ao reativar cliente');
     }
   };
 
