@@ -1,18 +1,21 @@
 import { createContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { StoreSettings, Store, UpdateStore, CreateStore } from '@/schemas/storeSettingsSchema';
-import { onStoreSettingsChange, createStore, saveStore, deleteStore } from '@/repositories/storeSettingsRepository';
+import { onStoreSettingsChange, createStore, saveStore, deleteStore, addSalesperson, removeSalesperson } from '@/repositories/storeSettingsRepository';
 
 export interface StoreSettingsContextType {
   settings: StoreSettings | null;
   defaultStore: Store | null;
   transferStores: Store[];
   allStores: Store[];
+  salespeople: string[];
   loading: boolean;
   error: Error | null;
   addStore: (newStore: CreateStore) => Promise<Store>;
   updateStore: (storeId: string, updates: UpdateStore) => Promise<void>;
   removeStore: (storeId: string) => Promise<void>;
+  addSalesperson: (name: string) => Promise<void>;
+  removeSalesperson: (name: string) => Promise<void>;
 }
 
 const StoreSettingsContext = createContext<StoreSettingsContextType>({} as StoreSettingsContextType);
@@ -43,6 +46,7 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
   const allStores = useMemo(() => settings?.stores || [], [settings]);
   const defaultStore = useMemo(() => allStores.find((s) => s.id === workspaceId) || null, [allStores, workspaceId]);
   const transferStores = useMemo(() => allStores.filter((s) => s.id !== workspaceId), [allStores, workspaceId]);
+  const salespeople = useMemo(() => settings?.salespeople || [], [settings]);
 
   const getWorkspaceId = (): string => {
     if (!workspaceId) throw new Error('Usuário não autenticado');
@@ -61,9 +65,17 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
     await deleteStore(getWorkspaceId(), storeId);
   };
 
+  const handleAddSalesperson = async (name: string): Promise<void> => {
+    await addSalesperson(getWorkspaceId(), name);
+  };
+
+  const handleRemoveSalesperson = async (name: string): Promise<void> => {
+    await removeSalesperson(getWorkspaceId(), name);
+  };
+
   return (
     <StoreSettingsContext.Provider
-      value={{ settings, defaultStore, transferStores, allStores, loading, error, addStore, updateStore, removeStore }}
+      value={{ settings, defaultStore, transferStores, allStores, salespeople, loading, error, addStore, updateStore, removeStore, addSalesperson: handleAddSalesperson, removeSalesperson: handleRemoveSalesperson }}
     >
       {children}
     </StoreSettingsContext.Provider>

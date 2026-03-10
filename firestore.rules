@@ -47,13 +47,32 @@ service cloud.firestore {
       allow create: if isAuthenticated()
                     && request.resource.data.workspaceId == getUserWorkspace();
 
-      // Permite atualização/deleção se:
+      // Permite atualização se:
       // 1. Usuário está autenticado
       // 2. O documento pertence ao workspace do usuário
       // 3. Não está tentando mudar o workspaceId
-      allow update, delete: if isAuthenticated()
-                            && resource.data.workspaceId == getUserWorkspace()
-                            && request.resource.data.workspaceId == resource.data.workspaceId;
+      allow update: if isAuthenticated()
+                    && resource.data.workspaceId == getUserWorkspace()
+                    && request.resource.data.workspaceId == resource.data.workspaceId;
+
+      // Permite deleção se:
+      // 1. Usuário está autenticado
+      // 2. O documento pertence ao workspace do usuário
+      allow delete: if isAuthenticated()
+                    && resource.data.workspaceId == getUserWorkspace();
+    }
+
+    // ============================================
+    // COLEÇÃO: workspace_settings (COM MULTI-TENANT)
+    // ============================================
+
+    match /workspace_settings/{workspaceId} {
+      allow read: if isAuthenticated()
+                  && getUserWorkspace() == workspaceId;
+
+      allow write: if isAuthenticated()
+                   && getUserWorkspace() == workspaceId
+                   && request.resource.data.workspaceId == workspaceId;
     }
 
     // ============================================

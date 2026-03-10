@@ -4,12 +4,13 @@ import StoreCard from './StoreCard';
 import StoreForm from './StoreForm';
 import { CreateStore } from '@/schemas/storeSettingsSchema';
 import { toast } from 'sonner';
-import { Spinner, Button } from '@/components/ui';
+import { Spinner, Button, Input } from '@/components/ui';
 
 export default function SettingsContent() {
-  const { addStore, updateStore, loading, removeStore, defaultStore, transferStores } = useStoreSettings();
+  const { addStore, updateStore, loading, removeStore, defaultStore, transferStores, salespeople, addSalesperson, removeSalesperson } = useStoreSettings();
 
   const [showAddForm, setShowAddForm] = useState(false);
+  const [newSalesperson, setNewSalesperson] = useState('');
 
   const handleAddStore = async (data: CreateStore) => {
     try {
@@ -18,6 +19,27 @@ export default function SettingsContent() {
       setShowAddForm(false);
     } catch {
       toast.error('Erro ao adicionar loja');
+    }
+  };
+
+  const handleAddSalesperson = async () => {
+    const name = newSalesperson.trim();
+    if (!name) return;
+    try {
+      await addSalesperson(name);
+      toast.success(`${name} adicionado!`);
+      setNewSalesperson('');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Erro ao adicionar vendedor');
+    }
+  };
+
+  const handleRemoveSalesperson = async (name: string) => {
+    try {
+      await removeSalesperson(name);
+      toast.success(`${name} removido!`);
+    } catch {
+      toast.error('Erro ao remover vendedor');
     }
   };
 
@@ -104,6 +126,55 @@ export default function SettingsContent() {
             ))
           )}
         </div>
+      </section>
+      {/* Vendedores */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <h3 className="text-lg font-semibold text-gray-800">Vendedores</h3>
+        </div>
+        <p className="text-gray-500 text-sm mb-4">
+          Lista de vendedores disponíveis no cadastro de clientes.
+        </p>
+
+        {/* Adicionar vendedor */}
+        <div className="flex gap-2 mb-4">
+          <Input
+            placeholder="Nome do vendedor"
+            value={newSalesperson}
+            onChange={(e) => setNewSalesperson(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleAddSalesperson()}
+          />
+          <Button variant="green" size="sm" onClick={handleAddSalesperson}>
+            <i className="fa-solid fa-plus mr-1"></i>
+            Adicionar
+          </Button>
+        </div>
+
+        {/* Lista de vendedores */}
+        {salespeople.length === 0 ? (
+          <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
+            <i className="fa-solid fa-user text-3xl text-gray-300 mb-2"></i>
+            <p className="text-gray-500 text-sm">Nenhum vendedor cadastrado</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {salespeople.map((name) => (
+              <div key={name} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+                <div className="flex items-center gap-2">
+                  <i className="fa-solid fa-user text-gray-400 text-sm"></i>
+                  <span className="text-sm font-medium text-gray-700">{name}</span>
+                </div>
+                <button
+                  onClick={() => handleRemoveSalesperson(name)}
+                  className="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+                  title="Remover vendedor"
+                >
+                  <i className="fa-solid fa-trash text-xs"></i>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

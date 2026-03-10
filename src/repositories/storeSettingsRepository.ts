@@ -121,3 +121,29 @@ export async function deleteStore(workspaceId: string, storeId: string) {
     updatedAt: getCurrentTimestamp(),
   });
 }
+
+export async function addSalesperson(workspaceId: string, name: string): Promise<void> {
+  const currentSettings = await getStoreSettings(workspaceId);
+  if (!currentSettings) throw new Error('Workspace settings not found');
+
+  const trimmed = name.trim();
+  if (!trimmed) throw new Error('Nome inválido');
+  if (currentSettings.salespeople.includes(trimmed)) throw new Error('Vendedor já existe');
+
+  const docRef = doc(db, COLLECTION_NAME, workspaceId);
+  await updateDoc(docRef, {
+    salespeople: [...currentSettings.salespeople, trimmed],
+    updatedAt: getCurrentTimestamp(),
+  });
+}
+
+export async function removeSalesperson(workspaceId: string, name: string): Promise<void> {
+  const currentSettings = await getStoreSettings(workspaceId);
+  if (!currentSettings) throw new Error('Workspace settings not found');
+
+  const docRef = doc(db, COLLECTION_NAME, workspaceId);
+  await updateDoc(docRef, {
+    salespeople: currentSettings.salespeople.filter((s) => s !== name),
+    updatedAt: getCurrentTimestamp(),
+  });
+}

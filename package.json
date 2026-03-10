@@ -11,7 +11,9 @@
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,css}\"",
     "type-check": "tsc --noEmit -p tsconfig.app.json",
     "test": "vitest",
-    "seed:stores": "tsx src/scripts/seedStoreSettings.ts"
+    "seed:stores": "tsx src/scripts/seedStoreSettings.ts",
+    "clear:demo": "tsx src/scripts/clearDemoCustomers.ts",
+    "seed:demo": "tsx src/scripts/seedDemoCustomers.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

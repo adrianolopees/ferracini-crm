@@ -9,10 +9,11 @@ import { toast } from 'sonner';
 import { Input, Select, Button, Spinner } from '@/components/ui';
 import { PageLayout } from '@/components/layout';
 import { AnimatedContainer } from '@/components/animations';
-import { useAuth } from '@/hooks';
+import { useAuth, useStoreSettings } from '@/hooks';
 
 function RegisterCustomer() {
   const { workspaceId } = useAuth();
+  const { salespeople } = useStoreSettings();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -164,14 +165,10 @@ function RegisterCustomer() {
             <Select
               label="Vendedor"
               placeholder="Selecione o vendedor"
-              options={[
-                { value: 'Adriano', label: 'Adriano' },
-                { value: 'Will', label: 'Will' },
-                { value: 'Marcelo', label: 'Marcelo' },
-              ]}
+              options={salespeople.map((name) => ({ value: name, label: name }))}
               {...register('salesperson')}
               error={errors.salesperson?.message}
-              disabled={isLoading}
+              disabled={isLoading || salespeople.length === 0}
               required
             />
           </div>

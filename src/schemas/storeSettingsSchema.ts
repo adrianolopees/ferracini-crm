@@ -24,6 +24,7 @@ const TimestampSchema = z.union([z.string(), z.instanceof(Timestamp)]).transform
 export const StoreSettingsSchema = z.object({
   workspaceId: WorkspaceSchema,
   stores: z.array(StoreSchema).min(1, 'Deve ter pelo menos 1 loja'),
+  salespeople: z.array(z.string()).default([]),
   updatedAt: TimestampSchema,
 });
 
