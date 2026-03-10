@@ -1,5 +1,5 @@
 import { Customer } from '@/schemas/customerSchema';
-import { formatDateTime, getDaysBetween } from '@/utils';
+import { formatDateTime } from '@/utils';
 import useStoreSettings from '@/hooks/useStoreSettings';
 
 interface HistoryCardProps {
@@ -12,18 +12,11 @@ function HistoryCard({ customer }: HistoryCardProps) {
   const isTransferStore = transferStores.some((s) => s.name === customer.sourceStore);
   return (
     <div className="border-l-4 border-l-emerald-500 bg-emerald-50/50 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200">
-      {/* Header : Name + Badge Total time*/}
+      {/* Header : Name */}
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2 sm:gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           {/* Name */}
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{customer.name}</h3>
-          {/* Badge Total Time */}
-          {customer.completedAt && (
-            <span className="text-gray-500 text-xs px-2 py-1 rounded-full font-medium bg-gray-100 whitespace-nowrap">
-              <i className="fa-solid fa-hourglass-end text-gray-700 text-[10px] pr-1"></i>
-              {getDaysBetween(customer.createdAt, customer.completedAt)}
-            </span>
-          )}
         </div>
       </div>
 

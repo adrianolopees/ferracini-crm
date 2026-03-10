@@ -20,22 +20,14 @@ function TransferCard({ customer }: TransferCardProps) {
         } as React.CSSProperties
       }
     >
-      {/* Header: Name + Transfer Time Badge + Store Badge */}
+      {/* Header: Name + Store Badge */}
       <div className="flex items-start justify-between mb-3 gap-2">
         <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{customer.name}</h3>
-          {customer.contactedAt && customer.transferredAt && (
-            <span className="text-xs px-2 py-1 rounded font-medium whitespace-nowrap">
-              <i className="fa-solid fa-truck-fast text-[10px] pr-1"></i>
-              {getDaysBetween(customer.transferredAt, customer.contactedAt)}
-            </span>
-          )}
         </div>
 
         {/* Source Store */}
-        <span
-          className="inline-flex items-center gap-1 text-xs font-semibold bg-[var(--store-color)] text-white px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0"
-        >
+        <span className="inline-flex items-center gap-1 text-xs font-semibold bg-[var(--store-color)] text-white px-2 py-0.5 rounded-full whitespace-nowrap flex-shrink-0">
           <i className="fa-solid fa-location-dot text-[10px]"></i>
           {customer.sourceStore || 'N/A'}
         </span>
@@ -80,6 +72,12 @@ function TransferCard({ customer }: TransferCardProps) {
             <span className="flex items-center gap-1 whitespace-nowrap">
               <i className={`fa-solid fa-circle-check text-[var(--store-color)]`}></i>
               {formatDate(customer.completedAt)}
+            </span>
+          )}
+          {customer.contactedAt && customer.transferredAt && (
+            <span className="text-xs px-2 py-1 rounded font-medium whitespace-nowrap">
+              <i className="fa-solid fa-truck-fast text-[10px] pr-1"></i>
+              {getDaysBetween(customer.transferredAt, customer.contactedAt)}
             </span>
           )}
         </div>

@@ -1,5 +1,5 @@
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
-import { getTimeAgo, getDaysBetween } from '@/utils';
+import { getTimeAgo } from '@/utils';
 
 const ARCHIVE_REASON_LABELS: Record<ArchiveReason, string> = {
   gave_up: 'Desistiu',
@@ -23,32 +23,36 @@ interface ArchivedCardProps {
 function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
   const reasonLabel = getArchiveReasonLabel(customer.archiveReason);
 
-  // Calculate days waiting before archive
-  const daysWaiting = customer.archivedAt ? getDaysBetween(customer.createdAt, customer.archivedAt) : null;
-
   return (
     <div className="border-l-4 border-l-gray-400 bg-gray-50 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200">
       {/* Header: Name + Days Waiting Badge */}
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2 sm:gap-3">
         <div className="flex items-center gap-2 flex-wrap">
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{customer.name}</h3>
-
-          {/* Badge Days Waiting */}
-          {daysWaiting && (
-            <span className="text-gray-500 text-xs px-2 py-1 rounded-full font-medium bg-gray-200 whitespace-nowrap">
-              <i className="fa-solid fa-clock text-gray-600 text-[10px] pr-1"></i>
-              {daysWaiting}
-            </span>
-          )}
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full bg-gray-200 whitespace-nowrap">
+            <i className="fa-solid fa-box-archive text-[10px] text-gray-600"></i>
+            <span className="text-gray-700">{reasonLabel}</span>
+          </span>
         </div>
-
-        {/* Archive Reason Badge */}
-        <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-1 rounded-full bg-gray-200 whitespace-nowrap">
-          <i className="fa-solid fa-box-archive text-[10px] text-gray-600"></i>
-          <span className="text-gray-700">{reasonLabel}</span>
-        </span>
+      </div>
+      {/* Archive Timeline */}
+      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 flex-wrap mb-2">
+        {customer.archivedAt && (
+          <>
+            <i className="fa-solid fa-calendar-xmark text-gray-600 text-[10px]"></i>
+            <span className="text-gray-500">Arquivado:</span>
+            <span className="text-gray-700">{getTimeAgo(customer.archivedAt)}</span>
+          </>
+        )}
       </div>
 
+      {/* Notes/Observations */}
+      {customer.notes && (
+        <div className="text-xs bg-white/50 rounded px-2 py-1.5 border border-gray-200 mb-2">
+          <i className="fa-solid fa-comment-dots text-gray-400 text-[10px] mr-1"></i>
+          <span className="text-gray-600 italic">"{customer.notes}"</span>
+        </div>
+      )}
       {/* Product Info - Same format as other cards */}
       <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap mb-2">
         <span className="font-stretch-50% text-gray-900">{customer.model}</span>
@@ -68,25 +72,6 @@ function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
           {customer.color}
         </span>
       </div>
-
-      {/* Archive Timeline */}
-      <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 flex-wrap mb-2">
-        {customer.archivedAt && (
-          <>
-            <i className="fa-solid fa-calendar-xmark text-gray-600 text-[10px]"></i>
-            <span className="text-gray-500">Arquivado:</span>
-            <span className="text-gray-700">{getTimeAgo(customer.archivedAt)}</span>
-          </>
-        )}
-      </div>
-
-      {/* Notes/Observations */}
-      {customer.notes && (
-        <div className="text-xs bg-white/50 rounded px-2 py-1.5 border border-gray-200 mb-2">
-          <i className="fa-solid fa-comment-dots text-gray-400 text-[10px] mr-1"></i>
-          <span className="text-gray-600 italic">"{customer.notes}"</span>
-        </div>
-      )}
 
       {/* Footer: Salesperson + Action Buttons */}
       <div className="border-t mt-2 pt-2 border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
