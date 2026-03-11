@@ -35,7 +35,7 @@ export default function StoreCard({ store, onUpdate, onDelete, canDelete }: Stor
         {/* Info da loja */}
         <div className="flex items-center gap-3">
           {/* Cor indicator */}
-          <div className="w-10 h-10 rounded-lg shadow-sm flex-shrink-0" style={{ backgroundColor: store.color }} />
+          <div className="fa-solid fa-store text-2xl flex-shrink-0" style={{ color: store.color }} />
           <div>
             <h4 className="font-semibold text-gray-800">{store.name}</h4>
             <p className="text-sm text-gray-500">{store.phone}</p>
