@@ -56,7 +56,7 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
   const salespeople = useMemo(() => settings?.salespeople || [], [settings]);
 
   const getWorkspaceId = (): string => {
-    if (!workspaceId) throw new Error('Usuário não autenticado');
+    if (!workspaceId) throw new Error('User not authenticated');
     return workspaceId;
   };
 
