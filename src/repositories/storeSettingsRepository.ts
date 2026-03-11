@@ -99,10 +99,10 @@ export async function saveStore(workspaceId: string, storeId: string, updates: U
   });
 }
 
-export async function deleteStore(workspaceId: string, storeId: string) {
+export async function deleteStore(workspaceId: string, storeId: string): Promise<void> {
   const currentSettings = await getStoreSettings(workspaceId);
   if (!currentSettings) {
-    return null;
+    throw new Error('Workspace settings not found');
   }
 
   const updatedStores = currentSettings.stores.filter((s) => s.id !== storeId);
