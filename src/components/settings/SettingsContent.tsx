@@ -89,119 +89,124 @@ export default function SettingsContent() {
           Vendedores
         </button>
       </div>
-      {/* Loja Principal */}
-      <section>
-        <div className="flex items-center gap-2 mb-3">
-          <h3 className="text-lg font-semibold text-gray-800">Minha Loja</h3>
-          <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">Principal</span>
-        </div>
-        <StoreCard
-          store={defaultStore}
-          onUpdate={(updates) => updateStore(defaultStore.id, updates)}
-          canDelete={false}
-        />
-      </section>
-
-      {/* Lojas de Transferência */}
-      <section>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-gray-800">Lojas de Transferência</h3>
-          {!showAddForm && (
-            <Button variant="green" size="sm" onClick={() => setShowAddForm(true)}>
-              <i className="fa-solid fa-plus mr-1"></i>
-              Adicionar
-            </Button>
-          )}
-        </div>
-
-        <p className="text-gray-500 text-sm mb-4">
-          Lojas de onde você recebe produtos. Aparecem nos botões de consulta.
-        </p>
-
-        {/* Formulário Adicionar */}
-        {showAddForm && (
-          <div className="mb-4">
-            <StoreForm onSubmit={handleAddStore} onCancel={() => setShowAddForm(false)} />
-          </div>
-        )}
-
-        {/* Lista de lojas */}
-        <div className="space-y-3">
-          {transferStores.length === 0 ? (
-            <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
-              <i className="fa-solid fa-store text-3xl text-gray-300 mb-2"></i>
-              <p className="text-gray-500 text-sm">Nenhuma loja de transferência</p>
-              <p className="text-gray-400 text-xs mt-1">Clique em "Adicionar" acima</p>
+      {activeTab === 'stores' && (
+        <>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="text-lg font-semibold text-gray-800">Minha Loja</h3>
+              <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium">Principal</span>
             </div>
-          ) : (
-            transferStores.map((store) => (
-              <StoreCard
-                key={store.id}
-                store={store}
-                onUpdate={(updates) => updateStore(store.id, updates)}
-                onDelete={() => {
-                  if (confirm(`Remover loja "${store.name}"?`)) {
-                    removeStore(store.id)
-                      .then(() => toast.success('Loja removida'))
-                      .catch(() => toast.error('Erro ao remover'));
-                  }
-                }}
-                canDelete={true}
-              />
-            ))
-          )}
-        </div>
-      </section>
-      {/* Vendedores */}
-      <section>
-        <div className="flex items-center gap-2 mb-3">
-          <h3 className="text-lg font-semibold text-gray-800">Vendedores</h3>
-        </div>
-        <p className="text-gray-500 text-sm mb-4">Lista de vendedores disponíveis no cadastro de clientes.</p>
+            <StoreCard
+              store={defaultStore}
+              onUpdate={(updates) => updateStore(defaultStore.id, updates)}
+              canDelete={false}
+            />
+          </section>
 
-        {/* Adicionar vendedor */}
-        <div className="flex gap-2 mb-4">
-          <Input
-            placeholder="Nome do vendedor"
-            value={newSalesperson}
-            onChange={(e) => setNewSalesperson(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddSalesperson()}
-          />
-          <Button variant="green" size="sm" onClick={handleAddSalesperson}>
-            <i className="fa-solid fa-plus mr-1"></i>
-            Adicionar
-          </Button>
-        </div>
+          <section>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-gray-800">Lojas de Transferência</h3>
+              {!showAddForm && (
+                <Button variant="green" size="sm" onClick={() => setShowAddForm(true)}>
+                  <i className="fa-solid fa-plus mr-1"></i>
+                  Adicionar
+                </Button>
+              )}
+            </div>
 
-        {/* Lista de vendedores */}
-        {salespeople.length === 0 ? (
-          <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
-            <i className="fa-solid fa-user text-3xl text-gray-300 mb-2"></i>
-            <p className="text-gray-500 text-sm">Nenhum vendedor cadastrado</p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {salespeople.map((name) => (
-              <div
-                key={name}
-                className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5"
-              >
-                <div className="flex items-center gap-2">
-                  <i className="fa-solid fa-user text-gray-400 text-sm"></i>
-                  <span className="text-sm font-medium text-gray-700">{name}</span>
-                </div>
-                <button
-                  onClick={() => handleRemoveSalesperson(name)}
-                  className="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
-                  title="Remover vendedor"
-                >
-                  <i className="fa-solid fa-trash text-xs"></i>
-                </button>
+            <p className="text-gray-500 text-sm mb-4">
+              Lojas de onde você recebe produtos. Aparecem nos botões de consulta.
+            </p>
+
+            {/* Formulário Adicionar */}
+            {showAddForm && (
+              <div className="mb-4">
+                <StoreForm onSubmit={handleAddStore} onCancel={() => setShowAddForm(false)} />
               </div>
-            ))}
-          </div>
-        )}
-      </section>
+            )}
+
+            {/* Lista de lojas */}
+            <div className="space-y-3">
+              {transferStores.length === 0 ? (
+                <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
+                  <i className="fa-solid fa-store text-3xl text-gray-300 mb-2"></i>
+                  <p className="text-gray-500 text-sm">Nenhuma loja de transferência</p>
+                  <p className="text-gray-400 text-xs mt-1">Clique em "Adicionar" acima</p>
+                </div>
+              ) : (
+                transferStores.map((store) => (
+                  <StoreCard
+                    key={store.id}
+                    store={store}
+                    onUpdate={(updates) => updateStore(store.id, updates)}
+                    onDelete={() => {
+                      if (confirm(`Remover loja "${store.name}"?`)) {
+                        removeStore(store.id)
+                          .then(() => toast.success('Loja removida'))
+                          .catch(() => toast.error('Erro ao remover'));
+                      }
+                    }}
+                    canDelete={true}
+                  />
+                ))
+              )}
+            </div>
+          </section>
+        </>
+      )}
+      {activeTab === 'salesperson' && (
+        <>
+          <section>
+            <div className="flex items-center gap-2 mb-3">
+              <h3 className="text-lg font-semibold text-gray-800">Vendedores</h3>
+            </div>
+            <p className="text-gray-500 text-sm mb-4">Lista de vendedores disponíveis no cadastro de clientes.</p>
+
+            {/* Adicionar vendedor */}
+            <div className="flex gap-2 mb-4">
+              <Input
+                placeholder="Nome do vendedor"
+                value={newSalesperson}
+                onChange={(e) => setNewSalesperson(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddSalesperson()}
+              />
+              <Button variant="green" size="sm" onClick={handleAddSalesperson}>
+                <i className="fa-solid fa-plus mr-1"></i>
+                Adicionar
+              </Button>
+            </div>
+
+            {/* Lista de vendedores */}
+            {salespeople.length === 0 ? (
+              <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
+                <i className="fa-solid fa-user text-3xl text-gray-300 mb-2"></i>
+                <p className="text-gray-500 text-sm">Nenhum vendedor cadastrado</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {salespeople.map((name) => (
+                  <div
+                    key={name}
+                    className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5"
+                  >
+                    <div className="flex items-center gap-2">
+                      <i className="fa-solid fa-user text-gray-400 text-sm"></i>
+                      <span className="text-sm font-medium text-gray-700">{name}</span>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveSalesperson(name)}
+                      className="text-red-400 hover:text-red-600 transition-colors cursor-pointer"
+                      title="Remover vendedor"
+                    >
+                      <i className="fa-solid fa-trash text-xs"></i>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
 }
