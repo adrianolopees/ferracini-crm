@@ -6,9 +6,21 @@ import { CreateStore } from '@/schemas/storeSettingsSchema';
 import { toast } from 'sonner';
 import { Spinner, Button, Input } from '@/components/ui';
 
-export default function SettingsContent() {
-  const { addStore, updateStore, loading, removeStore, defaultStore, transferStores, salespeople, addSalesperson, removeSalesperson } = useStoreSettings();
+type Tab = 'stores' | 'salesperson';
 
+export default function SettingsContent() {
+  const {
+    addStore,
+    updateStore,
+    loading,
+    removeStore,
+    defaultStore,
+    transferStores,
+    salespeople,
+    addSalesperson,
+    removeSalesperson,
+  } = useStoreSettings();
+  const [activeTab, setActiveTab] = useState<Tab>('stores');
   const [showAddForm, setShowAddForm] = useState(false);
   const [newSalesperson, setNewSalesperson] = useState('');
 
@@ -52,7 +64,6 @@ export default function SettingsContent() {
     );
   }
 
-  // Estado de erro
   if (!defaultStore) {
     return (
       <div className="text-center py-12">
@@ -64,6 +75,20 @@ export default function SettingsContent() {
 
   return (
     <div className="space-y-6">
+      <div className="flex border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab('stores')}
+          className={`flex-1 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer ${activeTab === 'stores' ? 'border-b-2 border-blue-600 text-blue-600' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Lojas
+        </button>
+        <button
+          onClick={() => setActiveTab('salesperson')}
+          className={`flex-1 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer ${activeTab === 'salesperson' ? 'border-b-2 border-blue-600 text-blue-600' : 'border-b-2 border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Vendedores
+        </button>
+      </div>
       {/* Loja Principal */}
       <section>
         <div className="flex items-center gap-2 mb-3">
@@ -132,9 +157,7 @@ export default function SettingsContent() {
         <div className="flex items-center gap-2 mb-3">
           <h3 className="text-lg font-semibold text-gray-800">Vendedores</h3>
         </div>
-        <p className="text-gray-500 text-sm mb-4">
-          Lista de vendedores disponíveis no cadastro de clientes.
-        </p>
+        <p className="text-gray-500 text-sm mb-4">Lista de vendedores disponíveis no cadastro de clientes.</p>
 
         {/* Adicionar vendedor */}
         <div className="flex gap-2 mb-4">
@@ -159,7 +182,10 @@ export default function SettingsContent() {
         ) : (
           <div className="space-y-2">
             {salespeople.map((name) => (
-              <div key={name} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5">
+              <div
+                key={name}
+                className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-2.5"
+              >
                 <div className="flex items-center gap-2">
                   <i className="fa-solid fa-user text-gray-400 text-sm"></i>
                   <span className="text-sm font-medium text-gray-700">{name}</span>
