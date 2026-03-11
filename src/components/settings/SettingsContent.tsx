@@ -168,7 +168,7 @@ export default function SettingsContent() {
                   onChange={(e) => setNewSalesperson(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleAddSalesperson()}
                 />
-                <Button variant="green" size="sm" onClick={handleAddSalesperson}>
+                <Button variant="green" size="sm" onClick={handleAddSalesperson} className="h-[42px]">
                   <i className="fa-solid fa-plus mr-1"></i>
                   Adicionar
                 </Button>
