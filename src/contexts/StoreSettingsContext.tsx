@@ -1,7 +1,14 @@
 import { createContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import useAuth from '@/hooks/useAuth';
 import { StoreSettings, Store, UpdateStore, CreateStore } from '@/schemas/storeSettingsSchema';
-import { onStoreSettingsChange, createStore, saveStore, deleteStore, addSalesperson, removeSalesperson } from '@/repositories/storeSettingsRepository';
+import {
+  onStoreSettingsChange,
+  createStore,
+  saveStore,
+  deleteStore,
+  addSalesperson,
+  removeSalesperson,
+} from '@/repositories/storeSettingsRepository';
 
 export interface StoreSettingsContextType {
   settings: StoreSettings | null;
@@ -18,7 +25,7 @@ export interface StoreSettingsContextType {
   removeSalesperson: (name: string) => Promise<void>;
 }
 
-const StoreSettingsContext = createContext<StoreSettingsContextType>({} as StoreSettingsContextType);
+const StoreSettingsContext = createContext<StoreSettingsContextType | undefined>(undefined);
 
 export function StoreSettingsProvider({ children }: { children: ReactNode }) {
   const { workspaceId } = useAuth();
@@ -75,7 +82,20 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
 
   return (
     <StoreSettingsContext.Provider
-      value={{ settings, defaultStore, transferStores, allStores, salespeople, loading, error, addStore, updateStore, removeStore, addSalesperson: handleAddSalesperson, removeSalesperson: handleRemoveSalesperson }}
+      value={{
+        settings,
+        defaultStore,
+        transferStores,
+        allStores,
+        salespeople,
+        loading,
+        error,
+        addStore,
+        updateStore,
+        removeStore,
+        addSalesperson: handleAddSalesperson,
+        removeSalesperson: handleRemoveSalesperson,
+      }}
     >
       {children}
     </StoreSettingsContext.Provider>
