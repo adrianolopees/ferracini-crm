@@ -122,7 +122,7 @@ export async function deleteStore(workspaceId: string, storeId: string) {
   });
 }
 
-export async function addSalesperson(workspaceId: string, name: string): Promise<void> {
+export async function createSalesperson(workspaceId: string, name: string): Promise<void> {
   const currentSettings = await getStoreSettings(workspaceId);
   if (!currentSettings) throw new Error('Workspace settings not found');
 
@@ -137,7 +137,7 @@ export async function addSalesperson(workspaceId: string, name: string): Promise
   });
 }
 
-export async function removeSalesperson(workspaceId: string, name: string): Promise<void> {
+export async function deleteSalesperson(workspaceId: string, name: string): Promise<void> {
   const currentSettings = await getStoreSettings(workspaceId);
   if (!currentSettings) throw new Error('Workspace settings not found');
 

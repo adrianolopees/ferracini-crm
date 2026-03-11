@@ -6,8 +6,8 @@ import {
   createStore,
   saveStore,
   deleteStore,
-  addSalesperson,
-  removeSalesperson,
+  createSalesperson,
+  deleteSalesperson,
 } from '@/repositories/storeSettingsRepository';
 
 export interface StoreSettingsContextType {
@@ -72,12 +72,12 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
     await deleteStore(getWorkspaceId(), storeId);
   };
 
-  const handleAddSalesperson = async (name: string): Promise<void> => {
-    await addSalesperson(getWorkspaceId(), name);
+  const addSalesperson = async (name: string): Promise<void> => {
+    await createSalesperson(getWorkspaceId(), name);
   };
 
-  const handleRemoveSalesperson = async (name: string): Promise<void> => {
-    await removeSalesperson(getWorkspaceId(), name);
+  const removeSalesperson = async (name: string): Promise<void> => {
+    await deleteSalesperson(getWorkspaceId(), name);
   };
 
   return (
@@ -93,8 +93,8 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
         addStore,
         updateStore,
         removeStore,
-        addSalesperson: handleAddSalesperson,
-        removeSalesperson: handleRemoveSalesperson,
+        addSalesperson,
+        removeSalesperson,
       }}
     >
       {children}
