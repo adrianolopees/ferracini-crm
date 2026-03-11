@@ -13,10 +13,6 @@ import { getCurrentTimestamp } from '@/utils';
 
 const COLLECTION_NAME = 'workspace_settings';
 
-/**
- * Listener em tempo real para mudanças nas configurações
- * Retorna função de unsubscribe
- */
 export function onStoreSettingsChange(
   workspaceId: string,
   callback: (settings: StoreSettings | null) => void
