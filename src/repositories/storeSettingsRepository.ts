@@ -9,12 +9,13 @@ import {
   CreateStoreSchema,
   UpdateStoreSchema,
 } from '@/schemas/storeSettingsSchema';
+import { WorkspaceId } from '@/schemas/userSchema';
 import { getCurrentTimestamp } from '@/utils';
 
 const COLLECTION_NAME = 'workspace_settings';
 
 export function onStoreSettingsChange(
-  workspaceId: string,
+  workspaceId: WorkspaceId,
   callback: (settings: StoreSettings | null) => void,
   onError?: (error: Error) => void
 ): () => void {
@@ -40,7 +41,7 @@ export function onStoreSettingsChange(
   return unsubscribe;
 }
 
-export async function getStoreSettings(workspaceId: string): Promise<StoreSettings | null> {
+export async function getStoreSettings(workspaceId: WorkspaceId): Promise<StoreSettings | null> {
   const docRef = doc(db, COLLECTION_NAME, workspaceId);
   const docSnap = await getDoc(docRef);
 
@@ -53,7 +54,7 @@ export async function getStoreSettings(workspaceId: string): Promise<StoreSettin
   return result.success ? result.data : null;
 }
 
-export async function createStore(workspaceId: string, newStore: CreateStore): Promise<Store> {
+export async function createStore(workspaceId: WorkspaceId, newStore: CreateStore): Promise<Store> {
   const validatedStore = CreateStoreSchema.parse(newStore);
 
   const currentSettings = await getStoreSettings(workspaceId);
@@ -78,7 +79,7 @@ export async function createStore(workspaceId: string, newStore: CreateStore): P
   return store;
 }
 
-export async function saveStore(workspaceId: string, storeId: string, updates: UpdateStore): Promise<void> {
+export async function saveStore(workspaceId: WorkspaceId, storeId: string, updates: UpdateStore): Promise<void> {
   const validatedUpdates = UpdateStoreSchema.parse(updates);
 
   const currentSettings = await getStoreSettings(workspaceId);
@@ -106,7 +107,7 @@ export async function saveStore(workspaceId: string, storeId: string, updates: U
   });
 }
 
-export async function deleteStore(workspaceId: string, storeId: string): Promise<void> {
+export async function deleteStore(workspaceId: WorkspaceId, storeId: string): Promise<void> {
   const currentSettings = await getStoreSettings(workspaceId);
   if (!currentSettings) {
     throw new Error('Workspace settings not found');
@@ -125,7 +126,7 @@ export async function deleteStore(workspaceId: string, storeId: string): Promise
   });
 }
 
-export async function createSalesperson(workspaceId: string, name: string): Promise<void> {
+export async function createSalesperson(workspaceId: WorkspaceId, name: string): Promise<void> {
   const currentSettings = await getStoreSettings(workspaceId);
   if (!currentSettings) throw new Error('Workspace settings not found');
 
@@ -140,7 +141,7 @@ export async function createSalesperson(workspaceId: string, name: string): Prom
   });
 }
 
-export async function deleteSalesperson(workspaceId: string, name: string): Promise<void> {
+export async function deleteSalesperson(workspaceId: WorkspaceId, name: string): Promise<void> {
   const docRef = doc(db, COLLECTION_NAME, workspaceId);
   await updateDoc(docRef, {
     salespeople: arrayRemove(name),

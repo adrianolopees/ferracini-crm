@@ -9,6 +9,7 @@ import {
   createSalesperson,
   deleteSalesperson,
 } from '@/repositories/storeSettingsRepository';
+import { WorkspaceId } from '@/schemas/userSchema';
 
 export interface StoreSettingsContextType {
   settings: StoreSettings | null;
@@ -62,7 +63,7 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
   const transferStores = useMemo(() => allStores.filter((s) => s.id !== workspaceId), [allStores, workspaceId]);
   const salespeople = useMemo(() => settings?.salespeople || [], [settings]);
 
-  const getWorkspaceId = (): string => {
+  const getWorkspaceId = (): WorkspaceId => {
     if (!workspaceId) throw new Error('User not authenticated');
     return workspaceId;
   };
