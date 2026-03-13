@@ -43,10 +43,17 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     setError(null);
 
-    const unsubscribe = onStoreSettingsChange(workspaceId, (newSettings) => {
-      setSettings(newSettings);
-      setLoading(false);
-    });
+    const unsubscribe = onStoreSettingsChange(
+      workspaceId,
+      (newSettings) => {
+        setSettings(newSettings);
+        setLoading(false);
+      },
+      (error) => {
+        setError(error);
+        setLoading(false);
+      }
+    );
     return () => unsubscribe();
   }, [workspaceId]);
 

@@ -1,5 +1,5 @@
 import { db } from '@/services/firebase';
-import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot, arrayRemove } from 'firebase/firestore';
 import {
   StoreSettings,
   Store,
@@ -15,20 +15,27 @@ const COLLECTION_NAME = 'workspace_settings';
 
 export function onStoreSettingsChange(
   workspaceId: string,
-  callback: (settings: StoreSettings | null) => void
+  callback: (settings: StoreSettings | null) => void,
+  onError?: (error: Error) => void
 ): () => void {
   const docRef = doc(db, COLLECTION_NAME, workspaceId);
 
-  const unsubscribe = onSnapshot(docRef, (docSnap) => {
-    if (!docSnap.exists()) {
-      callback(null);
-      return;
-    }
+  const unsubscribe = onSnapshot(
+    docRef,
+    (docSnap) => {
+      if (!docSnap.exists()) {
+        callback(null);
+        return;
+      }
 
-    const data = docSnap.data();
-    const result = StoreSettingsSchema.safeParse(data);
-    callback(result.success ? result.data : null);
-  });
+      const data = docSnap.data();
+      const result = StoreSettingsSchema.safeParse(data);
+      callback(result.success ? result.data : null);
+    },
+    (error: Error) => {
+      onError?.(error);
+    }
+  );
 
   return unsubscribe;
 }
@@ -134,12 +141,9 @@ export async function createSalesperson(workspaceId: string, name: string): Prom
 }
 
 export async function deleteSalesperson(workspaceId: string, name: string): Promise<void> {
-  const currentSettings = await getStoreSettings(workspaceId);
-  if (!currentSettings) throw new Error('Workspace settings not found');
-
   const docRef = doc(db, COLLECTION_NAME, workspaceId);
   await updateDoc(docRef, {
-    salespeople: currentSettings.salespeople.filter((s) => s !== name),
+    salespeople: arrayRemove(name),
     updatedAt: getCurrentTimestamp(),
   });
 }
