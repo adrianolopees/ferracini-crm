@@ -47,7 +47,7 @@ export default function StoreForm({ initialData, onSubmit, onCancel }: StoreForm
 
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)} className="bg-white border border-gray-200 rounded-lg p-4">
-      <h4 className="font-semibold text-gray-800 mb-3">{initialData ? 'Editar Loja' : 'Nova Loja'}</h4>
+      <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{initialData ? 'Editar Loja' : 'Nova Loja'}</h4>
 
       {/* Erro global */}
       {errors.root && (
@@ -94,14 +94,14 @@ export default function StoreForm({ initialData, onSubmit, onCancel }: StoreForm
               type="color"
               {...register('color')}
               onChange={(e) => setValue('color', e.target.value.toUpperCase())}
-              className="w-12 h-10 rounded cursor-pointer border border-gray-300 flex-shrink-0"
+              className="w-12 h-[42px] rounded cursor-pointer border border-gray-300 flex-shrink-0"
               disabled={isLoading}
             />
             <input
               type="text"
               value={color}
               onChange={(e) => setValue('color', e.target.value.toUpperCase())}
-              className={`flex-1 px-3 py-2 border rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`flex-1 px-4 py-2.5 border rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                 errors.color ? 'border-red-500' : 'border-gray-300'
               }`}
               placeholder="#3B82F6"

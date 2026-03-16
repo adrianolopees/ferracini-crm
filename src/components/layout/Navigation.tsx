@@ -1,12 +1,14 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks';
+import { useStoreSettings } from '@/hooks';
 import { useState } from 'react';
 import { SettingsModal } from '../settings';
 
 function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, displayName, workspaceId } = useAuth();
+  const { logout, workspaceId } = useAuth();
+  const { defaultStore } = useStoreSettings();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -22,8 +24,9 @@ function Navigation() {
           {/* Logo/Brand + Config */}
           <div className="flex items-center justify-center gap-1">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-              Ferracini{' '}
-              <span className={workspaceId === 'demo' ? 'text-amber-600' : 'text-blue-600'}>{displayName}</span>
+              <span style={{ color: workspaceId === 'demo' ? '#d97706' : (defaultStore?.color ?? '#2563eb') }}>
+                {defaultStore?.name ?? ''}
+              </span>
             </h2>
           </div>
 
@@ -71,20 +74,20 @@ function Navigation() {
           </div>
 
           {/* Engrenagem + Sair */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center justify-center p-2 text-gray-500 hover:text-blue-600 transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
               title="Configurações de Lojas"
             >
-              <i className="fa-solid fa-gear text-base"></i>
+              <i className="fa-solid fa-gear text-lg"></i>
             </button>
             <button
               onClick={() => logout()}
-              className="flex items-center justify-center p-2 text-gray-500 hover:text-red-600 transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer"
+              className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer"
               title="Sair do sistema"
             >
-              <i className="fa-solid fa-right-from-bracket text-base"></i>
+              <i className="fa-solid fa-right-from-bracket text-lg"></i>
             </button>
           </div>
         </div>
