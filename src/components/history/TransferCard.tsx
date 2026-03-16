@@ -33,9 +33,8 @@ function TransferCard({ customer }: TransferCardProps) {
         </span>
       </div>
 
-      {/* Product Details | Timeline */}
+      {/* Product Details */}
       <div className="space-y-2 sm:space-y-3">
-        {/* Product Details */}
         <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
           <span className="font-stretch-50% text-gray-900">{customer.model}</span>
           <span className="text-gray-400">•</span>
@@ -55,47 +54,59 @@ function TransferCard({ customer }: TransferCardProps) {
           </span>
         </div>
 
-        {/* Timeline  */}
-        <div className="flex flex-row sm:items-center gap-2 text-xs sm:text-sm text-gray-600">
+        {/* Timeline */}
+        <div className="flex flex-row flex-wrap items-center gap-2 text-xs sm:text-sm text-gray-600">
           <span className="flex items-center gap-1 whitespace-nowrap">
-            <i className={`fa-solid fa-clipboard-list text-[var(--store-color)]`}></i>
+            <i className={`fa-solid fa-calendar-plus text-[var(--store-color)]`}></i>
+            <span className="text-gray-500">Registrado:</span>
             {formatDate(customer.createdAt)}
           </span>
 
           {customer.contactedAt && (
             <span className="flex items-center gap-1 whitespace-nowrap">
-              <i className={`fa-solid fa-location-dot text-[var(--store-color)]`}></i>
+              <i className={`fa-solid fa-phone text-[var(--store-color)]`}></i>
+              <span className="text-gray-500">Contactado:</span>
               {formatDate(customer.contactedAt)}
             </span>
           )}
+
           {customer.completedAt && (
             <span className="flex items-center gap-1 whitespace-nowrap">
               <i className={`fa-solid fa-circle-check text-[var(--store-color)]`}></i>
+              <span className="text-gray-500">Finalizado:</span>
               {formatDate(customer.completedAt)}
             </span>
           )}
+
           {customer.contactedAt && customer.transferredAt && (
-            <span className="text-xs px-2 py-1 rounded font-medium whitespace-nowrap">
-              <i className="fa-solid fa-truck-fast text-[10px] pr-1"></i>
-              {getDaysBetween(customer.transferredAt, customer.contactedAt)}
+            <span
+              className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap"
+              style={{ backgroundColor: `${storeColor}20`, color: storeColor }}
+            >
+              <i className="fa-solid fa-truck-fast text-[10px]"></i>
+              Atendido em {getDaysBetween(customer.transferredAt, customer.contactedAt)}
             </span>
           )}
         </div>
       </div>
 
-      {/* Footer: Salesperson */}
-      <div
-        className={`mt-2 pt-2 border-t border-[var(--store-color)] flex flex-row sm:items-center justify-between gap-2`}
-      >
-        {customer.salesperson && (
+      {/* Footer: Phone + Salesperson */}
+      <div className="mt-2 pt-2 border-t border-[var(--store-color)] flex flex-row sm:items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap">
+          {customer.salesperson && (
+            <div className="inline-flex items-center gap-1.5 text-xs">
+              <i className={`fa-solid fa-user text-[var(--store-color)] text-[10px]`}></i>
+              <span className="font-medium text-gray-700">{customer.salesperson}</span>
+            </div>
+          )}
           <div className="inline-flex items-center gap-1.5 text-xs">
-            <i className={`fa-solid fa-user text-[var(--store-color)]  text-[10px]`}></i>
-            <span className="font-medium text-gray-700">{customer.salesperson}</span>
+            <i className={`fa-solid fa-phone text-[var(--store-color)] text-[10px]`}></i>
+            <span className="text-gray-600">{customer.phone}</span>
           </div>
-        )}
-        {/* Badge "Não vendido" (SÓ se arquivado) */}
+        </div>
+
         {customer.archived && (
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 sm:px-1 py-0.5 rounded-full whitespace-nowrap">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-gray-500 py-0.5 rounded-full whitespace-nowrap">
             <i className={`fa-solid fa-box-archive text-[var(--store-color)] text-[10px]`}></i>
             Não vendido
           </span>

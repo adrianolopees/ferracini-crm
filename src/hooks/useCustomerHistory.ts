@@ -65,7 +65,7 @@ function useCustomerHistory(): CustomerHistory {
           })
         )
       );
-      setRefreshTrigger((prev) => prev + 1); // força nova busca com dados atualizados
+      setRefreshTrigger((prev) => prev + 1);
     };
 
     archiveExceeded();

@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Customer } from '@/schemas/customerSchema';
 import { Store } from '@/schemas/storeSettingsSchema';
-import { getTimeAgo } from '@/utils';
+import { getTimeAgo, getDaysWaiting } from '@/utils';
 import { getCustomerStatus } from '@/utils';
 import { Button } from '@/components/ui';
 
@@ -58,6 +58,16 @@ function WorkflowCard({
   const status = getCustomerStatus(customer.createdAt, customer.status);
   const borderClass = status.borderClass + ' bg-gray-50';
 
+  const totalDaysWaiting = getDaysWaiting(customer.createdAt);
+  const daysReadyForPickup = customer.contactedAt ? getDaysWaiting(customer.contactedAt) : 0;
+  const pickupUrgent = customer.status === 'readyForPickup' && daysReadyForPickup >= 3;
+
+  const canReset =
+    onResetToInitial &&
+    (customer.consultingStore ||
+      customer.status === 'awaitingTransfer' ||
+      customer.status === 'readyForPickup');
+
   return (
     <motion.div
       ref={cardRef}
@@ -67,24 +77,18 @@ function WorkflowCard({
       transition={{ duration: 0.3 }}
       className={`${borderClass} rounded-lg p-3 sm:p-4 border-l-4 hover:shadow-md transition-shadow duration-200 relative`}
     >
-      {/* Top-Right Action Buttons */}
+      {/* Top-Right Action Buttons — desktop only */}
       {showActions && (
         <div className="hidden md:flex absolute top-3 right-3 flex-col gap-2">
-          {/* Reset to Initial State */}
-          {onResetToInitial &&
-            (customer.consultingStore ||
-              customer.status === 'awaitingTransfer' ||
-              customer.status === 'readyForPickup') && (
-              <button
-                onClick={() => onResetToInitial(customer)}
-                className="inline-flex items-center justify-center w-9 h-9 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors cursor-pointer shadow-sm"
-                title="Resetar para estado inicial"
-              >
-                <i className="fa-solid fa-rotate-left text-lg" />
-              </button>
-            )}
-
-          {/* Archive Active */}
+          {canReset && (
+            <button
+              onClick={() => onResetToInitial!(customer)}
+              className="inline-flex items-center justify-center w-9 h-9 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors cursor-pointer shadow-sm"
+              title="Resetar para estado inicial"
+            >
+              <i className="fa-solid fa-rotate-left text-lg" />
+            </button>
+          )}
           {onArchive && (
             <button
               onClick={() => onArchive(customer)}
@@ -94,8 +98,6 @@ function WorkflowCard({
               <i className="fa-solid fa-box-archive text-lg" />
             </button>
           )}
-
-          {/* Send WhatsApp Message */}
           {onSendMessage && (
             <button
               onClick={() => onSendMessage(customer)}
@@ -112,14 +114,12 @@ function WorkflowCard({
       <div className="flex items-start justify-between mb-1 gap-2 md:pr-20">
         <div className="flex items-center gap-2 flex-wrap min-w-0 flex-1">
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{customer.name}</h3>
-          {/* Badge de Urgêncy */}
-          {status.daysWaiting >= 14 && (
+          {customer.status === 'pending' && status.daysWaiting >= 14 && (
             <span className="inline-flex items-center gap-1 text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full font-medium whitespace-nowrap">
               <i className="fa-solid fa-exclamation-triangle text-[10px]"></i>
               <span>{status.daysWaiting} dias!</span>
             </span>
           )}
-          {/* Badge de Vendedor */}
           {customer.salesperson && (
             <span className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full whitespace-nowrap">
               <i className="fa-solid fa-user text-[10px]"></i>
@@ -129,59 +129,67 @@ function WorkflowCard({
         </div>
       </div>
 
-      {/* Timeline & Product Info */}
-      <div className="space-y-2 sm:space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-1 text-xs sm:text-sm sm:flex-wrap">
-          {customer.status === 'readyForPickup' && customer.contactedAt ? (
-            // Stage: READY FOR PICKUP - Tempo em destaque
-            <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
-              <i className="fa-solid fa-check-circle text-gray-500 text-xs"></i>
-              <span className="text-gray-600">Pronto há</span>
-              <span className="text-gray-900 font-bold text-sm sm:text-base">{getTimeAgo(customer.contactedAt)}</span>
-              {customer.sourceStore && (
-                <>
-                  <span className="text-gray-400 mx-1">•</span>
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <i className="fa-solid fa-store text-gray-500 text-xs"></i>
-                    <span className="text-gray-600">{customer.sourceStore}</span>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : customer.status === 'awaitingTransfer' ? (
-            // Stage: AWAITING TRANSFER - Loja em destaque
-            <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
-              <i className="fa-solid fa-truck-fast text-gray-500 text-xs"></i>
-              <span className="text-gray-600">Transferência:</span>
-              <span className="text-gray-900 font-bold text-sm sm:text-base uppercase">{customer.sourceStore}</span>
-              {customer.transferredAt && (
-                <>
-                  <span className="text-gray-400 mx-1">•</span>
-                  <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <i className="fa-solid fa-clock text-gray-500 text-xs"></i>
-                    <span className="text-gray-600">há {getTimeAgo(customer.transferredAt)}</span>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            // Stage: PENDING - Tempo em destaque
-            <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
-              <i className="fa-solid fa-clock text-gray-500 text-xs"></i>
-              <span className="text-gray-600">Aguardando há</span>
-              <span className="text-gray-900 font-bold text-sm sm:text-base">{getTimeAgo(customer.createdAt)}</span>
-            </div>
-          )}
+      {/* Timeline & Status */}
+      <div className="space-y-1.5 sm:space-y-2 mt-2">
+        {customer.status === 'readyForPickup' && customer.contactedAt ? (
+          <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+            <i className={`fa-solid fa-check-circle text-xs ${pickupUrgent ? 'text-amber-500' : 'text-gray-500'}`}></i>
+            <span className={pickupUrgent ? 'text-amber-600' : 'text-gray-600'}>Pronto há</span>
+            <span className={`font-bold text-sm sm:text-base ${pickupUrgent ? 'text-amber-700' : 'text-gray-900'}`}>
+              {getTimeAgo(customer.contactedAt)}
+            </span>
+            {pickupUrgent && (
+              <span className="inline-flex items-center gap-1 text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium whitespace-nowrap border border-amber-200">
+                <i className="fa-solid fa-bell text-[10px]"></i>
+                aguardando retirada
+              </span>
+            )}
+            {customer.sourceStore && (
+              <>
+                <span className="text-gray-400 mx-1">•</span>
+                <div className="flex items-center gap-1">
+                  <i className="fa-solid fa-store text-gray-500 text-xs"></i>
+                  <span className="text-gray-600">{customer.sourceStore}</span>
+                </div>
+              </>
+            )}
+          </div>
+        ) : customer.status === 'awaitingTransfer' ? (
+          <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+            <i className="fa-solid fa-truck-fast text-gray-500 text-xs"></i>
+            <span className="text-gray-600">Transferência:</span>
+            <span className="text-gray-900 font-bold text-sm sm:text-base uppercase">{customer.sourceStore}</span>
+            {customer.transferredAt && (
+              <>
+                <span className="text-gray-400 mx-1">•</span>
+                <div className="flex items-center gap-1">
+                  <i className="fa-solid fa-clock text-gray-500 text-xs"></i>
+                  <span className="text-gray-600">há {getTimeAgo(customer.transferredAt)}</span>
+                </div>
+              </>
+            )}
+            {totalDaysWaiting > 1 && (
+              <span className="inline-flex items-center gap-1 text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+                <i className="fa-solid fa-hourglass-half text-[10px]"></i>
+                {totalDaysWaiting} dias no total
+              </span>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
+            <i className="fa-solid fa-clock text-gray-500 text-xs"></i>
+            <span className="text-gray-600">Aguardando há</span>
+            <span className="text-gray-900 font-bold text-sm sm:text-base">{getTimeAgo(customer.createdAt)}</span>
+          </div>
+        )}
 
-          {/* Phone Number - Secundário */}
-          {showActions && (
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-              <span className="hidden sm:inline text-gray-400 mx-1">•</span>
-              <i className="fa-solid fa-phone text-xs"></i>
-              <span>{customer.phone}</span>
-            </div>
-          )}
-        </div>
+        {/* Phone */}
+        {showActions && (
+          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <i className="fa-solid fa-phone text-[10px]"></i>
+            <span>{customer.phone}</span>
+          </div>
+        )}
 
         {/* Product Details */}
         <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
@@ -236,25 +244,13 @@ function WorkflowCard({
               {customer.consultingStore}
             </span>
             {confirmStoreStock && (
-              <Button
-                onClick={() => confirmStoreStock(customer)}
-                variant="green"
-                size="xs"
-                withRing={false}
-                title="Loja tem o produto"
-              >
+              <Button onClick={() => confirmStoreStock(customer)} variant="green" size="xs" withRing={false} title="Loja tem o produto">
                 <i className="fa-solid fa-check pr-1.5"></i>
                 <span>Disponível</span>
               </Button>
             )}
             {rejectStoreStock && (
-              <Button
-                onClick={() => rejectStoreStock(customer)}
-                variant="red"
-                size="xs"
-                withRing={false}
-                title="Loja não tem o produto"
-              >
+              <Button onClick={() => rejectStoreStock(customer)} variant="red" size="xs" withRing={false} title="Loja não tem o produto">
                 <i className="fa-solid fa-times pr-1.5"></i>
                 <span>Indisponível</span>
               </Button>
@@ -272,25 +268,13 @@ function WorkflowCard({
               {customer.consultingStore}
             </span>
             {acceptTransfer && (
-              <Button
-                onClick={() => acceptTransfer(customer)}
-                variant="emerald"
-                size="xs"
-                withRing={false}
-                title="Cliente aceitou a transferência"
-              >
+              <Button onClick={() => acceptTransfer(customer)} variant="emerald" size="xs" withRing={false} title="Cliente aceitou a transferência">
                 <i className="fa-solid fa-check pr-1.5"></i>
                 <span>Cliente Aceitou</span>
               </Button>
             )}
             {declineTransfer && (
-              <Button
-                onClick={() => declineTransfer(customer)}
-                variant="red"
-                size="xs"
-                withRing={false}
-                title="Cliente recusou a transferência"
-              >
+              <Button onClick={() => declineTransfer(customer)} variant="red" size="xs" withRing={false} title="Cliente recusou a transferência">
                 <i className="fa-solid fa-times pr-1.5"></i>
                 <span>Cliente Recusou</span>
               </Button>
@@ -300,13 +284,7 @@ function WorkflowCard({
 
         {/* STATE 4: Awaiting Transfer - Product Arrived */}
         {customer.status === 'awaitingTransfer' && productArrived && (
-          <Button
-            onClick={() => productArrived(customer)}
-            variant="green"
-            size="xs"
-            withRing={false}
-            title="Produto chegou"
-          >
+          <Button onClick={() => productArrived(customer)} variant="green" size="xs" withRing={false} title="Produto chegou">
             <i className="fa-solid fa-box pr-1.5"></i>
             <span>Produto Chegou</span>
           </Button>
@@ -314,18 +292,48 @@ function WorkflowCard({
 
         {/* STATE 5: Ready for Pickup - Complete Order */}
         {customer.status === 'readyForPickup' && completeOrder && (
-          <Button
-            onClick={() => completeOrder(customer)}
-            variant="emerald"
-            size="xs"
-            withRing={false}
-            title="Cliente comprou"
-          >
+          <Button onClick={() => completeOrder(customer)} variant="emerald" size="xs" withRing={false} title="Cliente comprou">
             <i className="fa-solid fa-circle-check pr-1.5"></i>
             <span>Cliente Comprou</span>
           </Button>
         )}
       </div>
+
+      {/* Mobile Management Actions — visible only on mobile */}
+      {showActions && (
+        <div className="flex md:hidden items-center gap-2 mt-3 pt-3 border-t border-gray-200 flex-wrap">
+          {onSendMessage && (
+            <button
+              onClick={() => onSendMessage(customer)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 hover:bg-green-100 border border-green-200 rounded-full transition-colors cursor-pointer"
+              title="Enviar WhatsApp"
+            >
+              <i className="fa-brands fa-whatsapp text-[10px]"></i>
+              <span>WhatsApp</span>
+            </button>
+          )}
+          {canReset && (
+            <button
+              onClick={() => onResetToInitial!(customer)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-full transition-colors cursor-pointer"
+              title="Resetar para estado inicial"
+            >
+              <i className="fa-solid fa-rotate-left text-[10px]"></i>
+              <span>Resetar</span>
+            </button>
+          )}
+          {onArchive && (
+            <button
+              onClick={() => onArchive(customer)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 bg-white hover:bg-gray-50 border border-gray-200 rounded-full transition-colors cursor-pointer"
+              title="Arquivar cliente"
+            >
+              <i className="fa-solid fa-box-archive text-[10px]"></i>
+              <span>Arquivar</span>
+            </button>
+          )}
+        </div>
+      )}
     </motion.div>
   );
 }

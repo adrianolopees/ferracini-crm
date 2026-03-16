@@ -13,20 +13,14 @@ function LongWaitCard({ customer, onContact, onReadyForPickup, onArchive }: Long
 
   return (
     <div className="border-l-4 border-l-red-400 bg-red-50/50 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200">
-      {/* Header - Time awaiting and customer name*/}
-      <div className="flex items-center justify-between mb-3 flex-wrap gap-2 sm:gap-3">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-3 gap-2 flex-wrap">
         <div className="flex items-center gap-2 flex-wrap">
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base">{customer.name}</h3>
-          {/* Badge days awaiting*/}
           <span className="text-red-500 text-xs px-2 py-1 rounded-full font-medium bg-red-100 whitespace-nowrap">
             <i className="fa-solid fa-clock text-red-600 text-[10px] pr-1"></i>
             Esperando há {daysWaiting} dias
           </span>
-        </div>
-        {/* Register date */}
-        <div className="text-right hidden sm:block">
-          <p className="text-xs text-gray-500">Registrado em</p>
-          <p className="text-sm font-medium text-gray-700">{formatDate(customer.createdAt)}</p>
         </div>
       </div>
 
@@ -50,17 +44,43 @@ function LongWaitCard({ customer, onContact, onReadyForPickup, onArchive }: Long
         </span>
       </div>
 
-      {/* Footer: Salesperson + Action Buttons */}
-      <div className="border-t mt-2 pt-2 border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        {/* Salesperson*/}
-        {customer.salesperson && (
-          <div className="inline-flex items-center gap-1.5 text-xs">
-            <i className="fa-solid fa-user text-[10px] text-gray-600"></i>
-            <span className="font-medium text-gray-700">{customer.salesperson}</span>
-          </div>
+      {/* Timeline */}
+      <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap mb-2">
+        <span className="flex items-center gap-1 whitespace-nowrap">
+          <i className="fa-solid fa-calendar-plus text-red-400 text-[10px]"></i>
+          <span>Registrado:</span>
+          <span className="text-gray-700">{formatDate(customer.createdAt)}</span>
+        </span>
+        {customer.contactedAt ? (
+          <span className="flex items-center gap-1 whitespace-nowrap">
+            <i className="fa-solid fa-phone text-red-400 text-[10px]"></i>
+            <span>Último contato:</span>
+            <span className="text-gray-700">{formatDate(customer.contactedAt)}</span>
+          </span>
+        ) : (
+          <span className="flex items-center gap-1 whitespace-nowrap text-amber-600">
+            <i className="fa-solid fa-triangle-exclamation text-[10px]"></i>
+            Nunca contactado
+          </span>
         )}
+      </div>
 
-        {/* Buttons actions*/}
+      {/* Footer: Salesperson + Phone + Buttons */}
+      <div className="border-t mt-2 pt-2 border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          {customer.salesperson && (
+            <div className="inline-flex items-center gap-1.5 text-xs">
+              <i className="fa-solid fa-user text-[10px] text-gray-600"></i>
+              <span className="font-medium text-gray-700">{customer.salesperson}</span>
+            </div>
+          )}
+          <div className="inline-flex items-center gap-1.5 text-xs">
+            <i className="fa-solid fa-phone text-[10px] text-gray-600"></i>
+            <span className="text-gray-600">{customer.phone}</span>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           {onContact && (
             <button
@@ -76,10 +96,10 @@ function LongWaitCard({ customer, onContact, onReadyForPickup, onArchive }: Long
             <button
               onClick={() => onReadyForPickup(customer)}
               className="inline-flex items-center justify-center gap-1.5 px-4 py-2 sm:px-3 sm:py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium rounded-full transition-colors border border-blue-200 cursor-pointer min-h-[44px] sm:min-h-0"
-              title="Reativar cliente move ele para Pronto para Retirada"
+              title="Marcar produto como disponível para retirada"
             >
-              <i className="fa-solid fa-arrow-rotate-left text-[10px]"></i>
-              <span>Reativar</span>
+              <i className="fa-solid fa-check text-[10px]"></i>
+              <span>Disponível</span>
             </button>
           )}
           {onArchive && (

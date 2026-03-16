@@ -88,27 +88,29 @@ export default function StoreForm({ initialData, onSubmit, onCancel }: StoreForm
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Cor <span className="text-red-500">*</span>
         </label>
-        <div className="flex items-center gap-2">
-          <input
-            type="color"
-            {...register('color')}
-            onChange={(e) => setValue('color', e.target.value.toUpperCase())}
-            className="w-12 h-10 rounded cursor-pointer border border-gray-300"
-            disabled={isLoading}
-          />
-          <input
-            type="text"
-            value={color}
-            onChange={(e) => setValue('color', e.target.value.toUpperCase())}
-            className={`flex-1 px-3 py-2 border rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-              errors.color ? 'border-red-500' : 'border-gray-300'
-            }`}
-            placeholder="#3B82F6"
-            maxLength={7}
-            disabled={isLoading}
-          />
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              {...register('color')}
+              onChange={(e) => setValue('color', e.target.value.toUpperCase())}
+              className="w-12 h-10 rounded cursor-pointer border border-gray-300 flex-shrink-0"
+              disabled={isLoading}
+            />
+            <input
+              type="text"
+              value={color}
+              onChange={(e) => setValue('color', e.target.value.toUpperCase())}
+              className={`flex-1 px-3 py-2 border rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.color ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="#3B82F6"
+              maxLength={7}
+              disabled={isLoading}
+            />
+          </div>
           <span
-            className="px-3 py-1.5 rounded-full text-white text-sm font-medium shadow-sm"
+            className="self-start sm:self-auto px-3 py-1.5 rounded-full text-white text-sm font-medium shadow-sm truncate max-w-full sm:max-w-[160px]"
             style={{ backgroundColor: color }}
           >
             {watch('name') || 'Preview'}

@@ -273,10 +273,7 @@ function History() {
                   <h3 className="text-sm font-semibold text-gray-800">Filtros de Transferências</h3>
                 </div>
 
-                <div
-                  className="grid gap-2 sm:gap-3"
-                  style={{ gridTemplateColumns: `repeat(${Math.min(filterButtons.length, 4)}, 1fr)` }}
-                >
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-3">
                   {filterButtons.map((filter) => (
                     <FilterButton
                       key={filter.value}
