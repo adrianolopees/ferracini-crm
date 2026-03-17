@@ -308,7 +308,7 @@ function History() {
                   {searchTerm && <p className="text-gray-500 text-sm mt-1">Tente outro termo de busca</p>}
                 </div>
               ) : (
-                <AnimatePresence mode="popLayout">
+                <AnimatePresence mode="sync">
                   {filteredCustomers.map((customer, index) => {
                     const isArchivedTab = activeTab === 'archived';
                     const isTransferTab = activeTab === 'transfers';
