@@ -103,9 +103,9 @@ function SearchCustomers() {
 
   return (
     <PageLayout
-      title="Buscar"
-      highlight="Clientes"
-      subtitle="Produto novo chegou? Encontre quem está aguardando"
+      title="Consultar"
+      highlight="Fila"
+      subtitle="Veja quem aguarda este produto e notifique"
       maxWidth="2xl"
     >
       {/* Card de Busca */}

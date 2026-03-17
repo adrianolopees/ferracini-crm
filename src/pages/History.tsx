@@ -246,9 +246,9 @@ function History() {
 
   return (
     <PageLayout
-      title="Histórico de"
-      highlight="Clientes"
-      subtitle="Vendas finalizadas, transferências recebidas e clientes arquivados"
+      title="Histórico"
+      highlight="Completo"
+      subtitle="Finalizados, transferências e arquivados"
       maxWidth="2xl"
     >
       {/* Tabs e Conteúdo */}

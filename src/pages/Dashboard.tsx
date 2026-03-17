@@ -189,9 +189,9 @@ function Dashboard() {
 
   return (
     <PageLayout
-      title="Painel de"
-      highlight="Controle"
-      subtitle="Sistema para gerenciar solicitações de clientes, transferências entre lojas e reposições de estoque"
+      title="Visão"
+      highlight="Geral"
+      subtitle="Reservas ativas, transferências e retiradas"
     >
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-5xl mx-auto">
         {/* Card 1: Clientes Aguardando */}
@@ -199,7 +199,7 @@ function Dashboard() {
           <ActionCard
             title="Aguardando"
             value={metrics.totalActive}
-            subtitle={metrics.urgentCount > 0 ? `${metrics.urgentCount} urgente(s)` : 'Clientes na fila de espera'}
+            subtitle={metrics.urgentCount > 0 ? `${metrics.urgentCount} urgente(s)` : 'Na fila de espera'}
             icon="fa-solid fa-clock"
             colorScheme="blue"
             loading={loading}
@@ -210,9 +210,9 @@ function Dashboard() {
         {/* Card 2: Aguardando Transferência */}
         <AnimatedContainer type="slideDown" delay={0.2}>
           <ActionCard
-            title="Em Transferência"
+            title="Transferência"
             value={metrics.totalAwaitingTransfer}
-            subtitle="Aguardando transferência"
+            subtitle="A caminho da loja"
             icon="fa-solid fa-truck"
             colorScheme="yellow"
             loading={loading}
@@ -223,7 +223,7 @@ function Dashboard() {
         {/* Card 3: Pronto para Retirada */}
         <AnimatedContainer type="slideDown" delay={0.3}>
           <ActionCard
-            title="Pronto para Retirada"
+            title="Retirada"
             value={metrics.totalReadyForPickup}
             subtitle={
               metrics.totalFinished > 0

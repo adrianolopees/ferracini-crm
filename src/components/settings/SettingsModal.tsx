@@ -8,7 +8,7 @@ interface SettingsModalProps {
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   return (
-    <DialogModal isOpen={isOpen} onClose={onClose} title="Configurações de Lojas">
+    <DialogModal isOpen={isOpen} onClose={onClose} title="Configurações">
       <SettingsContent />
     </DialogModal>
   );

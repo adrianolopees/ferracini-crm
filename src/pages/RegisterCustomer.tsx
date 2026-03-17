@@ -79,9 +79,9 @@ function RegisterCustomer() {
 
   return (
     <PageLayout
-      title="Reservas de"
-      highlight="Clientes"
-      subtitle="Produto fora de estoque? Registre aqui"
+      title="Nova"
+      highlight="Reserva"
+      subtitle="Cadastre cliente para produto indisponível"
       maxWidth="2xl"
     >
       {/* Card do Formulário */}

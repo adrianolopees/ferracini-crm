@@ -101,7 +101,7 @@ export default function SettingsContent() {
         <div className="space-y-6">
           {/* Loja Principal */}
           <section>
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Minha Loja</h3>
+            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Loja Principal</h3>
             <StoreCard
               store={defaultStore}
               onUpdate={(updates) => updateStore(defaultStore.id, updates)}
@@ -113,7 +113,7 @@ export default function SettingsContent() {
           <section>
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Lojas de Transferência</h3>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Lojas Parceiras</h3>
                 <p className="text-xs text-gray-400 mt-0.5">Aparecem nos botões de consulta do workflow</p>
               </div>
               {!showAddForm && (
