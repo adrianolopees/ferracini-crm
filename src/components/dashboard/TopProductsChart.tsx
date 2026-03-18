@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useProductRanking } from '@/hooks';
 import { Spinner } from '../ui';
@@ -13,18 +13,6 @@ interface TopProductsChartProps {
 function TopProductsChart({ customers, loading }: TopProductsChartProps) {
   const { products, allProducts, totalReserves } = useProductRanking(customers, 10);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const COLORS = [
     '#1E3A8A', // blue-900
@@ -66,8 +54,8 @@ function TopProductsChart({ customers, loading }: TopProductsChartProps) {
         Top 10 Produtos Mais Procurados
       </h3>
 
-      {/* Lista com Ranking para Mobile */}
-      {isMobile && (
+      {/* Lista com Ranking — visível só no mobile */}
+      <div className="block sm:hidden">
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="space-y-3">
             {products.slice(0, 5).map((product, index) => {
@@ -90,13 +78,10 @@ function TopProductsChart({ customers, loading }: TopProductsChartProps) {
             })}
           </div>
 
-          {/* Mensagem e Total */}
           <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
             <div className="flex items-center justify-center gap-2">
               <i className="fa-solid fa-chart-simple text-blue-500"></i>
-              <span className="text-xs text-gray-600">
-                Total: {totalReserves} reservas
-              </span>
+              <span className="text-xs text-gray-600">Total: {totalReserves} reservas</span>
             </div>
             {allProducts.length > 5 && (
               <button
@@ -109,31 +94,19 @@ function TopProductsChart({ customers, loading }: TopProductsChartProps) {
             )}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Gráfico - Oculto em Mobile */}
-      {!isMobile && (
+      {/* Gráfico — visível só no desktop */}
+      <div className="hidden sm:block">
         <ResponsiveContainer width="100%" height={400}>
           <BarChart
             data={products}
             layout="vertical"
-            margin={{
-              top: 5,
-              right: 20,
-              left: 0,
-              bottom: 5,
-            }}
+            margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
           >
-            {/* Grid de fundo */}
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-
-            {/* Eixo X (quantidade) */}
             <XAxis type="number" tick={{ fill: '#6B7280', fontSize: 12 }} />
-
-            {/* Eixo Y (nomes dos produtos) */}
             <YAxis type="category" dataKey="name" width={80} tick={{ fill: '#6B7280', fontSize: 12 }} />
-
-            {/* Tooltip ao passar mouse */}
             <Tooltip
               contentStyle={{
                 backgroundColor: '#FFFFFF',
@@ -145,16 +118,9 @@ function TopProductsChart({ customers, loading }: TopProductsChartProps) {
                 boxShadow: '0 10px 25px rgba(59, 130, 246, 0.15)',
               }}
               formatter={(value: number) => [`${value} ${value === 1 ? 'cliente' : 'clientes'}`, 'Total']}
-              labelStyle={{
-                fontWeight: 'bold',
-                marginBottom: '4px',
-                color: '#3B82F6',
-                fontSize: '13px',
-              }}
+              labelStyle={{ fontWeight: 'bold', marginBottom: '4px', color: '#3B82F6', fontSize: '13px' }}
               cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }}
             />
-
-            {/* Barras */}
             <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={25}>
               {products.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -162,10 +128,7 @@ function TopProductsChart({ customers, loading }: TopProductsChartProps) {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-      )}
 
-      {/* Rodapé Desktop: total + ver todos */}
-      {!isMobile && (
         <div className="mt-4 flex items-center justify-between px-1">
           <p className="text-xs text-gray-500 flex items-center gap-1">
             <i className="fa-solid fa-chart-simple text-blue-500"></i>
@@ -181,7 +144,7 @@ function TopProductsChart({ customers, loading }: TopProductsChartProps) {
             </button>
           )}
         </div>
-      )}
+      </div>
 
       <AllProductsModal
         isOpen={isModalOpen}
