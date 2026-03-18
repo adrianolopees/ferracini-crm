@@ -10,7 +10,7 @@ import { Store } from '@/schemas/storeSettingsSchema';
 import { notifyOtherStore, notifyProductArrived, sendGenericMessage, sendToStore } from '@/services/whatsappService';
 import { useCustomerDashboard, useStoreSettings } from '@/hooks';
 import { updateCustomer } from '@/repositories';
-import { getCurrentTimestamp } from '@/utils';
+import { getCurrentTimestamp, getFirebaseErrorMessage } from '@/utils';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -40,8 +40,7 @@ function Dashboard() {
       setTimeout(() => setHighlightedCustomerId(null), 3000);
     } catch (error) {
       console.error('Erro na operação:', error);
-      const message = error instanceof Error ? error.message : 'Erro ao processar ação';
-      toast.error(message);
+      toast.error(getFirebaseErrorMessage(error));
     }
   };
 

@@ -12,7 +12,7 @@ import { useCustomerHistory, useStoreSettings } from '@/hooks';
 import { sendGenericMessage } from '@/services/whatsappService';
 import { WorkflowSkeleton } from '@/components/skeletons';
 import { deleteCustomerById, updateCustomer } from '@/repositories';
-import { getCurrentTimestamp } from '@/utils';
+import { getCurrentTimestamp, getFirebaseErrorMessage } from '@/utils';
 
 type TabType = 'finalized' | 'transfers' | 'archived' | 'long_wait';
 
@@ -109,7 +109,7 @@ function History() {
       refresh();
     } catch (error) {
       console.error('Erro ao reativar cliente:', error);
-      toast.error('Erro ao reativar cliente');
+      toast.error(getFirebaseErrorMessage(error));
     }
   };
 
@@ -129,7 +129,7 @@ function History() {
       refresh();
     } catch (error) {
       console.error('Erro ao excluir cliente:', error);
-      toast.error('Erro ao excluir cliente');
+      toast.error(getFirebaseErrorMessage(error));
     }
   };
 
@@ -148,7 +148,7 @@ function History() {
       refresh();
     } catch (error) {
       console.error('Erro ao mover cliente:', error);
-      toast.error('Erro ao atualizar cliente');
+      toast.error(getFirebaseErrorMessage(error));
     }
   };
 
@@ -173,7 +173,7 @@ function History() {
       refresh();
     } catch (error) {
       console.error('Erro ao arquivar cliente:', error);
-      toast.error('Erro ao arquivar cliente');
+      toast.error(getFirebaseErrorMessage(error));
     }
   };
 

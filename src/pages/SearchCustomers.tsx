@@ -9,11 +9,12 @@ import { WorkflowCard } from '@/components/dashboard';
 import { ArchiveModal } from '@/components/modals';
 import { AnimatedContainer, AnimatedListItem } from '@/components/animations';
 import { WorkflowSkeleton } from '@/components/skeletons';
-import { useAuth } from '@/hooks';
+import { useAuth, useStoreSettings } from '@/hooks';
 import { getCurrentTimestamp } from '@/utils';
 
 function SearchCustomers() {
   const { workspaceId } = useAuth();
+  const { defaultStore } = useStoreSettings();
   const [searchTerm, setSearchTerm] = useState('');
   const [allCustomers, setAllCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,9 +68,9 @@ function SearchCustomers() {
       await updateCustomer(customer.id, {
         status: 'readyForPickup',
         contactedAt: getCurrentTimestamp(),
-        sourceStore: 'Jundiaí',
+        sourceStore: defaultStore?.name,
       });
-      notifyProductArrived(customer);
+      notifyProductArrived(customer, defaultStore?.name || 'Loja');
       toast.success(`${customer.name} movido para "Pronto para Retirada"`);
       setAllCustomers(allCustomers.filter((c) => c.id !== customer.id));
     } catch (error) {
