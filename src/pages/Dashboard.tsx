@@ -274,15 +274,12 @@ function Dashboard() {
                   metrics.totalFinished > 0
                     ? Math.round(
                         (metrics.totalFinished /
-                          (metrics.totalActive +
-                            metrics.totalAwaitingTransfer +
-                            metrics.totalReadyForPickup +
-                            metrics.totalFinished)) *
+                          (metrics.totalFinished + metrics.totalArchived)) *
                           100
                       )
                     : 0
                 }%`}
-                subtitle="vendidos"
+                subtitle="de fechamento"
                 icon="fa-solid fa-chart-line"
                 colorScheme="cyan"
                 loading={loading}

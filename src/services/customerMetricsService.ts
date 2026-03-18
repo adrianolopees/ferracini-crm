@@ -6,6 +6,7 @@ export interface CustomerMetrics {
   totalReadyForPickup: number;
   totalAwaitingTransfer: number;
   totalFinished: number;
+  totalArchived: number;
   averageWaitTime: number;
   urgentCount: number;
   longWaitCount: number;
@@ -53,6 +54,7 @@ export function processCustomersForDashboard(
       }
 
       if (customer.archived) {
+        acc.metrics.totalArchived++;
         acc.lists.archived.push(customer);
         return acc;
       }
@@ -96,6 +98,7 @@ export function processCustomersForDashboard(
         totalReadyForPickup: 0,
         totalAwaitingTransfer: 0,
         totalFinished: 0,
+        totalArchived: 0,
         averageWaitTime: 0,
         urgentCount: 0,
         longWaitCount: 0,
