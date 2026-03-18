@@ -4,10 +4,12 @@ import { processCustomersForDashboard } from '@/services/customerMetricsService'
 import useAuth from './useAuth';
 import useStoreSettings from './useStoreSettings';
 import type { CustomerMetrics, CustomerLists } from '@/services/customerMetricsService';
+import type { Customer } from '@/schemas/customerSchema';
 
 interface CustomerDashboard {
   metrics: CustomerMetrics;
   lists: CustomerLists;
+  allCustomers: Customer[];
   loading: boolean;
   refresh: () => void;
 }
@@ -34,6 +36,7 @@ function useCustomerDashboard(): CustomerDashboard {
       finalized: [],
       archived: [],
     },
+    allCustomers: [],
   });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -61,6 +64,7 @@ function useCustomerDashboard(): CustomerDashboard {
         setData({
           metrics,
           lists,
+          allCustomers,
         });
       } catch (error) {
         console.error('Erro ao buscar dados:', error);

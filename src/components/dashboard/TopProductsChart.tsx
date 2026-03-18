@@ -2,9 +2,17 @@ import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useProductRanking } from '@/hooks';
 import { Spinner } from '../ui';
+import { AllProductsModal } from '../modals';
+import type { Customer } from '@/schemas/customerSchema';
 
-function TopProductsChart() {
-  const { products, totalReserves, loading } = useProductRanking(10);
+interface TopProductsChartProps {
+  customers: Customer[];
+  loading: boolean;
+}
+
+function TopProductsChart({ customers, loading }: TopProductsChartProps) {
+  const { products, allProducts, totalReserves } = useProductRanking(customers, 10);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -83,18 +91,22 @@ function TopProductsChart() {
           </div>
 
           {/* Mensagem e Total */}
-          <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
-            {products.length > 5 && (
-              <p className="text-xs text-gray-500 text-center">
-                +{products.length - 5} produtos • Ver todos no desktop
-              </p>
-            )}
+          <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
             <div className="flex items-center justify-center gap-2">
               <i className="fa-solid fa-chart-simple text-blue-500"></i>
               <span className="text-xs text-gray-600">
-                Total: {products.reduce((sum, p) => sum + p.count, 0)} reservas
+                Total: {totalReserves} reservas
               </span>
             </div>
+            {allProducts.length > 5 && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="w-full text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <i className="fa-solid fa-list text-[10px]"></i>
+                Ver todos os {allProducts.length} modelos
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -152,13 +164,31 @@ function TopProductsChart() {
         </ResponsiveContainer>
       )}
 
-      {/* Legenda - Apenas Desktop */}
+      {/* Rodapé Desktop: total + ver todos */}
       {!isMobile && (
-        <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1">
-          <i className="fa-solid fa-chart-simple text-blue-500"></i>
-          Baseado em {totalReserves} reservas
-        </p>
+        <div className="mt-4 flex items-center justify-between px-1">
+          <p className="text-xs text-gray-500 flex items-center gap-1">
+            <i className="fa-solid fa-chart-simple text-blue-500"></i>
+            Baseado em {totalReserves} reservas
+          </p>
+          {allProducts.length > 10 && (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1.5 cursor-pointer"
+            >
+              <i className="fa-solid fa-list text-[10px]"></i>
+              Ver todos os {allProducts.length} modelos
+            </button>
+          )}
+        </div>
       )}
+
+      <AllProductsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        products={allProducts}
+        totalReserves={totalReserves}
+      />
     </div>
   );
 }
