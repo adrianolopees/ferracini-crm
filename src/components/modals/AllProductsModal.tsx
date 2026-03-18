@@ -58,16 +58,14 @@ function AllProductsModal({ isOpen, onClose, products, totalReserves }: AllProdu
         <p className="text-center text-gray-500 text-sm py-8">Nenhum modelo encontrado</p>
       ) : (
         <div className="space-y-2">
-          {filtered.map((product, index) => {
+          {filtered.map((product) => {
             const globalRank = products.indexOf(product) + 1;
             const pct = Math.round((product.count / maxCount) * 100);
 
             return (
               <div key={product.name} className="flex items-center gap-3 py-2 px-1">
                 {/* Rank */}
-                <span className="w-7 text-right text-xs font-semibold text-gray-400 flex-shrink-0">
-                  #{globalRank}
-                </span>
+                <span className="w-7 text-right text-xs font-semibold text-gray-400 flex-shrink-0">#{globalRank}</span>
 
                 {/* Nome + barra */}
                 <div className="flex-1 min-w-0">
