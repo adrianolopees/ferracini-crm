@@ -7,7 +7,7 @@ import { SettingsModal } from '../settings';
 function Navigation() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, workspaceId } = useAuth();
+  const { logout } = useAuth();
   const { defaultStore } = useStoreSettings();
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -29,7 +29,7 @@ function Navigation() {
               className="w-8 h-8 object-contain flex-shrink-0"
             />
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 hidden sm:block">
-              <span style={{ color: workspaceId === 'demo' ? '#d97706' : (defaultStore?.color ?? '#2563eb') }}>
+              <span style={{ color: defaultStore?.color ?? '#2563eb' }}>
                 {defaultStore?.name ?? ''}
               </span>
             </h2>
