@@ -32,7 +32,7 @@ function HistoryCard({ customer }: HistoryCardProps) {
       {/* Product Details */}
       <div className="space-y-2 sm:space-y-3">
         <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 flex-wrap">
-          <span className="font-stretch-50% text-gray-900">{customer.model}</span>
+          <span className="font-semibold text-gray-900">{customer.model}</span>
           <i className="fa-solid fa-arrow-right text-gray-400 text-[10px]"></i>
           <span className="flex items-center gap-1">
             <i className="fa-solid fa-barcode text-[10px]"></i>
