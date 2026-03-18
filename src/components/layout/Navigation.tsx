@@ -21,9 +21,14 @@ function Navigation() {
     <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo/Brand + Config */}
-          <div className="flex items-center justify-center gap-1">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+          {/* Logo/Brand */}
+          <div className="flex items-center gap-2">
+            <img
+              src="/sino-de-notificacao.png"
+              alt="Logo"
+              className="w-8 h-8 object-contain flex-shrink-0"
+            />
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 hidden sm:block">
               <span style={{ color: workspaceId === 'demo' ? '#d97706' : (defaultStore?.color ?? '#2563eb') }}>
                 {defaultStore?.name ?? ''}
               </span>
