@@ -1,5 +1,5 @@
 import { Customer } from '@/schemas/customerSchema';
-import { formatDate, getDaysBetween } from '@/utils';
+import { formatDate, getDaysBetween, formatDays } from '@/utils';
 import useStoreSettings from '@/hooks/useStoreSettings';
 
 interface TransferCardProps {
@@ -84,7 +84,7 @@ function TransferCard({ customer }: TransferCardProps) {
               style={{ backgroundColor: `${storeColor}20`, color: storeColor }}
             >
               <i className="fa-solid fa-truck-fast text-[10px]"></i>
-              Atendido em {getDaysBetween(customer.transferredAt, customer.contactedAt)}
+              Atendido em {formatDays(getDaysBetween(customer.transferredAt, customer.contactedAt))}
             </span>
           )}
         </div>

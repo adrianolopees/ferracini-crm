@@ -49,7 +49,7 @@ function ArchivedCard({ customer, onRestore, onDelete }: ArchivedCardProps) {
             <i className="fa-solid fa-box-archive text-gray-500 text-[10px]"></i>
             <span>Arquivado:</span>
             <span className="text-gray-700">{formatDate(customer.archivedAt)}</span>
-            <span className="text-gray-400 italic">({getTimeAgo(customer.archivedAt)} atrás)</span>
+            <span className="text-gray-400 italic">({getTimeAgo(customer.archivedAt)})</span>
           </span>
         </div>
       )}

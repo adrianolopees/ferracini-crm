@@ -1,5 +1,5 @@
 import { Customer } from '@/schemas/customerSchema';
-import { formatDate, getDaysBetween } from '@/utils';
+import { formatDate, getDaysBetween, formatDays } from '@/utils';
 import useStoreSettings from '@/hooks/useStoreSettings';
 
 interface HistoryCardProps {
@@ -24,7 +24,7 @@ function HistoryCard({ customer }: HistoryCardProps) {
         {cycleDays && (
           <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap">
             <i className="fa-solid fa-stopwatch text-[10px]"></i>
-            Ciclo: {cycleDays}
+            Ciclo: {formatDays(cycleDays)}
           </span>
         )}
       </div>
