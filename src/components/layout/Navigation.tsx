@@ -20,26 +20,26 @@ function Navigation() {
   return (
     <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo/Brand */}
+        <div className="grid md:grid-cols-[1fr_auto_1fr] items-center h-16">
+          {/* Coluna 1 — Logo/Brand (alinhado à esquerda) */}
           <div className="flex items-center gap-2">
             <img
               src="/sino-de-notificacao.png"
               alt="Logo"
               className="w-6 h-6 object-contain flex-shrink-0"
             />
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 hidden sm:block">
+            <h2 className="text-lg font-bold text-gray-900 hidden md:block">
               <span style={{ color: defaultStore?.color ?? '#2563eb' }}>
                 {defaultStore?.name ?? ''}
               </span>
             </h2>
           </div>
 
-          {/* Tabs for Navigation */}
-          <div className="flex justify-around md:justify-center md:space-x-1 bg-gray-100 rounded-t-lg md:rounded-lg px-2 md:px-1 py-1 fixed md:sticky md:top-0 bottom-0 right-0 left-0 z-50 border-t md:border-0 border-gray-200 shadow-lg md:shadow-none">
+          {/* Coluna 2 — Tabs (centralizado) */}
+          <div className="flex justify-around md:justify-center md:gap-1 bg-gray-100 rounded-t-lg md:rounded-lg px-2 md:px-1 py-1 fixed md:static bottom-0 right-0 left-0 z-50 border-t md:border-0 border-gray-200 shadow-lg md:shadow-none">
             <button
               onClick={() => navigate('/dashboard')}
-              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-6 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
                 isDashboard ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -49,7 +49,7 @@ function Navigation() {
 
             <button
               onClick={() => navigate('/register')}
-              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-6 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
                 isRegister ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -59,7 +59,7 @@ function Navigation() {
 
             <button
               onClick={() => navigate('/search')}
-              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-6 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
                 isSearch ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -69,7 +69,7 @@ function Navigation() {
 
             <button
               onClick={() => navigate('/history')}
-              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-6 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
                 isHistory ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -78,8 +78,8 @@ function Navigation() {
             </button>
           </div>
 
-          {/* Engrenagem + Sair */}
-          <div className="flex items-center gap-2">
+          {/* Coluna 3 — Ações (alinhado à direita) */}
+          <div className="flex items-center justify-end gap-2">
             <button
               onClick={() => setIsSettingsOpen(true)}
               className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200 cursor-pointer"

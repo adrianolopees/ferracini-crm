@@ -1,20 +1,13 @@
 import { Customer } from '@/schemas/customerSchema';
 import { formatDate, getDaysBetween, formatDays } from '@/utils';
-import useStoreSettings from '@/hooks/useStoreSettings';
 
 interface HistoryCardProps {
   customer: Customer;
 }
 
 function HistoryCard({ customer }: HistoryCardProps) {
-  const { defaultStore, transferStores } = useStoreSettings();
-  const isDefaultStore = customer.sourceStore === defaultStore?.name;
-  const isTransferStore = transferStores.some((s) => s.name === customer.sourceStore);
-
   const cycleDays =
-    customer.createdAt && customer.completedAt
-      ? getDaysBetween(customer.createdAt, customer.completedAt)
-      : null;
+    customer.createdAt && customer.completedAt ? getDaysBetween(customer.createdAt, customer.completedAt) : null;
 
   return (
     <div className="border-l-4 border-l-emerald-500 bg-emerald-50/50 rounded-lg p-3 sm:p-4 hover:shadow-md transition-shadow duration-200">
@@ -81,19 +74,6 @@ function HistoryCard({ customer }: HistoryCardProps) {
             <span className="text-gray-600">{customer.phone}</span>
           </div>
         </div>
-
-        {/* Badge de Origem */}
-        {isDefaultStore ? (
-          <div className="inline-flex items-center gap-1.5 text-xs bg-emerald-100 px-2 py-1 rounded-full whitespace-nowrap">
-            <i className="fa-solid fa-store text-[10px] text-gray-600"></i>
-            <span className="font-medium text-gray-700">{customer.sourceStore}</span>
-          </div>
-        ) : isTransferStore ? (
-          <div className="inline-flex items-center gap-1.5 text-xs bg-blue-100 px-2 py-1 rounded-full whitespace-nowrap">
-            <i className="fa-solid fa-truck-fast text-[10px] text-gray-600"></i>
-            <span className="font-medium text-gray-700">{customer.sourceStore}</span>
-          </div>
-        ) : null}
       </div>
     </div>
   );
