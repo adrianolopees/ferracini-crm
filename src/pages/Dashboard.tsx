@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PageLayout } from '@/components/layout';
 import { AnimatedContainer } from '@/components/animations';
-import { ActionCard, MetricCard, LongWaitAlert, TopProductsChart } from '@/components/dashboard';
+import { ActionCard, MetricCard, LongWaitAlert, TopProductsChart, LossReasonsChart, SalespersonRankingChart, FunnelSpeedChart } from '@/components/dashboard';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { Store } from '@/schemas/storeSettingsSchema';
@@ -299,6 +299,15 @@ function Dashboard() {
             <div>
               <TopProductsChart customers={allCustomers} loading={loading} />
             </div>
+
+            {/* Gráfico de Motivos de Perda */}
+            <LossReasonsChart archived={lists.archived} loading={loading} />
+
+            {/* Ranking de Vendedores */}
+            <SalespersonRankingChart customers={allCustomers} loading={loading} />
+
+            {/* Velocidade do Funil */}
+            <FunnelSpeedChart customers={allCustomers} loading={loading} />
           </div>
         </AnimatedContainer>
       </div>

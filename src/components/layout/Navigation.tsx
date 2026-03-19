@@ -26,7 +26,7 @@ function Navigation() {
             <img
               src="/sino-de-notificacao.png"
               alt="Logo"
-              className="w-8 h-8 object-contain flex-shrink-0"
+              className="w-6 h-6 object-contain flex-shrink-0"
             />
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 hidden sm:block">
               <span style={{ color: defaultStore?.color ?? '#2563eb' }}>
