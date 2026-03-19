@@ -61,6 +61,11 @@ export function StoreSettingsProvider({ children }: { children: ReactNode }) {
   const allStores = useMemo(() => settings?.stores || [], [settings]);
   const defaultStore = useMemo(() => allStores.find((s) => s.id === workspaceId) || null, [allStores, workspaceId]);
   const transferStores = useMemo(() => allStores.filter((s) => s.id !== workspaceId), [allStores, workspaceId]);
+
+  useEffect(() => {
+    const color = defaultStore?.color ?? '#2563eb';
+    document.documentElement.style.setProperty('--color-brand', color);
+  }, [defaultStore?.color]);
   const salespeople = useMemo(() => settings?.salespeople || [], [settings]);
 
   const getWorkspaceId = (): WorkspaceId => {

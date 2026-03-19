@@ -5,6 +5,19 @@ import { Store, CreateStore, CreateStoreSchema } from '@/schemas/storeSettingsSc
 import { Input, Button, Spinner } from '@/components/ui';
 import { maskPhone } from '@/utils';
 
+const BRAND_COLORS = [
+  { hex: '#2563EB', name: 'Azul' },
+  { hex: '#4F46E5', name: 'Índigo' },
+  { hex: '#7C3AED', name: 'Violeta' },
+  { hex: '#9333EA', name: 'Roxo' },
+  { hex: '#0284C7', name: 'Céu' },
+  { hex: '#0D9488', name: 'Teal' },
+  { hex: '#0891B2', name: 'Ciano' },
+  { hex: '#DB2777', name: 'Rosa' },
+  { hex: '#E11D48', name: 'Carmim' },
+  { hex: '#475569', name: 'Ardósia' },
+];
+
 interface StoreFormProps {
   initialData?: Store;
   onSubmit: (data: CreateStore) => Promise<void>;
@@ -85,37 +98,40 @@ export default function StoreForm({ initialData, onSubmit, onCancel }: StoreForm
 
       {/* Cor */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Cor <span className="text-red-500">*</span>
-        </label>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="color"
-              {...register('color')}
-              onChange={(e) => setValue('color', e.target.value.toUpperCase())}
-              className="w-12 h-[42px] rounded cursor-pointer border border-gray-300 flex-shrink-0"
-              disabled={isLoading}
-            />
-            <input
-              type="text"
-              value={color}
-              onChange={(e) => setValue('color', e.target.value.toUpperCase())}
-              className={`flex-1 px-4 py-2.5 border rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                errors.color ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="#3B82F6"
-              maxLength={7}
-              disabled={isLoading}
-            />
-          </div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Cor da loja <span className="text-red-500">*</span>
+          </label>
           <span
-            className="self-start sm:self-auto px-3 py-1.5 rounded-full text-white text-sm font-medium shadow-sm truncate max-w-full sm:max-w-[160px]"
+            className="px-3 py-1 rounded-full text-white text-xs font-medium shadow-sm truncate max-w-[160px]"
             style={{ backgroundColor: color }}
           >
             {watch('name') || 'Preview'}
           </span>
         </div>
+
+        <div className="flex flex-wrap gap-2">
+          {BRAND_COLORS.map((c) => {
+            const isSelected = color.toUpperCase() === c.hex;
+            return (
+              <button
+                key={c.hex}
+                type="button"
+                title={c.name}
+                disabled={isLoading}
+                onClick={() => setValue('color', c.hex, { shouldValidate: true })}
+                className="w-8 h-8 rounded-full transition-transform duration-150 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center justify-center flex-shrink-0"
+                style={{
+                  backgroundColor: c.hex,
+                  boxShadow: isSelected ? `0 0 0 2px white, 0 0 0 4px ${c.hex}` : undefined,
+                }}
+              >
+                {isSelected && <i className="fa-solid fa-check text-white text-xs"></i>}
+              </button>
+            );
+          })}
+        </div>
+
         {errors.color && (
           <p className="text-red-500 text-sm mt-1">{errors.color.message}</p>
         )}

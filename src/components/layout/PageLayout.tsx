@@ -6,12 +6,11 @@ interface PageLayoutProps {
   title: string;
   highlight: string;
   subtitle: string;
-  color?: string;
   maxWidth?: '2xl' | '3xl' | '4xl' | '5xl' | 'none';
   children: ReactNode;
 }
 
-function PageLayout({ title, highlight, subtitle, color, maxWidth = '4xl', children }: PageLayoutProps) {
+function PageLayout({ title, highlight, subtitle, maxWidth = '4xl', children }: PageLayoutProps) {
   // Map maxWidth values to complete Tailwind classes
   const maxWidthClasses = {
     '2xl': 'max-w-2xl',
@@ -30,7 +29,7 @@ function PageLayout({ title, highlight, subtitle, color, maxWidth = '4xl', child
         <div className={maxWidth === 'none' ? '' : `${maxWidthClass} mx-auto`}>
           {/* Header */}
           <AnimatedContainer type="slideDown">
-            <PageHeader title={title} highlight={highlight} subtitle={subtitle} color={color} />
+            <PageHeader title={title} highlight={highlight} subtitle={subtitle} />
           </AnimatedContainer>
 
           {/* Conteúdo da página */}

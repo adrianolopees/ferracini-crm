@@ -37,45 +37,24 @@ function Navigation() {
 
           {/* Coluna 2 — Tabs (centralizado) */}
           <div className="flex justify-around md:justify-center md:gap-1 bg-gray-100 rounded-t-lg md:rounded-lg px-2 md:px-1 py-1 fixed md:static bottom-0 right-0 left-0 z-50 border-t md:border-0 border-gray-200 shadow-lg md:shadow-none">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
-                isDashboard ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <i className="fa-solid fa-tachometer-alt text-xl md:text-base"></i>
-              <span className="text-[10px] md:text-xs lg:text-sm">Painel</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/register')}
-              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
-                isRegister ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <i className="fa-solid fa-user-plus text-xl md:text-base"></i>
-              <span className="text-[10px] md:text-xs lg:text-sm">Cadastrar</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/search')}
-              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
-                isSearch ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <i className="fa-solid fa-magnifying-glass text-xl md:text-base"></i>
-              <span className="text-[10px] md:text-xs lg:text-sm">Buscar</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/history')}
-              className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
-                isHistory ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <i className="fa-solid fa-clock-rotate-left text-xl md:text-base"></i>
-              <span className="text-[10px] md:text-xs lg:text-sm">Histórico</span>
-            </button>
+            {[
+              { path: '/dashboard', icon: 'fa-tachometer-alt', label: 'Painel', active: isDashboard },
+              { path: '/register', icon: 'fa-user-plus', label: 'Cadastrar', active: isRegister },
+              { path: '/search', icon: 'fa-magnifying-glass', label: 'Buscar', active: isSearch },
+              { path: '/history', icon: 'fa-clock-rotate-left', label: 'Histórico', active: isHistory },
+            ].map(({ path, icon, label, active }) => (
+              <button
+                key={path}
+                onClick={() => navigate(path)}
+                className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+                  active ? 'bg-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                }`}
+                style={active ? { color: 'var(--color-brand)' } : undefined}
+              >
+                <i className={`fa-solid ${icon} text-xl md:text-base`}></i>
+                <span className="text-[10px] md:text-xs lg:text-sm">{label}</span>
+              </button>
+            ))}
           </div>
 
           {/* Coluna 3 — Ações (alinhado à direita) */}
