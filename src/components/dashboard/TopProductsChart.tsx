@@ -51,7 +51,7 @@ function TopProductsChart({ customers, loading }: TopProductsChartProps) {
       {/* Título */}
       <h3 className="text-base text-center font-semibold text-gray-700 mb-4 flex items-center justify-center gap-2">
         <i className="fa-solid fa-fire text-orange-500"></i>
-        Top 10 Produtos Mais Procurados
+        10 Produtos Mais Procurados
       </h3>
 
       {/* Lista com Ranking — visível só no mobile */}
@@ -99,11 +99,7 @@ function TopProductsChart({ customers, loading }: TopProductsChartProps) {
       {/* Gráfico — visível só no desktop */}
       <div className="hidden sm:block">
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart
-            data={products}
-            layout="vertical"
-            margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-          >
+          <BarChart data={products} layout="vertical" margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
             <XAxis type="number" tick={{ fill: '#6B7280', fontSize: 12 }} />
             <YAxis type="category" dataKey="name" width={80} tick={{ fill: '#6B7280', fontSize: 12 }} />
