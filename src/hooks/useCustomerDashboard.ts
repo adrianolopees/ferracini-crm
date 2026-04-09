@@ -23,6 +23,7 @@ function useCustomerDashboard(): CustomerDashboard {
       totalReadyForPickup: 0,
       totalAwaitingTransfer: 0,
       totalFinished: 0,
+      totalArchived: 0,
       averageWaitTime: 0,
       urgentCount: 0,
       longWaitCount: 0,
