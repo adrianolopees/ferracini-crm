@@ -3,6 +3,7 @@ import { getAllCustomers } from '@/repositories';
 import { processCustomersForDashboard } from '@/services/customerMetricsService';
 import useAuth from './useAuth';
 import useStoreSettings from './useStoreSettings';
+import { getFirebaseErrorMessage } from '@/utils';
 import type { CustomerMetrics, CustomerLists } from '@/services/customerMetricsService';
 import type { Customer } from '@/schemas/customerSchema';
 
@@ -11,13 +12,14 @@ interface CustomerDashboard {
   lists: CustomerLists;
   allCustomers: Customer[];
   loading: boolean;
+  error: string | null;
   refresh: () => void;
 }
 
 function useCustomerDashboard(): CustomerDashboard {
   const { workspaceId } = useAuth();
   const { transferStores } = useStoreSettings();
-  const [data, setData] = useState<Omit<CustomerDashboard, 'loading' | 'refresh'>>({
+  const [data, setData] = useState<Omit<CustomerDashboard, 'loading' | 'refresh' | 'error'>>({
     metrics: {
       totalActive: 0,
       totalReadyForPickup: 0,
@@ -41,6 +43,7 @@ function useCustomerDashboard(): CustomerDashboard {
   });
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
@@ -54,6 +57,7 @@ function useCustomerDashboard(): CustomerDashboard {
       }
       try {
         setLoading(true);
+        setError(null); // Limpa erro anterior
 
         const allCustomers = await getAllCustomers(workspaceId);
 
@@ -69,6 +73,7 @@ function useCustomerDashboard(): CustomerDashboard {
         });
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
+        setError(getFirebaseErrorMessage(error)); // Expõe erro para UI
       } finally {
         setLoading(false);
       }
@@ -79,6 +84,7 @@ function useCustomerDashboard(): CustomerDashboard {
   return {
     ...data,
     loading,
+    error,
     refresh,
   };
 }

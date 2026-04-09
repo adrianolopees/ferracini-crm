@@ -3,8 +3,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PageLayout } from '@/components/layout';
 import { AnimatedContainer } from '@/components/animations';
-import { ActionCard, MetricCard, LongWaitAlert, TopProductsChart, LossReasonsChart, SalespersonRankingChart, FunnelSpeedChart } from '@/components/dashboard';
+import {
+  ActionCard,
+  MetricCard,
+  LongWaitAlert,
+  TopProductsChart,
+  LossReasonsChart,
+  SalespersonRankingChart,
+  FunnelSpeedChart,
+} from '@/components/dashboard';
 import { ArchiveModal, CustomerListModal } from '@/components/modals';
+import { Button } from '@/components/ui';
 import { Customer, ArchiveReason } from '@/schemas/customerSchema';
 import { Store } from '@/schemas/storeSettingsSchema';
 import { notifyOtherStore, notifyProductArrived, sendGenericMessage, sendToStore } from '@/services/whatsappService';
@@ -19,7 +28,7 @@ function Dashboard() {
   const [customerToArchive, setCustomerToArchive] = useState<Customer | null>(null);
   const [modalType, setModalType] = useState<'awaiting' | 'awaitingTransfer' | 'readyForPickup' | null>(null);
   const [highlightedCustomerId, setHighlightedCustomerId] = useState<string | null>(null);
-  const { metrics, lists, allCustomers, loading, refresh } = useCustomerDashboard();
+  const { metrics, lists, allCustomers, loading, error, refresh } = useCustomerDashboard();
   const { defaultStore, transferStores } = useStoreSettings();
 
   useEffect(() => {
@@ -187,11 +196,21 @@ function Dashboard() {
   };
 
   return (
-    <PageLayout
-      title="Visão"
-      highlight="Geral"
-      subtitle="Reservas ativas, transferências e retiradas"
-    >
+    <PageLayout title="Visão" highlight="Geral" subtitle="Reservas ativas, transferências e retiradas">
+      {error && (
+        <AnimatedContainer type="slideUp" delay={0.1}>
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <i className="fa-solid fa-exclamation-triangle"></i>
+              <span>{error}</span>
+            </div>
+            <Button onClick={refresh} variant="outline" size="sm">
+              Tentar Novamente
+            </Button>
+          </div>
+        </AnimatedContainer>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4 max-w-5xl mx-auto">
         {/* Card 1: Clientes Aguardando */}
         <AnimatedContainer type="slideDown" delay={0.1}>
@@ -272,11 +291,7 @@ function Dashboard() {
                 title="Taxa Conversão"
                 value={`${
                   metrics.totalFinished > 0
-                    ? Math.round(
-                        (metrics.totalFinished /
-                          (metrics.totalFinished + metrics.totalArchived)) *
-                          100
-                      )
+                    ? Math.round((metrics.totalFinished / (metrics.totalFinished + metrics.totalArchived)) * 100)
                     : 0
                 }%`}
                 subtitle="de fechamento"
