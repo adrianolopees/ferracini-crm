@@ -57,7 +57,7 @@ function useCustomerDashboard(): CustomerDashboard {
       }
       try {
         setLoading(true);
-        setError(null); // Limpa erro anterior
+        setError(null);
 
         const allCustomers = await getAllCustomers(workspaceId);
 
@@ -73,7 +73,7 @@ function useCustomerDashboard(): CustomerDashboard {
         });
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
-        setError(getFirebaseErrorMessage(error)); // Expõe erro para UI
+        setError(getFirebaseErrorMessage(error));
       } finally {
         setLoading(false);
       }

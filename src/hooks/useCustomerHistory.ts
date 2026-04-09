@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAllCustomers, updateCustomer } from '@/repositories';
-import { getCurrentTimestamp } from '@/utils';
+import { getCurrentTimestamp, getFirebaseErrorMessage } from '@/utils';
 import { processCustomersForHistory, CustomerHistoryLists } from '@/services/customerMetricsService';
 import useAuth from './useAuth';
 import useStoreSettings from './useStoreSettings';
@@ -8,6 +8,7 @@ import useStoreSettings from './useStoreSettings';
 interface CustomerHistory {
   lists: CustomerHistoryLists;
   loading: boolean;
+  error: string | null;
   refresh: () => void;
 }
 
@@ -17,6 +18,7 @@ function useCustomerHistory(): CustomerHistory {
   const [allCustomers, setAllCustomers] = useState<Awaited<ReturnType<typeof getAllCustomers>>>([]);
   const [loading, setLoading] = useState(true);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
     setRefreshTrigger((prev) => prev + 1);
@@ -30,10 +32,12 @@ function useCustomerHistory(): CustomerHistory {
       }
       try {
         setLoading(true);
+        setError(null);
         const customers = await getAllCustomers(workspaceId);
         setAllCustomers(customers);
       } catch (error) {
         console.error('Erro ao buscar dados do histórico:', error);
+        setError(getFirebaseErrorMessage(error));
       } finally {
         setLoading(false);
       }
@@ -55,25 +59,29 @@ function useCustomerHistory(): CustomerHistory {
     if (processed.toAutoArchive.length === 0) return;
 
     const archiveExceeded = async () => {
-      await Promise.all(
-        processed.toAutoArchive.map((customer) =>
-          updateCustomer(customer.id, {
-            archived: true,
-            archiveReason: 'exceeded_wait_time',
-            archivedAt: getCurrentTimestamp(),
-            notes: 'Arquivado automaticamente por exceder 60 dias de espera',
-          })
-        )
-      );
-      setRefreshTrigger((prev) => prev + 1);
+      try {
+        await Promise.all(
+          processed.toAutoArchive.map((customer) =>
+            updateCustomer(customer.id, {
+              archived: true,
+              archiveReason: 'exceeded_wait_time',
+              archivedAt: getCurrentTimestamp(),
+              notes: 'Arquivado automaticamente por exceder 60 dias de espera',
+            })
+          )
+        );
+        setRefreshTrigger((prev) => prev + 1);
+      } catch (error) {
+        console.error('Arquivamento automatico não efetuado:', error);
+      }
     };
-
     archiveExceeded();
   }, [processed.toAutoArchive]);
 
   return {
     lists: processed,
     loading,
+    error,
     refresh,
   };
 }
