@@ -16,8 +16,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": { "@/*": ["./src/*"] },
+    "ignoreDeprecations": "6.0",
 
-    /* Linting - COMEÇAMOS SUAVE */
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
