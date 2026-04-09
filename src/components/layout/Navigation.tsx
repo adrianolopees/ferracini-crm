@@ -18,68 +18,87 @@ function Navigation() {
   const isHistory = location.pathname === '/history';
 
   return (
-    <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-[1fr_auto_1fr] items-center h-16">
-          {/* Coluna 1 — Logo/Brand (alinhado à esquerda) */}
-          <div className="flex items-center gap-2">
-            <img
-              src="/sino-de-notificacao.png"
-              alt="Logo"
-              className="w-6 h-6 object-contain flex-shrink-0"
-            />
-            <h2 className="text-lg font-bold text-gray-900 hidden md:block">
-              <span style={{ color: defaultStore?.color ?? '#2563eb' }}>
-                {defaultStore?.name ?? ''}
-              </span>
-            </h2>
-          </div>
+    <>
+      <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:grid md:grid-cols-[1fr_auto_1fr]">
+            {/* Coluna 1 — Logo/Brand (alinhado à esquerda) */}
+            <div className="flex items-center gap-2">
+              <img src="/sino-de-notificacao.png" alt="Logo" className="w-6 h-6 object-contain flex-shrink-0" />
+              <h2 className="text-lg font-bold text-gray-900 hidden md:block">
+                <span style={{ color: defaultStore?.color ?? '#2563eb' }}>{defaultStore?.name ?? ''}</span>
+              </h2>
+            </div>
 
-          {/* Coluna 2 — Tabs (centralizado) */}
-          <div className="flex justify-around md:justify-center md:gap-1 bg-gray-100 rounded-t-lg md:rounded-lg px-2 md:px-1 py-1 fixed md:static bottom-0 right-0 left-0 z-50 border-t md:border-0 border-gray-200 shadow-lg md:shadow-none">
-            {[
-              { path: '/dashboard', icon: 'fa-tachometer-alt', label: 'Painel', active: isDashboard },
-              { path: '/register', icon: 'fa-user-plus', label: 'Cadastrar', active: isRegister },
-              { path: '/search', icon: 'fa-magnifying-glass', label: 'Buscar', active: isSearch },
-              { path: '/history', icon: 'fa-clock-rotate-left', label: 'Histórico', active: isHistory },
-            ].map(({ path, icon, label, active }) => (
+            {/* Coluna 2 — Tabs (centralizado) — Hidden em mobile, displayed no Desktop */}
+            <div className="hidden md:flex justify-center gap-1 bg-gray-100 rounded-lg px-1 py-1">
+              {[
+                { path: '/dashboard', icon: 'fa-tachometer-alt', label: 'Painel', active: isDashboard },
+                { path: '/register', icon: 'fa-user-plus', label: 'Cadastrar', active: isRegister },
+                { path: '/search', icon: 'fa-magnifying-glass', label: 'Buscar', active: isSearch },
+                { path: '/history', icon: 'fa-clock-rotate-left', label: 'Histórico', active: isHistory },
+              ].map(({ path, icon, label, active }) => (
+                <button
+                  key={path}
+                  onClick={() => navigate(path)}
+                  className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+                    active ? 'bg-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  style={active ? { color: 'var(--color-brand)' } : undefined}
+                >
+                  <i className={`fa-solid ${icon} text-xl md:text-base`}></i>
+                  <span className="text-[10px] md:text-xs lg:text-sm">{label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Coluna 3 — Ações (alinhado à direita) */}
+            <div className="flex items-center justify-end gap-2">
               <button
-                key={path}
-                onClick={() => navigate(path)}
-                className={`flex flex-col md:flex-row items-center gap-0.5 md:gap-1.5 px-3 md:px-4 lg:px-5 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
-                  active ? 'bg-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
-                }`}
-                style={active ? { color: 'var(--color-brand)' } : undefined}
+                onClick={() => setIsSettingsOpen(true)}
+                className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
+                title="Configurações de Lojas"
               >
-                <i className={`fa-solid ${icon} text-xl md:text-base`}></i>
-                <span className="text-[10px] md:text-xs lg:text-sm">{label}</span>
+                <i className="fa-solid fa-gear text-lg"></i>
               </button>
-            ))}
-          </div>
-
-          {/* Coluna 3 — Ações (alinhado à direita) */}
-          <div className="flex items-center justify-end gap-2">
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-blue-600 hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
-              title="Configurações de Lojas"
-            >
-              <i className="fa-solid fa-gear text-lg"></i>
-            </button>
-            <button
-              onClick={() => logout()}
-              className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer"
-              title="Sair do sistema"
-            >
-              <i className="fa-solid fa-right-from-bracket text-lg"></i>
-            </button>
+              <button
+                onClick={() => logout()}
+                className="flex items-center justify-center w-9 h-9 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-200 cursor-pointer"
+                title="Sair do sistema"
+              >
+                <i className="fa-solid fa-right-from-bracket text-lg"></i>
+              </button>
+            </div>
           </div>
         </div>
+        {/* Modal de Configurações */}
+        <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       </div>
-      {/* Modal de Configurações */}
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-    </div>
+
+      {/* Mobile Navigation — Fixa na parte inferior em mobile */}
+      <div className="md:hidden fixed bottom-0 right-0 left-0 z-50 bg-gray-100 border-t border-gray-200 shadow-lg">
+        <div className="flex justify-around gap-1 px-2 py-1">
+          {[
+            { path: '/dashboard', icon: 'fa-tachometer-alt', label: 'Painel', active: isDashboard },
+            { path: '/register', icon: 'fa-user-plus', label: 'Cadastrar', active: isRegister },
+            { path: '/search', icon: 'fa-magnifying-glass', label: 'Buscar', active: isSearch },
+            { path: '/history', icon: 'fa-clock-rotate-left', label: 'Histórico', active: isHistory },
+          ].map(({ path, icon, label, active }) => (
+            <button
+              key={path}
+              onClick={() => navigate(path)}
+              className={`flex flex-col items-center gap-0.5 px-3 py-2 rounded-md font-medium transition-all duration-200 cursor-pointer ${
+                active ? 'bg-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+              }`}
+              style={active ? { color: 'var(--color-brand)' } : undefined}
+            >
+              <i className={`fa-solid ${icon} text-xl`}></i>
+              <span className="text-[10px]">{label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
-
 export default Navigation;
