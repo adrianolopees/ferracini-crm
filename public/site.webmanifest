@@ -1,7 +1,7 @@
 {
-  "name": "Ferracini CRM - Reservas",
-  "short_name": "Ferracini CRM",
-  "description": "Sistema de reservas de clientes Ferracini Maxi Shopping",
+  "name": "ContactFlow",
+  "short_name": "ContactFlow",
+  "description": "CRM inteligente para gestão de clientes, reservas e acompanhamento de vendas",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
