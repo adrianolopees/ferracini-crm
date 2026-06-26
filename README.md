@@ -1,309 +1,240 @@
-# 🏪 Ferracini CRM - Sistema de Gestão de Reservas
+<h1 align="center">Ferracini CRM</h1>
 
-<div align="center">
+<p align="center">
+  Sistema de gestão de reservas para rede de calçados — controle do funil completo do atendimento, do cadastro ao fechamento da venda.
+</p>
 
-![React](https://img.shields.io/badge/React-19.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-12.3-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
-![Vite](https://img.shields.io/badge/Vite-7.1-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.1-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-
-</div>
-
-Sistema profissional de CRM para gerenciamento de reservas de produtos da loja Ferracini. Desenvolvido com React, TypeScript, Firebase e Tailwind CSS.
-
-## ✨ Funcionalidades
-
-### 📊 Dashboard
-- ⚡ Visualização em tempo real de métricas principais
-- 🎯 Cards interativos com modals de detalhes
-- ⏰ Indicadores de urgência (clientes aguardando 7+ dias)
-- 📈 Cálculo automático de tempo médio de espera
-
-### 👥 Gestão de Clientes
-- ✍️ **Cadastro de Reservas**: Formulário validado com Zod para registro de novos clientes
-- 🔍 **Busca Inteligente**: Pesquisa por nome, telefone, modelo ou cor
-- 💬 **Contato via WhatsApp**: Integração direta com WhatsApp Web
-- 🎨 **Indicadores Visuais**: Cores para identificar urgência de atendimento
-
-### 🔒 Segurança
-- 🔐 Autenticação via Firebase Auth
-- 🛡️ Rotas protegidas (acesso apenas para usuários autenticados)
-- ✅ Regras de segurança do Firestore configuradas
-
-## 🛠️ Stack Tecnológica
-
-### Core
-- **React 19** - Biblioteca UI
-- **TypeScript** - Tipagem estática
-- **Vite** - Build tool e dev server
-- **Firebase 12** - Backend (Firestore + Auth)
-
-### UI/UX
-- **Tailwind CSS 4** - Estilização
-- **Framer Motion** - Animações suaves
-- **Radix UI** - Componentes acessíveis (Dialog)
-- **React Hot Toast** - Notificações
-- **React Router DOM** - Navegação
-
-### Qualidade de Código
-- **ESLint 9** - Linting com flat config
-- **Prettier** - Formatação automática
-- **React Hook Form** - Gerenciamento de formulários
-- **Zod** - Validação de schemas
-
-### Utilitários
-- **date-fns** - Manipulação de datas
-- **@hookform/resolvers** - Integração React Hook Form + Zod
-
-## 📋 Pré-requisitos
-
-- Node.js 18+ ou superior
-- Yarn ou npm
-- Conta no Firebase (Firestore + Authentication)
-
-## 🚀 Instalação
-
-### 1. Clone o repositório
-```bash
-git clone <seu-repositorio>
-cd salvar-contatos-loja-v2
-```
-
-### 2. Instale as dependências
-```bash
-yarn install
-# ou
-npm install
-```
-
-### 3. Configure as variáveis de ambiente
-
-Copie o arquivo `.env.example` para `.env`:
-```bash
-cp .env.example .env
-```
-
-Preencha as credenciais do Firebase no arquivo `.env`:
-```env
-VITE_FIREBASE_API_KEY=sua_api_key
-VITE_FIREBASE_AUTH_DOMAIN=seu_auth_domain
-VITE_FIREBASE_PROJECT_ID=seu_project_id
-VITE_FIREBASE_STORAGE_BUCKET=seu_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
-VITE_FIREBASE_APP_ID=seu_app_id
-```
-
-### 4. Configure o Firebase
-
-#### Firestore Database
-Crie uma coleção chamada `customers` com a seguinte estrutura:
-```typescript
-{
-  name: string
-  phone: string
-  model: string
-  color: string
-  size: string
-  createdAt: Timestamp
-}
-```
-
-#### Authentication
-Ative o método de autenticação **Email/Password** no console do Firebase.
-
-#### Regras de Segurança do Firestore
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /customers/{customerId} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}
-```
-
-### 5. Execute o projeto
-
-```bash
-# Modo desenvolvimento
-yarn dev
-
-# Build para produção
-yarn build
-
-# Preview da build
-yarn preview
-
-# Linting
-yarn lint
-
-# Formatação
-yarn format
-```
-
-O servidor de desenvolvimento estará rodando em `http://localhost:5173`
-
-## 📁 Estrutura do Projeto
-
-```
-salvar-contatos-loja-v2/
-├── src/
-│   ├── components/
-│   │   ├── ui/              # Componentes UI reutilizáveis
-│   │   │   ├── Button.tsx
-│   │   │   ├── Input.tsx
-│   │   │   ├── Modal.tsx
-│   │   │   ├── Spinner.tsx
-│   │   │   ├── Navigation.tsx
-│   │   │   └── DialogModal.tsx
-│   │   ├── animations/      # Componentes com animações
-│   │   │   ├── AnimatedButton.tsx
-│   │   │   ├── AnimatedContainer.tsx
-│   │   │   └── AnimatedList.tsx
-│   │   ├── CustomerListModal.tsx
-│   │   └── ProtectedRoute.tsx
-│   ├── pages/
-│   │   ├── Dashboard.tsx
-│   │   ├── RegisterCustomer.tsx
-│   │   ├── SearchCustomers.tsx
-│   │   └── Login.tsx
-│   ├── contexts/
-│   │   └── AuthContext.tsx  # Contexto de autenticação
-│   ├── hooks/
-│   │   ├── useAuth.ts
-│   │   ├── useDashboardMetrics.ts
-│   │   └── useCustomersList.ts
-│   ├── lib/
-│   │   └── firebase.ts      # Configuração do Firebase
-│   ├── utils/
-│   │   └── date.ts          # Funções utilitárias
-│   ├── App.tsx
-│   └── main.tsx
-├── public/                   # Assets estáticos
-├── .env.example             # Template de variáveis de ambiente
-├── vite.config.ts           # Configuração do Vite
-├── tsconfig.json            # Configuração do TypeScript
-├── eslint.config.js         # Configuração do ESLint
-├── .prettierrc              # Configuração do Prettier
-└── package.json
-```
-
-## 📜 Scripts Disponíveis
-
-| Script | Descrição |
-|--------|-----------|
-| `yarn dev` | Inicia o servidor de desenvolvimento |
-| `yarn build` | Gera build de produção na pasta `dist/` |
-| `yarn preview` | Preview da build de produção |
-| `yarn lint` | Executa o ESLint para encontrar problemas |
-| `yarn format` | Formata código com Prettier |
-
-## 🌐 Deploy
-
-### Vercel (Recomendado)
-
-O projeto já está configurado com `vercel.json` para deploy automático:
-
-1. Instale o Vercel CLI:
-```bash
-npm i -g vercel
-```
-
-2. Faça o deploy:
-```bash
-vercel
-```
-
-3. Configure as variáveis de ambiente no painel da Vercel (Settings > Environment Variables)
-
-### Firebase Hosting (Alternativa)
-
-```bash
-# Instale o Firebase CLI
-npm install -g firebase-tools
-
-# Login no Firebase
-firebase login
-
-# Inicialize o projeto
-firebase init hosting
-
-# Build e deploy
-yarn build
-firebase deploy
-```
-
-## 📝 Convenções de Código
-
-### TypeScript
-- Strict mode habilitado
-- Path alias: `@/` para imports (ex: `import { Button } from '@/components/ui/Button'`)
-
-### Estilo de Código
-- Single quotes para strings
-- Ponto e vírgula obrigatório
-- Tab width: 2 espaços
-- Print width: 80 caracteres
-
-### Commits
-Siga a convenção de commits semânticos:
-- `feat:` Nova funcionalidade
-- `fix:` Correção de bug
-- `docs:` Documentação
-- `style:` Formatação
-- `refactor:` Refatoração
-- `test:` Testes
-- `chore:` Manutenção
-
-## 🗺️ Próximas Funcionalidades (Roadmap)
-
-- [ ] Histórico de clientes contactados
-- [ ] Paginação na busca de clientes
-- [ ] Filtros avançados (cor, numeração, data)
-- [ ] Gráficos e visualizações de dados
-- [ ] Modo escuro
-- [ ] PWA (funcionar offline)
-- [ ] Exportar relatórios em PDF/Excel
-
-Veja o arquivo `TODO.md` para o roadmap completo.
-
-## 🔧 Troubleshooting
-
-### Erro de autenticação do Firebase
-Verifique se:
-- As credenciais no `.env` estão corretas
-- O método Email/Password está ativado no Firebase Console
-- As regras de segurança do Firestore permitem acesso autenticado
-
-### Erro ao fazer build
-```bash
-# Limpe o cache e reinstale
-rm -rf node_modules yarn.lock
-yarn install
-yarn build
-```
-
-### Porta 5173 já está em uso
-Altere a porta em `vite.config.ts`:
-```typescript
-server: {
-  port: 3000, // ou outra porta disponível
-}
-```
-
-## 🤝 Contribuindo
-
-1. Crie uma branch para sua feature: `git checkout -b feat/nova-feature`
-2. Commit suas mudanças: `git commit -m 'feat: adiciona nova feature'`
-3. Push para a branch: `git push origin feat/nova-feature`
-4. Abra um Pull Request
-
-## 📄 Licença
-
-Este projeto é proprietário e confidencial. Todos os direitos reservados.
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white&style=flat-square" />
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178c6?logo=typescript&logoColor=white&style=flat-square" />
+  <img src="https://img.shields.io/badge/Firebase-12-ffca28?logo=firebase&logoColor=black&style=flat-square" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-38bdf8?logo=tailwindcss&logoColor=white&style=flat-square" />
+  <img src="https://img.shields.io/badge/Vite-7-646cff?logo=vite&logoColor=white&style=flat-square" />
+  <img src="https://img.shields.io/badge/deploy-Vercel-000?logo=vercel&logoColor=white&style=flat-square" />
+</p>
 
 ---
 
-Desenvolvido com React + TypeScript + Firebase
+## Demo ao vivo
+
+**[https://ferracini-crm.vercel.app](https://ferracini-crm.vercel.app)**
+
+| Campo | Valor |
+|-------|-------|
+| E-mail | `demo@lojacrm.com` |
+| Senha | `demo123456` |
+
+> O workspace demo vem pré-carregado com ~60 clientes fictícios cobrindo todos os estados do funil: ativos, urgentes (+14 dias), em transferência, prontos para retirada, finalizados e arquivados.
+
+---
+
+## O problema que resolve
+
+Redes de calçados gerenciam reservas por WhatsApp e cadernos físicos — sem visibilidade de quem está esperando há quanto tempo, sem rastreamento de transferências entre filiais e sem métricas de conversão. O Ferracini CRM centraliza tudo em um painel em tempo real.
+
+---
+
+## Funcionalidades
+
+### Painel principal (Dashboard)
+- 8 cards de métricas em tempo real: total ativo, pronto para retirada, em transferência, finalizados, arquivados, média de espera, urgentes (+14 dias) e longa espera (+30 dias)
+- Cada card abre um modal com a lista de clientes daquele grupo
+- Alerta automático para clientes aguardando há mais de 30 dias
+- Ações por cliente direto no card: consultar filial, confirmar/rejeitar estoque, registrar transferência, notificar chegada, finalizar compra, arquivar
+
+### Gráficos analíticos (Recharts)
+- Produtos mais reservados
+- Ranking de vendedores por conversão
+- Motivos de arquivamento (loss reasons)
+- Velocidade de conversão do funil
+
+### Gestão de clientes
+- Cadastro de reserva com validação em tempo real (Zod + React Hook Form) — nome, telefone com máscara, modelo, referência, tamanho, cor, vendedor
+- Busca inteligente por nome, modelo ou referência com ações rápidas
+- Histórico completo: finalizados, transferências entre filiais, arquivados e candidatos a auto-arquivamento (+60 dias)
+
+### Integração WhatsApp
+- Consulta de estoque em outras filiais via link direto para WhatsApp Web
+- Notificação automática ao cliente quando o produto chega
+- Mensagens pré-preenchidas com dados do produto e da loja
+
+### Configurações de workspace
+- Gerenciar filiais (nome, telefone, cor de destaque)
+- Gerenciar equipe de vendedores
+- Cor da loja refletida como variável CSS em todo o sistema
+
+---
+
+## Stack
+
+| Categoria | Tecnologia |
+|-----------|------------|
+| UI | React 19 + TypeScript 5.9 |
+| Build | Vite 7 |
+| Estilização | Tailwind CSS 4 |
+| Roteamento | React Router DOM 7 |
+| Formulários | React Hook Form 7 + Zod 4 |
+| Animações | Framer Motion 12 |
+| Gráficos | Recharts 3 |
+| Notificações | Sonner 2 |
+| Modal | Radix UI Dialog |
+| Backend | Firebase 12 (Firestore + Auth) |
+| Datas | date-fns 4 |
+| Testes | Vitest 4 |
+| Linting | ESLint 9 (flat config) + Prettier 3 |
+| Deploy | Vercel |
+
+---
+
+## Arquitetura
+
+Arquitetura em camadas onde cada camada só conhece a imediatamente abaixo:
+
+```
+Pages → Hooks → Contexts → Services → Repositories → Firebase
+         ↑                                  ↑
+      Schemas (Zod)                    Utils (puras)
+```
+
+| Camada | Responsabilidade |
+|--------|-----------------|
+| `pages/` | Orquestra UI e estado local; chama hooks |
+| `hooks/` | Busca dados, calcula métricas, expõe estado para páginas |
+| `contexts/` | Estado global (Auth, StoreSettings) com listeners real-time |
+| `services/` | Lógica de negócio pura — métricas e integração WhatsApp |
+| `repositories/` | Único ponto de acesso ao Firestore; toda query filtra por `workspaceId` |
+| `schemas/` | Validação Zod + tipos derivados via `z.infer<>` |
+| `utils/` | Funções puras sem efeitos colaterais |
+
+**Isolamento multi-tenant:** cada workspace é isolado por `workspaceId`. Nenhuma query retorna dados de outro workspace — garantia implementada tanto no repository quanto nas regras do Firestore.
+
+---
+
+## Estrutura de pastas
+
+```
+src/
+├── components/
+│   ├── animations/     # Wrappers Framer Motion
+│   ├── dashboard/      # MetricCard, ActionCard, WorkflowCard, gráficos
+│   ├── history/        # Cards de histórico por tipo
+│   ├── layout/         # Navigation, PageLayout, PageHeader
+│   ├── modals/         # DialogModal, CustomerListModal, ArchiveModal, ConfirmModal
+│   ├── settings/       # SettingsModal (lojas e vendedores)
+│   ├── skeletons/      # Loading states
+│   └── ui/             # Button, Input, Select, Spinner, Tabs, Skeleton
+├── contexts/           # AuthContext, StoreSettingsContext
+├── hooks/              # useCustomerDashboard, useCustomerHistory, useProductRanking
+├── pages/              # Dashboard, RegisterCustomer, SearchCustomers, History, Login
+├── repositories/       # customerRepository, storeSettingsRepository, userRepository
+├── schemas/            # customerSchema, storeSettingsSchema, userSchema, loginSchema
+├── scripts/            # Seed e cleanup de dados demo
+├── services/           # firebase, customerMetricsService, whatsappService
+└── utils/              # dateUtils, phoneUtils, firebaseErrors, customerStatus
+```
+
+---
+
+## Rodando localmente
+
+**Pré-requisitos:** Node.js 20+, Yarn, projeto Firebase com Firestore e Authentication habilitados.
+
+```bash
+# 1. Clone
+git clone https://github.com/seu-usuario/ferracini-crm.git
+cd ferracini-crm
+
+# 2. Dependências
+yarn install
+
+# 3. Variáveis de ambiente
+cp .env.example .env
+# Preencha .env com suas credenciais do Firebase
+
+# 4. Inicie
+yarn dev   # http://localhost:5173
+```
+
+### Variáveis de ambiente
+
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
+
+### Scripts disponíveis
+
+| Script | Descrição |
+|--------|-----------|
+| `yarn dev` | Dev server em localhost:5173 |
+| `yarn build` | Build de produção |
+| `yarn preview` | Preview da build |
+| `yarn type-check` | Verificação TypeScript |
+| `yarn test` | Testes com Vitest |
+| `yarn lint` | ESLint |
+| `yarn format` | Prettier |
+| `yarn seed:demo` | Popula workspace demo com ~60 clientes fictícios |
+| `yarn clear:demo` | Remove clientes do workspace demo |
+| `yarn seed:stores` | Cria configurações iniciais de lojas |
+
+---
+
+## Modelo de dados
+
+### `customers/{id}`
+
+```ts
+{
+  workspaceId: string
+  name: string
+  phone: string                  // Formato: (XX) 9XXXX-XXXX
+  model: string
+  reference: string
+  size: string
+  color: string
+  salesperson: string
+  createdAt: string              // ISO 8601
+  status: 'pending' | 'awaitingTransfer' | 'readyForPickup' | 'completed'
+  archived: boolean
+  archiveReason?: 'gave_up' | 'no_response' | 'bought_elsewhere'
+                | 'product_unavailable' | 'other' | 'exceeded_wait_time'
+  sourceStore?: string           // Filial de origem da transferência
+  consultingStore?: string       // Filial sendo consultada
+  contactedAt?: string
+  transferredAt?: string
+  completedAt?: string
+  archivedAt?: string
+}
+```
+
+### `workspace_settings/{workspaceId}`
+
+```ts
+{
+  stores: Array<{ id: string; name: string; phone: string; color: string }>
+  salespeople: string[]
+  updatedAt: string
+}
+```
+
+---
+
+## Decisões técnicas
+
+**Zod como source of truth:** todos os tipos derivam de schemas Zod via `z.infer<>`. Validação em runtime e tipo estático a partir de um único lugar. Dados do Firestore passam por `safeParse` antes de chegar ao componente — sem `any`, sem cast forçado.
+
+**Context em vez de Redux/Zustand:** o estado global real é mínimo (auth + store settings). React Context com listeners Firestore atende com zero dependência extra. Estado de UI fica colocado no componente que o consome (colocation).
+
+**`refreshTrigger` em vez de listeners real-time no dashboard:** o dashboard processa 60+ registros com agregações complexas. Listener em toda a coleção seria custoso. A UI invalida o cache via `refreshTrigger` apenas após ações do usuário.
+
+**Datas centralizadas em `dateUtils`:** toda operação de data passa por `date-fns` + `parseISO` + `isValid`. Timestamps armazenados como ISO string via `getCurrentTimestamp()`. Zero `new Date()` espalhado no código.
+
+---
+
+## Licença
+
+Projeto privado — todos os direitos reservados.
