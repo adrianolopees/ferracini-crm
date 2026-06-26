@@ -16,11 +16,17 @@ function Login() {
     register,
     handleSubmit,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     mode: 'onSubmit',
   });
+
+  const fillDemo = () => {
+    setValue('email', 'demo@lojacrm.com');
+    setValue('password', 'demo123456');
+  };
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -52,6 +58,25 @@ function Login() {
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-1">Ferracini</h1>
             <p className="text-gray-600 text-sm">Sistema de Reservas</p>
+          </div>
+
+          {/* Demo banner */}
+          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4">
+            <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide mb-1">
+              Acesso de demonstração
+            </p>
+            <p className="text-sm text-blue-800 mb-3">
+              <span className="font-mono">demo@lojacrm.com</span>
+              {' · '}
+              <span className="font-mono">demo123456</span>
+            </p>
+            <button
+              type="button"
+              onClick={fillDemo}
+              className="text-xs font-medium text-blue-700 underline underline-offset-2 hover:text-blue-900 transition-colors"
+            >
+              Preencher automaticamente
+            </button>
           </div>
 
           {/* Form */}
